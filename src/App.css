@@ -1,0 +1,56 @@
+
+/* Shared component styles: visual values come from the active theme. */
+
+.app {
+    min-height: 100vh;
+    background: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-family);
+}
+
+.app *,
+.app *::before,
+.app *::after {
+    box-sizing: border-box;
+}
+
+.card {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border: var(--border-heavy) solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.heading {
+    color: var(--color-text);
+    font-weight: var(--heading-weight);
+    text-transform: var(--heading-transform);
+    letter-spacing: var(--heading-letter-spacing);
+}
+
+.app button {
+    font-family: var(--font-family);
+    font-weight: var(--font-weight);
+    color: var(--color-text);
+    background: var(--color-primary);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-small);
+    box-shadow: var(--shadow-small);
+}
+
+.app input,
+.app select {
+    font-family: var(--font-family);
+    color: var(--color-text);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-small);
+}
+
+.badge {
+    background: var(--color-highlight);
+    color: var(--color-text);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-small);
+}

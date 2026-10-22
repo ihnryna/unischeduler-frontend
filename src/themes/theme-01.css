@@ -1,0 +1,512 @@
+
+/* THEME 01 — NEO-BRUTALIST */
+
+.app[data-theme="theme-01"] {
+    --color-background: #f5f0df;
+    --color-surface: #fffdf5;
+    --color-text: #171717;
+    --color-border: #171717;
+    --color-primary: #00cfc1;
+    --color-highlight: #ff00c8;
+    --color-muted: #59564e;
+
+    --page: #f5f0df;
+    --surface: #fffdf5;
+    --ink: #171717;
+    --muted: #59564e;
+    --accent: #00cfc1;
+    --mint: #00cfc1;
+    --peach: #ffb8e8;
+    --blue: #b8d8ff;
+    --yellow: #ffd500;
+    --pink: #ff00c8;
+
+    --radius: 0px;
+    --radius-small: 0px;
+    --border-width: 2px;
+    --border-heavy: 2px;
+    --shadow: 5px 5px 0 #171717;
+    --shadow-small: 3px 3px 0 #171717;
+    --font-family: "Kyiv Type Sans", Inter, system-ui, sans-serif;
+    --font-weight: 650;
+    --heading-weight: 950;
+    --heading-transform: uppercase;
+    --heading-letter-spacing: -1px;
+
+    padding: 20px clamp(12px, 2.5vw, 36px) 32px;
+    background: var(--color-background);
+    color: var(--color-text);
+}
+
+.app[data-theme="theme-01"] .topbar {
+    border-bottom: 3px solid var(--ink);
+    margin-bottom: 24px;
+}
+
+.app[data-theme="theme-01"] .brand-logo {
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    background: var(--accent);
+    font-weight: 950;
+}
+
+.app[data-theme="theme-01"] .brand-text strong {
+    font-weight: 950;
+    letter-spacing: -1.2px;
+}
+
+.app[data-theme="theme-01"] .brand-text small {
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.app[data-theme="theme-01"] .semester-label {
+    background: var(--yellow);
+    border: 2px solid var(--ink);
+    font-weight: 850;
+}
+
+.app[data-theme="theme-01"] .profile-button {
+    background: var(--pink);
+}
+
+.app[data-theme="theme-01"] .sidebar {
+    padding: 18px;
+    background: var(--surface);
+    border: 2px solid var(--ink);
+    box-shadow: var(--shadow);
+}
+
+.app[data-theme="theme-01"] .sidebar-label,
+.app[data-theme="theme-01"] .eyebrow {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-01"] .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    color: var(--ink);
+    border: 2px solid transparent;
+    text-decoration: none;
+    font-weight: 800;
+}
+
+.app[data-theme="theme-01"] .nav-link.active {
+    background: var(--yellow);
+    border-color: var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+}
+
+.app[data-theme="theme-01"] .nav-link:hover {
+    background: var(--accent-soft, #b5fff6);
+}
+
+.app[data-theme="theme-01"] .sidebar-divider {
+    height: 3px;
+    background: var(--ink);
+}
+
+.app[data-theme="theme-01"] .sidebar-stat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--ink);
+}
+
+.app[data-theme="theme-01"] .stat-icon {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border: 2px solid var(--ink);
+    background: var(--pink);
+}
+
+.app[data-theme="theme-01"] .mint-icon {
+    background: var(--accent);
+}
+
+.app[data-theme="theme-01"] .sidebar-note {
+    padding: 14px;
+    border: 2px solid var(--ink);
+    background: var(--yellow);
+    box-shadow: 3px 3px 0 var(--ink);
+}
+
+.app[data-theme="theme-01"] .sidebar-footer {
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.app[data-theme="theme-01"] .page-heading h1 {
+    font-size: clamp(30px, 4vw, 48px);
+    line-height: 1.04;
+    font-weight: 950;
+    letter-spacing: -2px;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-01"] .page-description {
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.app[data-theme="theme-01"] button {
+    border: 2px solid var(--ink);
+    border-radius: 0;
+    background: var(--accent);
+    color: var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    font-weight: 850;
+    cursor: pointer;
+    transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.app[data-theme="theme-01"] button:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--ink);
+}
+
+.app[data-theme="theme-01"] button:active {
+    transform: translate(3px, 3px);
+    box-shadow: none;
+}
+
+.app[data-theme="theme-01"] .primary-button {
+    padding: 13px 18px;
+    background: var(--pink);
+}
+
+.app[data-theme="theme-01"] .week-toolbar {
+    padding: 14px 18px;
+    border: 2px solid var(--ink);
+    background: var(--yellow);
+    box-shadow: var(--shadow);
+}
+
+.app[data-theme="theme-01"] .week-icon {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    border: 2px solid var(--ink);
+    background: var(--accent);
+}
+
+.app[data-theme="theme-01"] .week-toolbar h2 {
+    font-weight: 950;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-01"] .week-controls button {
+    min-height: 38px;
+    min-width: 38px;
+    padding: 8px 12px;
+    background: var(--surface);
+}
+
+.app[data-theme="theme-01"] .week-controls .today-button {
+    background: var(--pink);
+}
+
+.app[data-theme="theme-01"] .calendar {
+    border: 2px solid var(--ink);
+    border-radius: 0;
+    box-shadow: var(--shadow);
+    background: var(--surface);
+}
+
+.app[data-theme="theme-01"] .calendar-header {
+    background: var(--accent);
+    border-bottom: 3px solid var(--ink);
+}
+
+.app[data-theme="theme-01"] .calendar-header > * {
+    padding: 12px 5px;
+    border-right: 1px solid var(--ink);
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-01"] .day-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.app[data-theme="theme-01"] .day-header.selected {
+    background: var(--pink);
+}
+
+.app[data-theme="theme-01"] .calendar-body {
+    background-color: var(--surface);
+    background-image: repeating-linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent 63px,
+            rgb(0 0 0 / 16%) 63px,
+            rgb(0 0 0 / 16%) 64px
+    );
+}
+
+.app[data-theme="theme-01"] .time-column {
+    background: var(--yellow);
+    border-right: 2px solid var(--ink);
+}
+
+.app[data-theme="theme-01"] .time-label {
+    height: 64px;
+    padding: 5px;
+    font-size: 10px;
+    font-weight: 850;
+}
+
+.app[data-theme="theme-01"] .hour-slot {
+    border-bottom: 1px solid rgb(0 0 0 / 10%);
+}
+
+.app[data-theme="theme-01"] .day-column-selected {
+    background-color: rgb(255 0 200 / 8%);
+}
+
+.app[data-theme="theme-01"] .lesson-card {
+    padding: 8px;
+    border: 2px solid var(--ink);
+    border-radius: 0;
+    box-shadow: 3px 3px 0 var(--ink);
+    color: var(--ink);
+}
+
+.app[data-theme="theme-01"] .lesson-purple {
+    background: var(--pink);
+}
+
+.app[data-theme="theme-01"] .lesson-mint {
+    background: var(--accent);
+}
+
+.app[data-theme="theme-01"] .lesson-peach {
+    background: var(--peach);
+}
+
+.app[data-theme="theme-01"] .lesson-blue {
+    background: var(--blue);
+}
+
+.app[data-theme="theme-01"] .lesson-time {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.app[data-theme="theme-01"] .lesson-title {
+    font-size: 12px;
+    line-height: 1.25;
+    font-weight: 950;
+}
+
+.app[data-theme="theme-01"] .lesson-type,
+.app[data-theme="theme-01"] .lesson-detail,
+.app[data-theme="theme-01"] .lesson-teacher {
+    display: block;
+    margin-top: 4px;
+    font-size: 10px;
+    line-height: 1.3;
+    font-weight: 750;
+}
+
+.app[data-theme="theme-01"] .bottom-widgets > * {
+    padding: 18px;
+    border: 2px solid var(--ink);
+    border-radius: 0;
+    box-shadow: var(--shadow);
+    background: var(--surface);
+}
+
+.app[data-theme="theme-01"] .bottom-widgets > *:nth-child(2) {
+    background: #fff0fb;
+}
+
+.app[data-theme="theme-01"] .upcoming-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 58px;
+    padding: 8px;
+    border: 2px solid var(--ink);
+    background: var(--yellow);
+}
+
+.app[data-theme="theme-01"] .upcoming-lesson {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.app[data-theme="theme-01"] .upcoming-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.app[data-theme="theme-01"] .overview-stats > div {
+    padding: 12px 6px;
+    border: 2px solid var(--ink);
+    background: var(--accent);
+    text-align: center;
+}
+
+.app[data-theme="theme-01"] .overview-stats strong,
+.app[data-theme="theme-01"] .overview-stats span {
+    display: block;
+}
+
+.app[data-theme="theme-01"] .overview-stats strong {
+    font-size: 23px;
+    font-weight: 950;
+}
+
+.app[data-theme="theme-01"] .page-footer {
+    border-top: 2px solid var(--ink);
+    padding-top: 14px;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.app[data-theme="theme-01"] .demo-notice {
+    padding: 12px;
+    border: 2px dashed var(--ink);
+    background: var(--yellow);
+}
+
+@media (max-width: 900px) {
+    .app[data-theme="theme-01"] .page-heading {
+        align-items: flex-start;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app[data-theme="theme-01"] button {
+        transition: none;
+    }
+}
+
+
+/* ===== HEADER: NEO-BRUTALISM ===== */
+
+.app[data-theme="theme-01"] .topbar {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    min-height: 94px;
+    padding: 18px 32px;
+    background: #fffdf5;
+    border-bottom: 3px solid #191919;
+}
+
+.app[data-theme="theme-01"] .brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.app[data-theme="theme-01"] .brand-logo {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    color: #191919;
+    background: #b8f34b;
+    border: 3px solid #191919;
+    border-radius: 0;
+    box-shadow: 4px 4px 0 #191919;
+    font-size: 22px;
+    font-weight: 900;
+    transform: rotate(-3deg);
+}
+
+.app[data-theme="theme-01"] .brand-text {
+    color: #191919;
+    font-size: clamp(20px, 2vw, 26px);
+    font-weight: 900;
+    letter-spacing: -1.1px;
+}
+
+.app[data-theme="theme-01"] .topbar-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.app[data-theme="theme-01"] .semester-label {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 9px 13px;
+    color: #191919;
+    background: #ffe66b;
+    border: 2px solid #191919;
+    border-radius: 0;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.app[data-theme="theme-01"] .profile-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 9px 15px;
+    color: #fffdf5;
+    background: #191919;
+    border: 2px solid #191919;
+    border-radius: 0;
+    box-shadow: 3px 3px 0 #ff70a6;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.app[data-theme="theme-01"] .profile-button:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 #ff70a6;
+}
+
+.app[data-theme="theme-01"] .profile-button:focus-visible {
+    outline: 3px solid #237cff;
+    outline-offset: 4px;
+}
+
+@media (max-width: 600px) {
+    .app[data-theme="theme-01"] .topbar {
+        padding: 16px 18px;
+    }
+
+    .app[data-theme="theme-01"] .topbar-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+}

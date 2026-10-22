@@ -1,0 +1,495 @@
+
+/* =========================================
+   UNIScheduler — Theme 10: Retro Learning
+   Kyiv Type Sans + playful editorial style
+   ========================================= */
+
+.app[data-theme="theme-10"] {
+    --retro-bg: #fff4e2;
+    --retro-paper: #fffdf8;
+    --retro-ink: #29251f;
+    --retro-muted: #71685c;
+    --retro-yellow: #f5c928;
+    --retro-pink: #f6c7d7;
+    --retro-blue: #c7d8ff;
+    --retro-green: #d6e9b8;
+    --retro-lilac: #d9c7f0;
+    --retro-line: #29251f;
+
+    background: var(--retro-bg);
+    color: var(--retro-ink);
+    font-family: "Kyiv Type Sans", sans-serif;
+    min-height: 100%;
+}
+
+.app[data-theme="theme-10"] *,
+.app[data-theme="theme-10"] *::before,
+.app[data-theme="theme-10"] *::after {
+    box-sizing: border-box;
+}
+
+/* Main background */
+.app[data-theme="theme-10"] .app-layout,
+.app[data-theme="theme-10"] .layout,
+.app[data-theme="theme-10"] .dashboard,
+.app[data-theme="theme-10"] .main-layout {
+    background: var(--retro-bg);
+    gap: 18px;
+}
+
+/* Sidebar */
+.app[data-theme="theme-10"] .sidebar,
+.app[data-theme="theme-10"] aside {
+    background: var(--retro-paper);
+    color: var(--retro-ink);
+    border: 2px solid var(--retro-line);
+    border-radius: 24px;
+    margin: 12px;
+    padding: 22px 16px;
+    box-shadow: 4px 4px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .sidebar *,
+.app[data-theme="theme-10"] aside * {
+    color: inherit;
+}
+
+.app[data-theme="theme-10"] .sidebar a,
+.app[data-theme="theme-10"] .sidebar button,
+.app[data-theme="theme-10"] aside a,
+.app[data-theme="theme-10"] aside button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 11px 13px;
+    margin-bottom: 5px;
+    background: transparent;
+    border: 2px solid transparent;
+    border-radius: 14px;
+    color: var(--retro-ink);
+    text-align: left;
+    transition: transform 150ms ease, background 150ms ease;
+}
+
+.app[data-theme="theme-10"] .sidebar a:hover,
+.app[data-theme="theme-10"] .sidebar button:hover,
+.app[data-theme="theme-10"] aside a:hover,
+.app[data-theme="theme-10"] aside button:hover {
+    background: var(--retro-pink);
+    border-color: var(--retro-ink);
+    transform: translateX(2px);
+}
+
+.app[data-theme="theme-10"] .sidebar .active,
+.app[data-theme="theme-10"] .sidebar [aria-current="page"],
+.app[data-theme="theme-10"] aside [aria-current="page"] {
+    background: var(--retro-yellow);
+    border-color: var(--retro-ink);
+    font-weight: 700;
+}
+
+/* Page header */
+.app[data-theme="theme-10"] header,
+.app[data-theme="theme-10"] .topbar,
+.app[data-theme="theme-10"] .page-header {
+    background: transparent;
+    border-bottom: 2px solid var(--retro-ink);
+    padding: 20px 24px;
+}
+
+.app[data-theme="theme-10"] h1,
+.app[data-theme="theme-10"] .page-title {
+    color: var(--retro-ink);
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 700;
+    letter-spacing: -0.055em;
+    line-height: 1.05;
+}
+
+.app[data-theme="theme-10"] h2,
+.app[data-theme="theme-10"] h3 {
+    color: var(--retro-ink);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+}
+
+.app[data-theme="theme-10"] p,
+.app[data-theme="theme-10"] small,
+.app[data-theme="theme-10"] .muted,
+.app[data-theme="theme-10"] .subtitle {
+    color: var(--retro-muted);
+}
+
+/* Cards and panels */
+.app[data-theme="theme-10"] .card,
+.app[data-theme="theme-10"] .panel,
+.app[data-theme="theme-10"] .widget,
+.app[data-theme="theme-10"] .calendar-card,
+.app[data-theme="theme-10"] .content-card {
+    background: var(--retro-paper);
+    border: 2px solid var(--retro-ink);
+    border-radius: 22px;
+    padding: 20px;
+    box-shadow: 4px 4px 0 var(--retro-ink);
+    transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.app[data-theme="theme-10"] .card:hover,
+.app[data-theme="theme-10"] .panel:hover,
+.app[data-theme="theme-10"] .widget:hover,
+.app[data-theme="theme-10"] .calendar-card:hover,
+.app[data-theme="theme-10"] .content-card:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 6px 6px 0 var(--retro-ink);
+}
+
+/* Buttons */
+.app[data-theme="theme-10"] button {
+    border: 2px solid var(--retro-ink);
+    border-radius: 14px;
+    background: var(--retro-paper);
+    color: var(--retro-ink);
+    padding: 10px 16px;
+    font: inherit;
+    font-weight: 600;
+    box-shadow: 3px 3px 0 var(--retro-ink);
+    cursor: pointer;
+    transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.app[data-theme="theme-10"] button:hover {
+    background: var(--retro-yellow);
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] button:active {
+    transform: translate(3px, 3px);
+    box-shadow: none;
+}
+
+.app[data-theme="theme-10"] button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Inputs */
+.app[data-theme="theme-10"] input,
+.app[data-theme="theme-10"] select,
+.app[data-theme="theme-10"] textarea {
+    width: 100%;
+    border: 2px solid var(--retro-ink);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--retro-ink);
+    padding: 11px 13px;
+    font: inherit;
+}
+
+.app[data-theme="theme-10"] input:focus,
+.app[data-theme="theme-10"] select:focus,
+.app[data-theme="theme-10"] textarea:focus {
+    outline: 3px solid var(--retro-yellow);
+    outline-offset: 2px;
+}
+
+/* Calendar grid */
+.app[data-theme="theme-10"] .calendar,
+.app[data-theme="theme-10"] .calendar-grid,
+.app[data-theme="theme-10"] .week-grid,
+.app[data-theme="theme-10"] .schedule-grid {
+    background: var(--retro-paper);
+    border: 2px solid var(--retro-ink);
+    border-radius: 20px;
+    overflow: hidden;
+    gap: 0;
+}
+
+.app[data-theme="theme-10"] .calendar-day,
+.app[data-theme="theme-10"] .day-cell,
+.app[data-theme="theme-10"] .calendar-cell,
+.app[data-theme="theme-10"] .time-slot {
+    min-width: 0;
+    background: var(--retro-paper);
+    border-right: 1px solid #d7cfc1;
+    border-bottom: 1px solid #d7cfc1;
+    padding: 8px;
+}
+
+.app[data-theme="theme-10"] .weekday,
+.app[data-theme="theme-10"] .weekday-header,
+.app[data-theme="theme-10"] .day-header {
+    background: var(--retro-yellow);
+    color: var(--retro-ink);
+    border-bottom: 2px solid var(--retro-ink);
+    padding: 12px 8px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+/* Lesson cards */
+.app[data-theme="theme-10"] .event,
+.app[data-theme="theme-10"] .event-card,
+.app[data-theme="theme-10"] .schedule-event,
+.app[data-theme="theme-10"] .lesson-card {
+    display: block;
+    padding: 10px 12px;
+    margin: 3px 0;
+    border: 2px solid var(--retro-ink);
+    border-radius: 13px;
+    background: var(--retro-lilac);
+    color: var(--retro-ink);
+    font-size: 0.84rem;
+    line-height: 1.35;
+    box-shadow: 2px 2px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .event:nth-child(4n + 1),
+.app[data-theme="theme-10"] .event-card:nth-child(4n + 1),
+.app[data-theme="theme-10"] .schedule-event:nth-child(4n + 1),
+.app[data-theme="theme-10"] .lesson-card:nth-child(4n + 1) {
+    background: var(--retro-blue);
+}
+
+.app[data-theme="theme-10"] .event:nth-child(4n + 2),
+.app[data-theme="theme-10"] .event-card:nth-child(4n + 2),
+.app[data-theme="theme-10"] .schedule-event:nth-child(4n + 2),
+.app[data-theme="theme-10"] .lesson-card:nth-child(4n + 2) {
+    background: var(--retro-pink);
+}
+
+.app[data-theme="theme-10"] .event:nth-child(4n + 3),
+.app[data-theme="theme-10"] .event-card:nth-child(4n + 3),
+.app[data-theme="theme-10"] .schedule-event:nth-child(4n + 3),
+.app[data-theme="theme-10"] .lesson-card:nth-child(4n + 3) {
+    background: var(--retro-green);
+}
+
+/* Category chips */
+.app[data-theme="theme-10"] .badge,
+.app[data-theme="theme-10"] .tag,
+.app[data-theme="theme-10"] .chip,
+.app[data-theme="theme-10"] .pill {
+    display: inline-flex;
+    align-items: center;
+    border: 2px solid var(--retro-ink);
+    border-radius: 999px;
+    padding: 5px 10px;
+    background: var(--retro-pink);
+    color: var(--retro-ink);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* Decorative highlights */
+.app[data-theme="theme-10"] hr,
+.app[data-theme="theme-10"] .divider {
+    border: 0;
+    border-top: 2px solid var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] ::selection {
+    background: var(--retro-yellow);
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] :focus-visible {
+    outline-color: var(--retro-ink);
+    outline-offset: 3px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .app[data-theme="theme-10"] .sidebar,
+    .app[data-theme="theme-10"] aside {
+        margin: 6px;
+        padding: 14px 10px;
+        border-radius: 18px;
+    }
+
+    .app[data-theme="theme-10"] .card,
+    .app[data-theme="theme-10"] .panel,
+    .app[data-theme="theme-10"] .widget,
+    .app[data-theme="theme-10"] .calendar-card,
+    .app[data-theme="theme-10"] .content-card {
+        padding: 14px;
+        border-radius: 17px;
+    }
+
+    .app[data-theme="theme-10"] header,
+    .app[data-theme="theme-10"] .topbar,
+    .app[data-theme="theme-10"] .page-header {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 620px) {
+    .app[data-theme="theme-10"] h1,
+    .app[data-theme="theme-10"] .page-title {
+        font-size: 2rem;
+    }
+
+    .app[data-theme="theme-10"] .calendar,
+    .app[data-theme="theme-10"] .calendar-grid,
+    .app[data-theme="theme-10"] .week-grid,
+    .app[data-theme="theme-10"] .schedule-grid {
+        overflow-x: auto;
+    }
+
+    .app[data-theme="theme-10"] button {
+        padding: 9px 12px;
+    }
+}
+
+
+/* =========================================
+   THEME 10 — COLOR BOOST
+   Додати в кінець theme-10.css
+   ========================================= */
+
+.app[data-theme="theme-10"] {
+    background: #fff4e2 !important;
+    color: #29251f;
+}
+
+/* Теплий кремовий фон усієї сторінки */
+.app[data-theme="theme-10"] .app-layout,
+.app[data-theme="theme-10"] .layout,
+.app[data-theme="theme-10"] .dashboard,
+.app[data-theme="theme-10"] .main-layout,
+.app[data-theme="theme-10"] main {
+    background-color: #fff4e2;
+}
+
+/* Білі панелі з виразним контуром */
+.app[data-theme="theme-10"] .card,
+.app[data-theme="theme-10"] .panel,
+.app[data-theme="theme-10"] .widget,
+.app[data-theme="theme-10"] .calendar-card,
+.app[data-theme="theme-10"] .content-card {
+    background-color: #fffdf8 !important;
+    border: 2px solid #29251f;
+    border-radius: 22px;
+    box-shadow: 4px 4px 0 #29251f;
+}
+
+/* Кольорові заголовки календаря */
+.app[data-theme="theme-10"] .weekday,
+.app[data-theme="theme-10"] .weekday-header,
+.app[data-theme="theme-10"] .day-header,
+.app[data-theme="theme-10"] thead,
+.app[data-theme="theme-10"] th {
+    background-color: #f5c928 !important;
+    color: #29251f !important;
+    border-color: #29251f;
+}
+
+/* Кольорові заняття */
+.app[data-theme="theme-10"] .event,
+.app[data-theme="theme-10"] .event-card,
+.app[data-theme="theme-10"] .schedule-event,
+.app[data-theme="theme-10"] .lesson-card {
+    background-color: #d9c7f0 !important;
+    color: #29251f !important;
+    border: 2px solid #29251f;
+    border-radius: 13px;
+    box-shadow: 2px 2px 0 #29251f;
+}
+
+/* Пастельні варіанти для занять */
+.app[data-theme="theme-10"] .event:nth-of-type(3n + 1),
+.app[data-theme="theme-10"] .event-card:nth-of-type(3n + 1),
+.app[data-theme="theme-10"] .schedule-event:nth-of-type(3n + 1),
+.app[data-theme="theme-10"] .lesson-card:nth-of-type(3n + 1) {
+    background-color: #c7d8ff !important;
+}
+
+.app[data-theme="theme-10"] .event:nth-of-type(3n + 2),
+.app[data-theme="theme-10"] .event-card:nth-of-type(3n + 2),
+.app[data-theme="theme-10"] .schedule-event:nth-of-type(3n + 2),
+.app[data-theme="theme-10"] .lesson-card:nth-of-type(3n + 2) {
+    background-color: #f6c7d7 !important;
+}
+
+/* Акцентні кнопки */
+.app[data-theme="theme-10"] button,
+.app[data-theme="theme-10"] .button {
+    border: 2px solid #29251f;
+    border-radius: 14px;
+    background-color: #fffdf8;
+    color: #29251f;
+    box-shadow: 3px 3px 0 #29251f;
+}
+
+.app[data-theme="theme-10"] button:hover,
+.app[data-theme="theme-10"] .button:hover {
+    background-color: #f5c928 !important;
+    color: #29251f !important;
+}
+
+/* Основна дія — жовта */
+.app[data-theme="theme-10"] .primary,
+.app[data-theme="theme-10"] .primary-button,
+.app[data-theme="theme-10"] button[type="submit"] {
+    background-color: #f5c928 !important;
+    color: #29251f !important;
+}
+
+/* Навігація */
+.app[data-theme="theme-10"] .sidebar,
+.app[data-theme="theme-10"] aside {
+    background-color: #fffdf8 !important;
+    border: 2px solid #29251f;
+    box-shadow: 4px 4px 0 #29251f;
+}
+
+.app[data-theme="theme-10"] .sidebar .active,
+.app[data-theme="theme-10"] .sidebar [aria-current="page"],
+.app[data-theme="theme-10"] aside [aria-current="page"] {
+    background-color: #f5c928 !important;
+    color: #29251f !important;
+}
+
+/* Теги та категорії */
+.app[data-theme="theme-10"] .badge,
+.app[data-theme="theme-10"] .tag,
+.app[data-theme="theme-10"] .chip,
+.app[data-theme="theme-10"] .pill {
+    background-color: #f6c7d7 !important;
+    color: #29251f !important;
+    border: 2px solid #29251f;
+    border-radius: 999px;
+}
+
+/* Рядки й комірки календаря */
+.app[data-theme="theme-10"] .calendar-day,
+.app[data-theme="theme-10"] .day-cell,
+.app[data-theme="theme-10"] .calendar-cell,
+.app[data-theme="theme-10"] .time-slot,
+.app[data-theme="theme-10"] td {
+    background-color: #fffdf8;
+    border-color: #e0d5c4;
+}
+
+/* Поля введення */
+.app[data-theme="theme-10"] input,
+.app[data-theme="theme-10"] select,
+.app[data-theme="theme-10"] textarea {
+    background-color: #fffdf8;
+    color: #29251f;
+    border: 2px solid #29251f;
+    border-radius: 12px;
+}
+
+/* Прибираємо стандартні холодні фони */
+.app[data-theme="theme-10"] .bg-white,
+.app[data-theme="theme-10"] .bg-gray,
+.app[data-theme="theme-10"] .bg-slate-50,
+.app[data-theme="theme-10"] .bg-neutral-50 {
+    background-color: #fffdf8 !important;
+}

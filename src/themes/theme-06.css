@@ -1,0 +1,716 @@
+
+/* =========================================================
+   THEME 06 — SWISS GRID / BRUTALIST TIMETABLE
+   Radical layout language: hard edges, flat color, no cards
+   ========================================================= */
+
+.app[data-theme="theme-06"] {
+    --color-background: #f1efe7;
+    --color-surface: #f8f7f2;
+    --color-text: #171717;
+    --color-primary: #e63825;
+    --color-highlight: #e8ff45;
+    --color-border: #171717;
+    --border-heavy: #171717;
+    --border-width: 1px;
+    --radius: 0;
+    --radius-small: 0;
+    --shadow: none;
+    --shadow-small: none;
+    --font-family: "Kyiv Type Sans", Arial, Helvetica, sans-serif;
+    --font-weight: 400;
+
+    min-height: 100vh;
+    color: #171717;
+    background: #f1efe7;
+    font-family: var(--font-family);
+}
+
+.app[data-theme="theme-06"] *,
+.app[data-theme="theme-06"] *::before,
+.app[data-theme="theme-06"] *::after {
+    box-sizing: border-box;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.app[data-theme="theme-06"] button {
+    font: inherit;
+}
+
+/* =========================================================
+   HEADER — no floating container
+   ========================================================= */
+
+.app[data-theme="theme-06"] .topbar {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    min-height: 76px;
+    margin: 0;
+    padding: 14px 28px;
+    color: #f1efe7;
+    background: #171717;
+    border: 0;
+    border-bottom: 5px solid #e63825;
+}
+
+.app[data-theme="theme-06"] .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.app[data-theme="theme-06"] .brand-logo {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    color: #171717;
+    background: #e8ff45;
+    border: 0;
+    font-size: 1.3rem;
+    font-weight: 900;
+}
+
+.app[data-theme="theme-06"] .brand-text {
+    color: #f1efe7;
+    font-size: 1.35rem;
+    font-weight: 900;
+    letter-spacing: -0.075em;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-06"] .semester-label {
+    padding: 6px 9px;
+    color: #171717;
+    background: #e8ff45;
+    font-size: 0.68rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-06"] .profile-button {
+    padding: 10px 14px;
+    color: #171717;
+    background: #f1efe7;
+    border: 0;
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.app[data-theme="theme-06"] .profile-button:hover {
+    color: #171717;
+    background: #e8ff45;
+}
+
+/* =========================================================
+   LAYOUT — hard vertical division
+   ========================================================= */
+
+.app[data-theme="theme-06"] .app-layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 0;
+    align-items: stretch;
+    padding: 0;
+}
+
+.app[data-theme="theme-06"] .sidebar {
+    min-width: 0;
+    padding: 24px 0;
+    color: #f1efe7;
+    background: #171717;
+    border: 0;
+    border-right: 1px solid #77766e;
+}
+
+.app[data-theme="theme-06"] .sidebar-label {
+    padding: 0 18px;
+    margin: 22px 0 9px;
+    color: #a6a49c;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-06"] .navigation {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.app[data-theme="theme-06"] .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 12px 18px;
+    color: #d7d5cd;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid #393939;
+    font-size: 0.78rem;
+    font-weight: 650;
+    text-decoration: none;
+    transition: background 120ms ease, color 120ms ease;
+}
+
+.app[data-theme="theme-06"] .nav-link::before {
+    content: "↗";
+    color: #77766e;
+    font-size: 0.8rem;
+}
+
+.app[data-theme="theme-06"] .nav-link:hover {
+    color: #171717;
+    background: #e8ff45;
+}
+
+.app[data-theme="theme-06"] .nav-link.active {
+    color: #171717;
+    background: #e63825;
+    font-weight: 900;
+}
+
+.app[data-theme="theme-06"] .nav-link.active::before {
+    color: #171717;
+    content: "→";
+}
+
+.app[data-theme="theme-06"] .sidebar-divider {
+    height: 4px;
+    margin: 22px 0;
+    background: #f1efe7;
+    border: 0;
+}
+
+.app[data-theme="theme-06"] .sidebar-stat {
+    padding: 13px 18px;
+    margin: 0;
+    color: #f1efe7;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid #393939;
+    font-size: 0.78rem;
+}
+
+.app[data-theme="theme-06"] .stat-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 27px;
+    height: 27px;
+    margin-right: 8px;
+    color: #171717;
+    background: #e8ff45;
+    font-weight: 900;
+}
+
+.app[data-theme="theme-06"] .sidebar-note {
+    padding: 15px 18px;
+    margin: 20px 0;
+    color: #171717;
+    background: #e8ff45;
+    border: 0;
+    font-size: 0.76rem;
+    line-height: 1.55;
+}
+
+.app[data-theme="theme-06"] .sidebar-footer {
+    padding: 12px 18px;
+    color: #aaa89f;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+}
+
+/* =========================================================
+   MAIN — editorial typography
+   ========================================================= */
+
+.app[data-theme="theme-06"] .main-content {
+    min-width: 0;
+    padding: 28px;
+}
+
+.app[data-theme="theme-06"] .page-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 23px;
+    margin: 0 0 22px;
+    border-bottom: 4px solid #171717;
+}
+
+.app[data-theme="theme-06"] .page-heading h1,
+.app[data-theme="theme-06"] .page-heading h2 {
+    margin: 0;
+    color: #171717;
+    font-size: clamp(2.4rem, 5vw, 5.5rem);
+    font-weight: 950;
+    line-height: 0.92;
+    letter-spacing: -0.095em;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-06"] .eyebrow {
+    display: block;
+    margin-bottom: 14px;
+    color: #e63825;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-06"] .page-description {
+    max-width: 520px;
+    margin-top: 14px;
+    color: #5d5c55;
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+/* =========================================================
+   BUTTONS — rectangular, flat, high contrast
+   ========================================================= */
+
+.app[data-theme="theme-06"] .primary-button {
+    padding: 14px 18px;
+    color: #f1efe7;
+    background: #171717;
+    border: 0;
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color 120ms ease, background 120ms ease;
+}
+
+.app[data-theme="theme-06"] .primary-button:hover {
+    color: #171717;
+    background: #e8ff45;
+}
+
+.app[data-theme="theme-06"] .icon-button,
+.app[data-theme="theme-06"] .today-button {
+    min-width: 38px;
+    min-height: 38px;
+    padding: 9px 12px;
+    color: #171717;
+    background: transparent;
+    border: 1px solid #171717;
+    font-size: 0.8rem;
+    font-weight: 850;
+    cursor: pointer;
+}
+
+.app[data-theme="theme-06"] .icon-button:hover,
+.app[data-theme="theme-06"] .today-button:hover {
+    color: #f1efe7;
+    background: #171717;
+}
+
+/* =========================================================
+   WEEK TOOLBAR — strip, not a card
+   ========================================================= */
+
+.app[data-theme="theme-06"] .week-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 12px 0;
+    margin-bottom: 20px;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid #171717;
+    border-bottom: 1px solid #171717;
+}
+
+.app[data-theme="theme-06"] .week-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.88rem;
+    font-weight: 850;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-06"] .week-icon {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    color: #171717;
+    background: #e63825;
+    font-weight: 900;
+}
+
+.app[data-theme="theme-06"] .week-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* =========================================================
+   CALENDAR — hard grid, no floating container
+   ========================================================= */
+
+.app[data-theme="theme-06"] .calendar {
+    overflow: hidden;
+    background: #f8f7f2;
+    border: 2px solid #171717;
+}
+
+.app[data-theme="theme-06"] .calendar-header {
+    display: grid;
+    background: #171717;
+    border-bottom: 2px solid #171717;
+}
+
+.app[data-theme="theme-06"] .time-header,
+.app[data-theme="theme-06"] .day-header {
+    padding: 14px 7px;
+    color: #f1efe7;
+    background: #171717;
+    border-right: 1px solid #77766e;
+    font-size: 0.68rem;
+    font-weight: 850;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-06"] .day-header:last-child {
+    border-right: 0;
+}
+
+.app[data-theme="theme-06"] .day-header.today {
+    color: #171717;
+    background: #e8ff45;
+}
+
+.app[data-theme="theme-06"] .calendar-body {
+    background: #f8f7f2;
+}
+
+.app[data-theme="theme-06"] .time-column {
+    background: #e8e5dc;
+    border-right: 1px solid #171717;
+}
+
+.app[data-theme="theme-06"] .time-label {
+    padding: 7px 5px;
+    color: #55544e;
+    font-size: 0.65rem;
+    font-weight: 750;
+}
+
+.app[data-theme="theme-06"] .day-column {
+    position: relative;
+    background: #f8f7f2;
+    border-right: 1px solid #bcbab1;
+}
+
+.app[data-theme="theme-06"] .day-column:last-child {
+    border-right: 0;
+}
+
+.app[data-theme="theme-06"] .day-column.today {
+    background: #fffef5;
+}
+
+.app[data-theme="theme-06"] .hour-slot {
+    border-bottom: 1px solid #d4d1c7;
+}
+
+.app[data-theme="theme-06"] .hour-slot:hover {
+    background: #ece9df;
+}
+
+/* =========================================================
+   LESSONS — solid blocks with a colored left rail
+   ========================================================= */
+
+.app[data-theme="theme-06"] .lesson-card {
+    overflow: hidden;
+    padding: 8px 9px;
+    color: #171717;
+    background: #e8e5dc;
+    border: 0;
+    border-left: 5px solid #171717;
+    transition: filter 120ms ease;
+}
+
+.app[data-theme="theme-06"] .lesson-card:hover {
+    filter: contrast(1.12);
+}
+
+.app[data-theme="theme-06"] .lesson-card.lesson-0 {
+    background: #e8ff45;
+    border-left-color: #171717;
+}
+
+.app[data-theme="theme-06"] .lesson-card.lesson-1 {
+    background: #f2a8c9;
+    border-left-color: #e63825;
+}
+
+.app[data-theme="theme-06"] .lesson-card.lesson-2 {
+    color: #f8f7f2;
+    background: #171717;
+    border-left-color: #e8ff45;
+}
+
+.app[data-theme="theme-06"] .lesson-card.lesson-3 {
+    background: #b9c8ee;
+    border-left-color: #303f7b;
+}
+
+.app[data-theme="theme-06"] .lesson-time {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 0.64rem;
+    font-weight: 850;
+    letter-spacing: 0.02em;
+}
+
+.app[data-theme="theme-06"] .lesson-title {
+    margin-bottom: 5px;
+    font-size: 0.8rem;
+    font-weight: 900;
+    line-height: 1.25;
+    letter-spacing: -0.035em;
+}
+
+.app[data-theme="theme-06"] .lesson-type {
+    display: inline-block;
+    margin-bottom: 5px;
+    font-size: 0.62rem;
+    font-weight: 850;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-06"] .lesson-detail,
+.app[data-theme="theme-06"] .lesson-teacher {
+    font-size: 0.67rem;
+    font-weight: 550;
+    line-height: 1.4;
+}
+
+.app[data-theme="theme-06"] .lesson-card.lesson-2 .lesson-time,
+.app[data-theme="theme-06"] .lesson-card.lesson-2 .lesson-title,
+.app[data-theme="theme-06"] .lesson-card.lesson-2 .lesson-type,
+.app[data-theme="theme-06"] .lesson-card.lesson-2 .lesson-detail,
+.app[data-theme="theme-06"] .lesson-card.lesson-2 .lesson-teacher {
+    color: #f8f7f2;
+}
+
+/* =========================================================
+   WIDGETS — rows and dividers instead of rounded cards
+   ========================================================= */
+
+.app[data-theme="theme-06"] .bottom-widgets {
+    display: grid;
+    gap: 0;
+    margin-top: 30px;
+    border-top: 3px solid #171717;
+}
+
+.app[data-theme="theme-06"] .widget {
+    padding: 18px 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid #aaa79e;
+}
+
+.app[data-theme="theme-06"] .widget-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-bottom: 12px;
+    margin-bottom: 7px;
+    border-bottom: 1px solid #171717;
+    font-size: 0.82rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-06"] .status-dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    margin-right: 6px;
+    background: #e63825;
+}
+
+.app[data-theme="theme-06"] .upcoming-lesson {
+    display: grid;
+    grid-template-columns: 90px minmax(0, 1fr);
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid #d4d1c7;
+}
+
+.app[data-theme="theme-06"] .upcoming-lesson:last-child {
+    border-bottom: 0;
+}
+
+.app[data-theme="theme-06"] .upcoming-date {
+    align-self: start;
+    padding: 8px;
+    color: #171717;
+    background: #e8ff45;
+    font-size: 0.7rem;
+    font-weight: 900;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-06"] .upcoming-details {
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   STATS — typography first
+   ========================================================= */
+
+.app[data-theme="theme-06"] .overview-stats {
+    display: grid;
+    gap: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-top: 3px solid #171717;
+    border-bottom: 3px solid #171717;
+}
+
+.app[data-theme="theme-06"] .overview-stats .stat-card,
+.app[data-theme="theme-06"] .overview-stats .stat-item {
+    padding: 16px 12px;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid #aaa79e;
+}
+
+.app[data-theme="theme-06"] .page-footer {
+    padding: 20px 0;
+    color: #77766e;
+    border-top: 1px solid #171717;
+    font-size: 0.66rem;
+    font-weight: 750;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-06"] .demo-notice {
+    padding: 13px;
+    color: #171717;
+    background: #e8ff45;
+    border: 0;
+    border-left: 5px solid #171717;
+    font-size: 0.76rem;
+    font-weight: 650;
+}
+
+/* =========================================================
+   KEYBOARD FOCUS
+   ========================================================= */
+
+.app[data-theme="theme-06"] button:focus-visible,
+.app[data-theme="theme-06"] a:focus-visible {
+    outline: 3px solid #e63825;
+    outline-offset: 3px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+    .app[data-theme="theme-06"] .app-layout {
+        grid-template-columns: 175px minmax(0, 1fr);
+    }
+
+    .app[data-theme="theme-06"] .main-content {
+        padding: 20px;
+    }
+
+    .app[data-theme="theme-06"] .topbar {
+        padding: 12px 18px;
+    }
+
+    .app[data-theme="theme-06"] .page-heading h1,
+    .app[data-theme="theme-06"] .page-heading h2 {
+        font-size: clamp(2rem, 5vw, 3.5rem);
+    }
+}
+
+@media (max-width: 600px) {
+    .app[data-theme="theme-06"] .topbar {
+        flex-wrap: wrap;
+        padding: 12px;
+    }
+
+    .app[data-theme="theme-06"] .app-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .app[data-theme="theme-06"] .sidebar {
+        padding: 0;
+        border-right: 0;
+        border-bottom: 3px solid #e63825;
+    }
+
+    .app[data-theme="theme-06"] .navigation {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .app[data-theme="theme-06"] .nav-link {
+        padding: 10px;
+        border-right: 1px solid #393939;
+    }
+
+    .app[data-theme="theme-06"] .sidebar-label,
+    .app[data-theme="theme-06"] .sidebar-stat,
+    .app[data-theme="theme-06"] .sidebar-note,
+    .app[data-theme="theme-06"] .sidebar-footer {
+        display: none;
+    }
+
+    .app[data-theme="theme-06"] .main-content {
+        padding: 18px 12px;
+    }
+
+    .app[data-theme="theme-06"] .page-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .app[data-theme="theme-06"] .week-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .app[data-theme="theme-06"] .calendar {
+        overflow-x: auto;
+    }
+
+    .app[data-theme="theme-06"] .calendar-header,
+    .app[data-theme="theme-06"] .calendar-body {
+        min-width: 620px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app[data-theme="theme-06"] *,
+    .app[data-theme="theme-06"] *::before,
+    .app[data-theme="theme-06"] *::after {
+        transition: none !important;
+    }
+}

@@ -1,0 +1,237 @@
+
+/* Спільна геометрія сторінки для всіх тем */
+
+.app[data-theme] {
+    width: 100%;
+    min-height: 100vh;
+}
+
+.app[data-theme] *,
+.app[data-theme] *::before,
+.app[data-theme] *::after {
+    box-sizing: border-box;
+}
+
+.app[data-theme] .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    width: 100%;
+    min-height: 76px;
+    padding: 16px 32px;
+}
+
+.app[data-theme] .brand,
+.app[data-theme] .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.app[data-theme] .app-layout {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    align-items: start;
+    gap: 28px;
+    width: 100%;
+    max-width: 1800px;
+    margin-inline: auto;
+    padding: 24px 32px 32px;
+}
+
+.app[data-theme] .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+}
+
+.app[data-theme] .main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 0;
+    width: 100%;
+}
+
+.app[data-theme] .page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-width: 0;
+}
+
+.app[data-theme] .page-heading > div {
+    min-width: 0;
+}
+
+.app[data-theme] .week-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    min-width: 0;
+}
+
+.app[data-theme] .week-info,
+.app[data-theme] .week-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.app[data-theme] .calendar {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.app[data-theme] .calendar-header {
+    display: grid;
+    grid-template-columns: 64px repeat(7, minmax(0, 1fr));
+    width: 100%;
+}
+
+.app[data-theme] .calendar-header > * {
+    min-width: 0;
+}
+
+.app[data-theme] .calendar-body {
+    display: grid;
+    grid-template-columns: 64px repeat(7, minmax(0, 1fr));
+    width: 100%;
+    min-width: 0;
+}
+
+.app[data-theme] .time-column {
+    min-width: 0;
+}
+
+.app[data-theme] .day-column {
+    position: relative;
+    min-width: 0;
+    height: 704px;
+    overflow: hidden;
+}
+
+.app[data-theme] .time-label,
+.app[data-theme] .hour-slot {
+    height: 64px;
+    min-height: 64px;
+}
+
+.app[data-theme] .hour-slot {
+    width: 100%;
+}
+
+.app[data-theme] .lesson-card {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    min-width: 0;
+    max-width: calc(100% - 8px);
+    overflow: hidden;
+    overflow-wrap: anywhere;
+}
+
+.app[data-theme] .lesson-title {
+    display: block;
+    overflow-wrap: anywhere;
+}
+
+.app[data-theme] .bottom-widgets {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    width: 100%;
+    min-width: 0;
+}
+
+.app[data-theme] .widget {
+    min-width: 0;
+}
+
+.app[data-theme] .overview-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.app[data-theme] .page-footer {
+    margin-top: 8px;
+}
+
+@media (max-width: 1100px) {
+    .app[data-theme] .app-layout {
+        grid-template-columns: 200px minmax(0, 1fr);
+        gap: 20px;
+        padding-inline: 20px;
+    }
+
+    .app[data-theme] .calendar-header,
+    .app[data-theme] .calendar-body {
+        grid-template-columns: 48px repeat(7, minmax(0, 1fr));
+    }
+
+    .app[data-theme] .lesson-card {
+        padding: 6px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 760px) {
+    .app[data-theme] .topbar {
+        padding: 14px 16px;
+    }
+
+    .app[data-theme] .app-layout {
+        display: flex;
+        flex-direction: column;
+        padding: 16px;
+    }
+
+    .app[data-theme] .sidebar {
+        width: 100%;
+    }
+
+    .app[data-theme] .main-content {
+        width: 100%;
+    }
+
+    .app[data-theme] .page-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .app[data-theme] .bottom-widgets {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .app[data-theme] .calendar {
+        overflow-x: auto;
+    }
+
+    .app[data-theme] .calendar-header,
+    .app[data-theme] .calendar-body {
+        min-width: 720px;
+    }
+}
+
+@media (max-width: 480px) {
+    .app[data-theme] .topbar-right {
+        gap: 6px;
+    }
+
+    .app[data-theme] .semester-label {
+        display: none;
+    }
+
+    .app[data-theme] .week-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

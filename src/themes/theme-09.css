@@ -1,0 +1,240 @@
+
+/* UNIScheduler — Theme 09: Colorful Calendar */
+
+.app[data-theme="theme-09"] {
+    --color-bg: #fbfaf8;
+    --color-surface: #ffffff;
+    --color-text: #242329;
+    --color-muted: #8d8990;
+    --color-line: #eeebed;
+
+    --color-lavender: #bfaed2;
+    --color-lemon: #e6eb83;
+    --color-blue: #5d80be;
+    --color-coral: #f58288;
+    --color-mint: #c5e1d8;
+
+    background:
+            radial-gradient(ellipse at 20% 60%, #d9d9f3 0%, transparent 38%),
+            radial-gradient(ellipse at 85% 80%, #f9dfcf 0%, transparent 35%),
+            var(--color-bg);
+    color: var(--color-text);
+    font-family: "Kyiv Type Sans", sans-serif;
+}
+
+/* Soft, rounded UI */
+.app[data-theme="theme-09"] * {
+    box-sizing: border-box;
+}
+
+.app[data-theme="theme-09"] .sidebar,
+.app[data-theme="theme-09"] aside {
+    background: rgba(255, 255, 255, 0.82);
+    border-right: 1px solid var(--color-line);
+    backdrop-filter: blur(16px);
+}
+
+.app[data-theme="theme-09"] .card,
+.app[data-theme="theme-09"] .panel,
+.app[data-theme="theme-09"] .widget,
+.app[data-theme="theme-09"] .calendar-card,
+.app[data-theme="theme-09"] .content-card {
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 24px;
+    box-shadow: 0 8px 24px rgba(55, 48, 65, 0.07);
+    padding: 20px;
+}
+
+/* Typography */
+.app[data-theme="theme-09"] h1,
+.app[data-theme="theme-09"] .page-title {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 650;
+    letter-spacing: -0.06em;
+}
+
+.app[data-theme="theme-09"] h2,
+.app[data-theme="theme-09"] h3 {
+    letter-spacing: -0.035em;
+    font-weight: 600;
+}
+
+.app[data-theme="theme-09"] p,
+.app[data-theme="theme-09"] small,
+.app[data-theme="theme-09"] .muted {
+    color: var(--color-muted);
+}
+
+/* Navigation */
+.app[data-theme="theme-09"] .sidebar a,
+.app[data-theme="theme-09"] .sidebar button,
+.app[data-theme="theme-09"] aside a,
+.app[data-theme="theme-09"] aside button {
+    border-radius: 14px;
+    padding: 11px 14px;
+    transition: background 160ms ease, transform 160ms ease;
+}
+
+.app[data-theme="theme-09"] .sidebar a:hover,
+.app[data-theme="theme-09"] .sidebar button:hover,
+.app[data-theme="theme-09"] aside a:hover,
+.app[data-theme="theme-09"] aside button:hover {
+    background: #f0edf5;
+}
+
+.app[data-theme="theme-09"] .sidebar .active,
+.app[data-theme="theme-09"] .sidebar [aria-current="page"],
+.app[data-theme="theme-09"] aside [aria-current="page"] {
+    background: var(--color-lavender);
+    color: var(--color-text);
+}
+
+/* Category cards */
+.app[data-theme="theme-09"] .category-card,
+.app[data-theme="theme-09"] .category,
+.app[data-theme="theme-09"] .calendar-category {
+    border: none;
+    border-radius: 24px;
+    padding: 20px;
+    min-height: 130px;
+    box-shadow: 0 7px 16px rgba(45, 39, 53, 0.12);
+    transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.app[data-theme="theme-09"] .category-card:hover,
+.app[data-theme="theme-09"] .category:hover,
+.app[data-theme="theme-09"] .calendar-category:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 22px rgba(45, 39, 53, 0.15);
+}
+
+/* Calendar grid */
+.app[data-theme="theme-09"] .calendar,
+.app[data-theme="theme-09"] .calendar-grid,
+.app[data-theme="theme-09"] .week-grid,
+.app[data-theme="theme-09"] .schedule-grid {
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid rgba(225, 220, 230, 0.8);
+    border-radius: 22px;
+    overflow: hidden;
+    gap: 0;
+}
+
+.app[data-theme="theme-09"] .calendar-day,
+.app[data-theme="theme-09"] .day-cell,
+.app[data-theme="theme-09"] .calendar-cell,
+.app[data-theme="theme-09"] .time-slot {
+    background: transparent;
+    border-right: 1px solid var(--color-line);
+    border-bottom: 1px solid var(--color-line);
+    padding: 9px;
+}
+
+.app[data-theme="theme-09"] .weekday,
+.app[data-theme="theme-09"] .weekday-header,
+.app[data-theme="theme-09"] .day-header {
+    color: var(--color-muted);
+    background: #fff;
+    padding: 12px 8px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+/* Events */
+.app[data-theme="theme-09"] .event,
+.app[data-theme="theme-09"] .event-card,
+.app[data-theme="theme-09"] .schedule-event,
+.app[data-theme="theme-09"] .lesson-card {
+    border: none;
+    border-radius: 13px;
+    padding: 10px 12px;
+    background: var(--color-lavender);
+    color: var(--color-text);
+    box-shadow: 0 3px 8px rgba(45, 39, 53, 0.08);
+    font-size: 0.83rem;
+    line-height: 1.35;
+}
+
+.app[data-theme="theme-09"] .event:nth-child(4n + 1),
+.app[data-theme="theme-09"] .event-card:nth-child(4n + 1),
+.app[data-theme="theme-09"] .schedule-event:nth-child(4n + 1),
+.app[data-theme="theme-09"] .lesson-card:nth-child(4n + 1) {
+    background: var(--color-lemon);
+}
+
+.app[data-theme="theme-09"] .event:nth-child(4n + 2),
+.app[data-theme="theme-09"] .event-card:nth-child(4n + 2),
+.app[data-theme="theme-09"] .schedule-event:nth-child(4n + 2),
+.app[data-theme="theme-09"] .lesson-card:nth-child(4n + 2) {
+    background: var(--color-blue);
+    color: #fff;
+}
+
+.app[data-theme="theme-09"] .event:nth-child(4n + 3),
+.app[data-theme="theme-09"] .event-card:nth-child(4n + 3),
+.app[data-theme="theme-09"] .schedule-event:nth-child(4n + 3),
+.app[data-theme="theme-09"] .lesson-card:nth-child(4n + 3) {
+    background: var(--color-coral);
+}
+
+/* Buttons and form controls */
+.app[data-theme="theme-09"] button {
+    border: 1px solid transparent;
+    border-radius: 14px;
+    padding: 10px 16px;
+    background: #f0edf5;
+    color: var(--color-text);
+    transition: transform 160ms ease, background 160ms ease;
+}
+
+.app[data-theme="theme-09"] button:hover {
+    background: var(--color-lavender);
+    transform: translateY(-1px);
+}
+
+.app[data-theme="theme-09"] input,
+.app[data-theme="theme-09"] select,
+.app[data-theme="theme-09"] textarea {
+    border: 1px solid #e9e4eb;
+    border-radius: 13px;
+    background: #fff;
+    color: var(--color-text);
+    padding: 11px 13px;
+    font: inherit;
+}
+
+.app[data-theme="theme-09"] input:focus,
+.app[data-theme="theme-09"] select:focus,
+.app[data-theme="theme-09"] textarea:focus {
+    outline: 2px solid var(--color-lavender);
+    outline-offset: 2px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .app[data-theme="theme-09"] .card,
+    .app[data-theme="theme-09"] .panel,
+    .app[data-theme="theme-09"] .widget,
+    .app[data-theme="theme-09"] .calendar-card,
+    .app[data-theme="theme-09"] .content-card {
+        padding: 14px;
+        border-radius: 19px;
+    }
+}
+
+@media (max-width: 620px) {
+    .app[data-theme="theme-09"] h1,
+    .app[data-theme="theme-09"] .page-title {
+        font-size: 2rem;
+    }
+
+    .app[data-theme="theme-09"] .calendar,
+    .app[data-theme="theme-09"] .calendar-grid,
+    .app[data-theme="theme-09"] .week-grid,
+    .app[data-theme="theme-09"] .schedule-grid {
+        overflow-x: auto;
+    }
+}

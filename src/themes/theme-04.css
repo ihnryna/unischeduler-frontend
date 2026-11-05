@@ -1,0 +1,648 @@
+
+/* =========================================================
+   THEME 04 — NEO-BRUTALISM
+   UNIScheduler
+   ========================================================= */
+
+.app[data-theme="theme-04"] {
+    --color-background: #a58aef;
+    --color-text: #17151b;
+    --color-surface: #fffaf0;
+    --color-primary: #ff806c;
+    --color-highlight: #c9f77b;
+
+    --color-border: #17151b;
+    --border-heavy: #17151b;
+    --border-width: 2px;
+
+    --radius: 22px;
+    --radius-small: 12px;
+
+    --shadow: 5px 5px 0 #17151b;
+    --shadow-small: 3px 3px 0 #17151b;
+
+    --font-family: "Kyiv Type Sans", Arial, sans-serif;
+    --font-weight: 500;
+
+    font-family: var(--font-family);
+    color: var(--color-text);
+    background: var(--color-background);
+    min-height: 100vh;
+}
+
+/* ---------- Загальні елементи ---------- */
+
+.app[data-theme="theme-04"] * {
+    box-sizing: border-box;
+}
+
+.app[data-theme="theme-04"] button {
+    font: inherit;
+}
+
+.app[data-theme="theme-04"] .topbar,
+.app[data-theme="theme-04"] .sidebar,
+.app[data-theme="theme-04"] .calendar,
+.app[data-theme="theme-04"] .widget,
+.app[data-theme="theme-04"] .overview-stats {
+    border: 2px solid var(--border-heavy);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+/* ---------- Header ---------- */
+
+.app[data-theme="theme-04"] .topbar {
+    position: relative;
+    z-index: 2;
+    margin: 16px 20px 20px;
+    padding: 14px 22px;
+    background: #fffaf0;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.app[data-theme="theme-04"] .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.app[data-theme="theme-04"] .brand-logo {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    color: #17151b;
+    background: #c9f77b;
+    border: 2px solid #17151b;
+    border-radius: 15px;
+    box-shadow: 3px 3px 0 #17151b;
+}
+
+.app[data-theme="theme-04"] .brand-text {
+    font-size: 1.25rem;
+    font-weight: 900;
+    letter-spacing: -0.055em;
+}
+
+.app[data-theme="theme-04"] .semester-label {
+    padding: 7px 12px;
+    background: #ffcf80;
+    border: 2px solid #17151b;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.app[data-theme="theme-04"] .profile-button {
+    min-height: 42px;
+    padding: 8px 15px;
+    color: #17151b;
+    background: #ffb9ed;
+    border: 2px solid #17151b;
+    border-radius: 999px;
+    font-weight: 800;
+    box-shadow: 3px 3px 0 #17151b;
+    cursor: pointer;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.app[data-theme="theme-04"] .profile-button:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 #17151b;
+}
+
+/* ---------- Основне компонування ---------- */
+
+.app[data-theme="theme-04"] .app-layout {
+    gap: 22px;
+    padding: 0 20px 24px;
+    align-items: start;
+}
+
+/* ---------- Sidebar ---------- */
+
+.app[data-theme="theme-04"] .sidebar {
+    padding: 18px;
+    background: #ffcf80;
+}
+
+.app[data-theme="theme-04"] .sidebar-label {
+    margin: 4px 0 12px;
+    color: #51432f;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-04"] .navigation {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.app[data-theme="theme-04"] .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 13px;
+    color: #17151b;
+    background: #fffaf0;
+    border: 2px solid #17151b;
+    border-radius: 14px;
+    font-weight: 750;
+    text-decoration: none;
+    transition: transform 150ms ease, background 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.app[data-theme="theme-04"] .nav-link:hover {
+    background: #ffb9ed;
+    transform: translate(-2px, -2px);
+    box-shadow: 3px 3px 0 #17151b;
+}
+
+.app[data-theme="theme-04"] .nav-link.active {
+    background: #c9f77b;
+    box-shadow: 3px 3px 0 #17151b;
+}
+
+.app[data-theme="theme-04"] .sidebar-divider {
+    height: 2px;
+    margin: 18px 0;
+    background: #17151b;
+    border: 0;
+}
+
+.app[data-theme="theme-04"] .sidebar-stat {
+    padding: 13px;
+    margin-top: 12px;
+    background: #fffaf0;
+    border: 2px solid #17151b;
+    border-radius: 15px;
+}
+
+.app[data-theme="theme-04"] .stat-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    margin-right: 8px;
+    background: #ff806c;
+    border: 2px solid #17151b;
+    border-radius: 11px;
+}
+
+.app[data-theme="theme-04"] .sidebar-note {
+    padding: 14px;
+    margin-top: 16px;
+    background: #ffb9ed;
+    border: 2px solid #17151b;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+.app[data-theme="theme-04"] .sidebar-footer {
+    margin-top: 20px;
+    font-size: 0.75rem;
+    font-weight: 650;
+}
+
+/* ---------- Заголовок сторінки ---------- */
+
+.app[data-theme="theme-04"] .main-content {
+    min-width: 0;
+}
+
+.app[data-theme="theme-04"] .page-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin: 4px 0 22px;
+}
+
+.app[data-theme="theme-04"] .page-heading h1,
+.app[data-theme="theme-04"] .page-heading h2 {
+    margin: 0;
+    color: #17151b;
+    font-size: clamp(1.8rem, 3vw, 2.7rem);
+    font-weight: 950;
+    letter-spacing: -0.065em;
+    line-height: 1.05;
+}
+
+.app[data-theme="theme-04"] .eyebrow {
+    display: inline-block;
+    margin-bottom: 9px;
+    padding: 5px 10px;
+    background: #ffb9ed;
+    border: 2px solid #17151b;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-04"] .page-description {
+    max-width: 650px;
+    margin-top: 10px;
+    color: #39313f;
+    font-size: 0.9rem;
+    line-height: 1.65;
+}
+
+/* ---------- Кнопки ---------- */
+
+.app[data-theme="theme-04"] .primary-button {
+    padding: 12px 18px;
+    color: #fffaf0;
+    background: #17151b;
+    border: 2px solid #17151b;
+    border-radius: 999px;
+    font-weight: 850;
+    box-shadow: 4px 4px 0 #fffaf0;
+    cursor: pointer;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.app[data-theme="theme-04"] .primary-button:hover {
+    color: #17151b;
+    background: #c9f77b;
+    box-shadow: 2px 2px 0 #17151b;
+    transform: translate(2px, 2px);
+}
+
+.app[data-theme="theme-04"] .icon-button,
+.app[data-theme="theme-04"] .today-button {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 8px 12px;
+    color: #17151b;
+    background: #fffaf0;
+    border: 2px solid #17151b;
+    border-radius: 999px;
+    font-weight: 850;
+    box-shadow: 2px 2px 0 #17151b;
+    cursor: pointer;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.app[data-theme="theme-04"] .icon-button:hover,
+.app[data-theme="theme-04"] .today-button:hover {
+    background: #ffb9ed;
+    transform: translate(2px, 2px);
+    box-shadow: none;
+}
+
+/* ---------- Перемикач тижня ---------- */
+
+.app[data-theme="theme-04"] .week-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    background: #c9f77b;
+    border: 2px solid #17151b;
+    border-radius: 18px;
+    box-shadow: 4px 4px 0 #17151b;
+}
+
+.app[data-theme="theme-04"] .week-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 850;
+}
+
+.app[data-theme="theme-04"] .week-icon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    background: #fffaf0;
+    border: 2px solid #17151b;
+    border-radius: 12px;
+}
+
+.app[data-theme="theme-04"] .week-controls {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+/* ---------- Календар ---------- */
+
+.app[data-theme="theme-04"] .calendar {
+    overflow: hidden;
+    background: #fffaf0;
+}
+
+.app[data-theme="theme-04"] .calendar-header {
+    display: grid;
+    background: #ffb9ed;
+    border-bottom: 2px solid #17151b;
+}
+
+.app[data-theme="theme-04"] .time-header,
+.app[data-theme="theme-04"] .day-header {
+    padding: 13px 8px;
+    color: #17151b;
+    font-size: 0.78rem;
+    font-weight: 900;
+    text-align: center;
+    border-right: 2px solid #17151b;
+}
+
+.app[data-theme="theme-04"] .day-header:last-child {
+    border-right: 0;
+}
+
+.app[data-theme="theme-04"] .calendar-body {
+    background: #fffaf0;
+}
+
+.app[data-theme="theme-04"] .time-column {
+    background: #f4ebff;
+    border-right: 2px solid #17151b;
+}
+
+.app[data-theme="theme-04"] .time-label {
+    padding: 7px 5px;
+    color: #655d6b;
+    font-size: 0.7rem;
+    font-weight: 750;
+}
+
+.app[data-theme="theme-04"] .day-column {
+    position: relative;
+    border-right: 1px solid #c9bdcf;
+}
+
+.app[data-theme="theme-04"] .day-column:last-child {
+    border-right: 0;
+}
+
+.app[data-theme="theme-04"] .hour-slot {
+    border-bottom: 1px solid #d9d0de;
+    transition: background 120ms ease;
+}
+
+.app[data-theme="theme-04"] .hour-slot:hover {
+    background: #f7edff;
+}
+
+/* ---------- Картки занять ---------- */
+
+.app[data-theme="theme-04"] .lesson-card {
+    overflow: hidden;
+    padding: 9px 10px;
+    color: #17151b;
+    background: #ffcf80;
+    border: 2px solid #17151b;
+    border-radius: 13px;
+    box-shadow: 3px 3px 0 #17151b;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.app[data-theme="theme-04"] .lesson-card:hover {
+    z-index: 1;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 #17151b;
+}
+
+.app[data-theme="theme-04"] .lesson-card.lesson-0 {
+    background: #c9f77b;
+}
+
+.app[data-theme="theme-04"] .lesson-card.lesson-1 {
+    background: #ffb9ed;
+}
+
+.app[data-theme="theme-04"] .lesson-card.lesson-2 {
+    background: #ff806c;
+}
+
+.app[data-theme="theme-04"] .lesson-card.lesson-3 {
+    background: #a8e6f2;
+}
+
+.app[data-theme="theme-04"] .lesson-time {
+    display: inline-block;
+    margin-bottom: 6px;
+    padding: 3px 6px;
+    background: #fffaf0;
+    border: 1.5px solid #17151b;
+    border-radius: 6px;
+    font-size: 0.67rem;
+    font-weight: 850;
+}
+
+.app[data-theme="theme-04"] .lesson-title {
+    margin-bottom: 5px;
+    font-size: 0.84rem;
+    font-weight: 950;
+    line-height: 1.3;
+    letter-spacing: -0.025em;
+}
+
+.app[data-theme="theme-04"] .lesson-type {
+    display: inline-block;
+    margin-bottom: 5px;
+    font-size: 0.68rem;
+    font-weight: 850;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-04"] .lesson-detail,
+.app[data-theme="theme-04"] .lesson-teacher {
+    font-size: 0.72rem;
+    font-weight: 650;
+    line-height: 1.45;
+}
+
+/* ---------- Нижні віджети ---------- */
+
+.app[data-theme="theme-04"] .bottom-widgets {
+    display: grid;
+    gap: 18px;
+    margin-top: 22px;
+}
+
+.app[data-theme="theme-04"] .widget {
+    padding: 18px;
+    background: #fffaf0;
+}
+
+.app[data-theme="theme-04"] .widget:nth-child(2n) {
+    background: #ffb9ed;
+}
+
+.app[data-theme="theme-04"] .widget-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 15px;
+    font-weight: 950;
+    letter-spacing: -0.025em;
+}
+
+.app[data-theme="theme-04"] .status-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 6px;
+    background: #c9f77b;
+    border: 1.5px solid #17151b;
+    border-radius: 50%;
+}
+
+.app[data-theme="theme-04"] .upcoming-lesson {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1.5px dashed #8b7e8f;
+}
+
+.app[data-theme="theme-04"] .upcoming-lesson:last-child {
+    border-bottom: 0;
+}
+
+.app[data-theme="theme-04"] .upcoming-date {
+    flex-shrink: 0;
+    padding: 8px;
+    background: #c9f77b;
+    border: 2px solid #17151b;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-align: center;
+}
+
+.app[data-theme="theme-04"] .upcoming-details {
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+/* ---------- Статистика ---------- */
+
+.app[data-theme="theme-04"] .overview-stats {
+    padding: 18px;
+    background: #a8e6f2;
+}
+
+.app[data-theme="theme-04"] .overview-stats > * {
+    min-width: 0;
+}
+
+.app[data-theme="theme-04"] .overview-stats .stat-card,
+.app[data-theme="theme-04"] .overview-stats .stat-item {
+    padding: 15px;
+    background: #fffaf0;
+    border: 2px solid #17151b;
+    border-radius: 15px;
+    box-shadow: 3px 3px 0 #17151b;
+}
+
+.app[data-theme="theme-04"] .page-footer {
+    padding: 16px 4px;
+    color: #302640;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.app[data-theme="theme-04"] .demo-notice {
+    padding: 12px 15px;
+    background: #ffcf80;
+    border: 2px solid #17151b;
+    border-radius: 13px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+/* ---------- Фокус клавіатури ---------- */
+
+.app[data-theme="theme-04"] button:focus-visible,
+.app[data-theme="theme-04"] a:focus-visible {
+    outline: 3px solid #17151b;
+    outline-offset: 4px;
+}
+
+/* ---------- Адаптивність ---------- */
+
+@media (max-width: 900px) {
+    .app[data-theme="theme-04"] .topbar {
+        margin: 12px;
+        padding: 12px 15px;
+    }
+
+    .app[data-theme="theme-04"] .app-layout {
+        gap: 16px;
+        padding: 0 12px 18px;
+    }
+
+    .app[data-theme="theme-04"] .sidebar {
+        padding: 12px;
+    }
+
+    .app[data-theme="theme-04"] .week-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 600px) {
+    .app[data-theme="theme-04"] .topbar {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .app[data-theme="theme-04"] .brand-text {
+        font-size: 1.05rem;
+    }
+
+    .app[data-theme="theme-04"] .page-heading {
+        flex-direction: column;
+    }
+
+    .app[data-theme="theme-04"] .week-toolbar {
+        padding: 12px;
+    }
+
+    .app[data-theme="theme-04"] .calendar {
+        overflow-x: auto;
+    }
+
+    .app[data-theme="theme-04"] .calendar-header,
+    .app[data-theme="theme-04"] .calendar-body {
+        min-width: 620px;
+    }
+
+    .app[data-theme="theme-04"] .lesson-card {
+        padding: 6px;
+        box-shadow: 2px 2px 0 #17151b;
+    }
+
+    .app[data-theme="theme-04"] .lesson-title {
+        font-size: 0.73rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app[data-theme="theme-04"] *,
+    .app[data-theme="theme-04"] *::before,
+    .app[data-theme="theme-04"] *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+    }
+}

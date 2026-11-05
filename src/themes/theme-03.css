@@ -1,0 +1,643 @@
+
+/* THEME 03 — MONOCHROME + LIME */
+
+.app[data-theme="theme-03"] {
+    --color-background: #f3f4f0;
+    --color-surface: #ffffff;
+    --color-text: #20231e;
+    --color-border: #d9dcd4;
+    --color-primary: #d5ff54;
+    --color-highlight: #d5ff54;
+    --color-muted: #73786d;
+
+    --page: #f3f4f0;
+    --surface: #ffffff;
+    --ink: #20231e;
+    --muted: #73786d;
+    --accent: #d5ff54;
+    --mint: #d5ff54;
+    --peach: #e6e8e1;
+    --blue: #dce1d7;
+    --yellow: #d5ff54;
+    --pink: #d5ff54;
+
+    --radius: 8px;
+    --radius-small: 5px;
+    --border-width: 1px;
+    --border-heavy: 1px;
+    --shadow: none;
+    --shadow-small: none;
+    --font-family: "Kyiv Type Sans", Inter, system-ui, sans-serif;
+    --font-weight: 450;
+    --heading-weight: 750;
+    --heading-transform: none;
+    --heading-letter-spacing: -0.6px;
+
+    padding: 12px clamp(12px, 2vw, 28px) 24px;
+    background: var(--color-background);
+    color: var(--color-text);
+}
+
+.app[data-theme="theme-03"] .topbar {
+    min-height: 64px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #d9dcd4;
+}
+
+.app[data-theme="theme-03"] .brand {
+    gap: 10px;
+}
+
+.app[data-theme="theme-03"] .brand-logo {
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--ink);
+    border-radius: 5px;
+    background: var(--accent);
+    color: var(--ink);
+    font-size: 21px;
+    font-weight: 850;
+}
+
+.app[data-theme="theme-03"] .brand-logo span {
+    color: #626c3d;
+}
+
+.app[data-theme="theme-03"] .brand-text strong {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.7px;
+}
+
+.app[data-theme="theme-03"] .brand-text small {
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.app[data-theme="theme-03"] .semester-label {
+    padding: 7px 10px;
+    border: 1px solid #d9dcd4;
+    border-radius: 5px;
+    background: #fff;
+    color: #565b50;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.app[data-theme="theme-03"] .profile-button {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--ink);
+    border-radius: 5px;
+    background: #fff;
+    box-shadow: none;
+    font-weight: 750;
+}
+
+.app[data-theme="theme-03"] .app-layout {
+    gap: 20px;
+    padding-top: 20px;
+}
+
+.app[data-theme="theme-03"] .sidebar {
+    gap: 14px;
+    padding: 12px;
+    border: 1px solid #d9dcd4;
+    border-radius: 7px;
+    background: #fff;
+}
+
+.app[data-theme="theme-03"] .sidebar-label,
+.app[data-theme="theme-03"] .eyebrow {
+    color: #777c70;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+}
+
+.app[data-theme="theme-03"] .navigation {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.app[data-theme="theme-03"] .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #5d6257;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 550;
+}
+
+.app[data-theme="theme-03"] .nav-link.active {
+    border-color: #d8dfca;
+    background: #f0f4e8;
+    color: #272c20;
+    font-weight: 750;
+}
+
+.app[data-theme="theme-03"] .nav-link.active .nav-icon {
+    display: grid;
+    width: 22px;
+    height: 22px;
+    place-items: center;
+    border-radius: 3px;
+    background: var(--accent);
+    color: #22271b;
+}
+
+.app[data-theme="theme-03"] .nav-link:hover {
+    background: #f5f6f2;
+}
+
+.app[data-theme="theme-03"] .sidebar-divider {
+    height: 1px;
+    background: #e3e5df;
+}
+
+.app[data-theme="theme-03"] .sidebar-stat {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 0;
+}
+
+.app[data-theme="theme-03"] .stat-icon {
+    display: grid;
+    width: 30px;
+    height: 30px;
+    place-items: center;
+    border: 1px solid #d9dcd4;
+    border-radius: 4px;
+    background: #f3f4f0;
+}
+
+.app[data-theme="theme-03"] .purple-icon {
+    background: var(--accent);
+}
+
+.app[data-theme="theme-03"] .mint-icon {
+    background: #e8ebe3;
+}
+
+.app[data-theme="theme-03"] .sidebar-stat strong {
+    font-size: 15px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.app[data-theme="theme-03"] .sidebar-stat small {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.app[data-theme="theme-03"] .sidebar-note {
+    padding: 11px;
+    border-left: 3px solid #a5c63c;
+    background: #f4f6ed;
+    font-size: 11px;
+}
+
+.app[data-theme="theme-03"] .sidebar-note strong {
+    display: block;
+    margin: 5px 0;
+    font-weight: 750;
+}
+
+.app[data-theme="theme-03"] .sidebar-note p {
+    margin-bottom: 0;
+    color: #6c7165;
+}
+
+.app[data-theme="theme-03"] .sidebar-footer {
+    color: #858a7e;
+    font-size: 9px;
+}
+
+.app[data-theme="theme-03"] .page-heading h1 {
+    margin: 0;
+    font-size: clamp(27px, 3vw, 36px);
+    font-weight: 800;
+    letter-spacing: -1.4px;
+    line-height: 1.12;
+}
+
+.app[data-theme="theme-03"] .page-description {
+    color: #74796e;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.app[data-theme="theme-03"] button {
+    border: 1px solid #cfd3c8;
+    border-radius: 5px;
+    background: #fff;
+    color: #282c24;
+    box-shadow: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 120ms ease;
+}
+
+.app[data-theme="theme-03"] button:hover {
+    background: #eef0e9;
+}
+
+.app[data-theme="theme-03"] .primary-button {
+    padding: 11px 15px;
+    border-color: #20231e;
+    background: var(--accent);
+    color: #20231e;
+    font-weight: 800;
+}
+
+.app[data-theme="theme-03"] .primary-button:hover {
+    background: #c6f13d;
+}
+
+.app[data-theme="theme-03"] .week-toolbar {
+    padding: 11px 14px;
+    border: 1px solid #d9dcd4;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.app[data-theme="theme-03"] .week-icon {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border: 1px solid #d9dcd4;
+    border-radius: 4px;
+    background: #f1f3ec;
+}
+
+.app[data-theme="theme-03"] .week-toolbar h2 {
+    font-size: 14px;
+    font-weight: 750;
+    letter-spacing: -0.4px;
+}
+
+.app[data-theme="theme-03"] .week-info p {
+    margin-bottom: 0;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.app[data-theme="theme-03"] .week-controls {
+    gap: 6px;
+}
+
+.app[data-theme="theme-03"] .week-controls button {
+    min-height: 32px;
+    padding: 6px 10px;
+}
+
+.app[data-theme="theme-03"] .week-controls .today-button {
+    border-color: #20231e;
+    background: var(--accent);
+    font-weight: 750;
+}
+
+.app[data-theme="theme-03"] .calendar {
+    border: 1px solid #cfd3c8;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.app[data-theme="theme-03"] .calendar-header {
+    border-bottom: 1px solid #cfd3c8;
+    background: #e9ebe5;
+}
+
+.app[data-theme="theme-03"] .calendar-header > * {
+    padding: 10px 3px;
+    border-right: 1px solid #d9dcd4;
+    color: #62675c;
+    font-size: 10px;
+    font-weight: 750;
+}
+
+.app[data-theme="theme-03"] .day-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.app[data-theme="theme-03"] .day-header.selected {
+    background: var(--accent);
+    color: #22271b;
+}
+
+.app[data-theme="theme-03"] .calendar-body {
+    background-color: #fff;
+    background-image: repeating-linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent 63px,
+            #e6e8e2 63px,
+            #e6e8e2 64px
+    );
+}
+
+.app[data-theme="theme-03"] .time-column {
+    border-right: 1px solid #d9dcd4;
+    background: #f7f8f5;
+}
+
+.app[data-theme="theme-03"] .time-label {
+    height: 64px;
+    padding: 6px 4px;
+    color: #7c8176;
+    font-size: 9px;
+    font-weight: 550;
+    font-variant-numeric: tabular-nums;
+}
+
+.app[data-theme="theme-03"] .hour-slot {
+    border-bottom: 1px solid rgb(90 96 80 / 7%);
+}
+
+.app[data-theme="theme-03"] .day-column-selected {
+    background-color: rgb(213 255 84 / 12%);
+}
+
+.app[data-theme="theme-03"] .lesson-card {
+    padding: 7px;
+    border: 1px solid #cfd3c8;
+    border-left: 3px solid #a5c63c;
+    border-radius: 4px;
+    box-shadow: none;
+    color: #272b23;
+}
+
+.app[data-theme="theme-03"] .lesson-purple {
+    background: #f0f4e7;
+    border-left-color: #a5c63c;
+}
+
+.app[data-theme="theme-03"] .lesson-mint {
+    background: #f3f5ef;
+    border-left-color: #849a54;
+}
+
+.app[data-theme="theme-03"] .lesson-peach {
+    background: #f1f1ed;
+    border-left-color: #a7aaa0;
+}
+
+.app[data-theme="theme-03"] .lesson-blue {
+    background: #e9ece6;
+    border-left-color: #7e8974;
+}
+
+.app[data-theme="theme-03"] .lesson-time {
+    display: block;
+    margin-bottom: 4px;
+    color: #707568;
+    font-size: 9px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.app[data-theme="theme-03"] .lesson-title {
+    font-size: 11px;
+    line-height: 1.3;
+    font-weight: 750;
+}
+
+.app[data-theme="theme-03"] .lesson-type,
+.app[data-theme="theme-03"] .lesson-detail,
+.app[data-theme="theme-03"] .lesson-teacher {
+    display: block;
+    margin-top: 3px;
+    color: #707568;
+    font-size: 9px;
+    line-height: 1.3;
+}
+
+.app[data-theme="theme-03"] .bottom-widgets > * {
+    padding: 16px;
+    border: 1px solid #d9dcd4;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.app[data-theme="theme-03"] .bottom-widgets h2 {
+    font-size: 14px;
+    font-weight: 750;
+    letter-spacing: -0.4px;
+}
+
+.app[data-theme="theme-03"] .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #a5c63c;
+}
+
+.app[data-theme="theme-03"] .upcoming-lesson {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.app[data-theme="theme-03"] .upcoming-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    padding: 7px;
+    border: 1px solid #d9dcd4;
+    border-radius: 4px;
+    background: var(--accent);
+}
+
+.app[data-theme="theme-03"] .upcoming-date strong {
+    font-size: 20px;
+    font-weight: 850;
+}
+
+.app[data-theme="theme-03"] .upcoming-date span {
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.app[data-theme="theme-03"] .upcoming-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    font-size: 10px;
+}
+
+.app[data-theme="theme-03"] .upcoming-details > strong {
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.app[data-theme="theme-03"] .upcoming-details span {
+    color: var(--muted);
+}
+
+.app[data-theme="theme-03"] .overview-stats > div {
+    padding: 10px 4px;
+    border: 1px solid #e0e3da;
+    border-radius: 4px;
+    background: #f7f8f5;
+    text-align: center;
+}
+
+.app[data-theme="theme-03"] .overview-stats > div:first-child {
+    background: #eff5df;
+}
+
+.app[data-theme="theme-03"] .overview-stats strong,
+.app[data-theme="theme-03"] .overview-stats span {
+    display: block;
+}
+
+.app[data-theme="theme-03"] .overview-stats strong {
+    font-size: 21px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.app[data-theme="theme-03"] .overview-stats span {
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 9px;
+}
+
+.app[data-theme="theme-03"] .page-footer {
+    padding-top: 10px;
+    border-top: 1px solid #d9dcd4;
+    color: #7b8075;
+    font-size: 10px;
+}
+
+.app[data-theme="theme-03"] .demo-notice {
+    padding: 10px 12px;
+    border-left: 3px solid #a5c63c;
+    background: #eff4e3;
+    font-size: 11px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app[data-theme="theme-03"] button {
+        transition: none;
+    }
+}
+
+
+/* ===== HEADER: MONOCHROME + LIME ===== */
+
+.app[data-theme="theme-03"] .topbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    min-height: 88px;
+    padding: 18px 32px;
+    background: #ffffff;
+    border-bottom: 1px solid #d9dcd4;
+}
+
+.app[data-theme="theme-03"] .brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.app[data-theme="theme-03"] .brand-logo {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    color: #20231e;
+    background: #d5ff54;
+    border: 1px solid #20231e;
+    border-radius: 9px;
+    font-size: 21px;
+    font-weight: 850;
+}
+
+.app[data-theme="theme-03"] .brand-text {
+    color: #20231e;
+    font-size: clamp(20px, 2vw, 25px);
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.app[data-theme="theme-03"] .topbar-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.app[data-theme="theme-03"] .semester-label {
+    display: inline-flex;
+    align-items: center;
+    min-height: 42px;
+    padding: 9px 13px;
+    color: #555b50;
+    background: #f3f4f0;
+    border: 1px solid #d9dcd4;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.app[data-theme="theme-03"] .profile-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 42px;
+    padding: 9px 14px;
+    color: #20231e;
+    background: #d5ff54;
+    border: 1px solid #20231e;
+    border-radius: 7px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 750;
+    cursor: pointer;
+    transition: background 160ms ease, transform 160ms ease;
+}
+
+.app[data-theme="theme-03"] .profile-button:hover {
+    background: #c3ed3e;
+    transform: translateY(-1px);
+}
+
+.app[data-theme="theme-03"] .profile-button:focus-visible {
+    outline: 3px solid #20231e;
+    outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+    .app[data-theme="theme-03"] .topbar {
+        padding: 16px 18px;
+    }
+
+    .app[data-theme="theme-03"] .topbar-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+}

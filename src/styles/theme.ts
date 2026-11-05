@@ -1,4 +1,4 @@
 /**
  * Активна тема UNIScheduler.
  */
-export const ACTIVE_THEME = "theme-02";
+export const ACTIVE_THEME = "theme-10";

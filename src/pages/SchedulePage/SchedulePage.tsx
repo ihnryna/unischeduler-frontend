@@ -26,7 +26,6 @@ export function SchedulePage() {
 
             <section className="week-toolbar">
                 <div className="week-info">
-                    <div className="week-icon">▦</div>
 
                     <div>
                         <h2>26 жовтня — 1 листопада</h2>

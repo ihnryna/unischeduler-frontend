@@ -1,11 +1,12 @@
 import {useState} from 'react'
 
-import {lessons} from '../../features/schedule/mockSchedule'
 import {ScheduleGrid} from '../../components/schedule/ScheduleGrid'
+import {useSchedule} from '../../features/schedule/useSchedule'
 
 export function SchedulePage() {
     const [weekOffset, setWeekOffset] = useState(0)
     const [selectedDay, setSelectedDay] = useState<number | null>(null)
+    const {events, isLoading, error} = useSchedule()
 
     return (
         <>
@@ -73,8 +74,16 @@ export function SchedulePage() {
                 </p>
             )}
 
+            {isLoading && (
+                <p className="demo-notice">Завантажуємо демонстраційний розклад…</p>
+            )}
+
+            {error && (
+                <p className="demo-notice" role="alert">{error}</p>
+            )}
+
             <ScheduleGrid
-                lessons={lessons}
+                events={events}
                 selectedDay={selectedDay}
                 onSelectDay={(dayIndex) => {
                     setSelectedDay((current) =>
@@ -119,7 +128,7 @@ export function SchedulePage() {
 
                     <div className="overview-stats">
                         <div>
-                            <strong>{lessons.length}</strong>
+                            <strong>{events.length}</strong>
                             <span>подій</span>
                         </div>
 

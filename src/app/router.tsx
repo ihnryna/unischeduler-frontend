@@ -11,11 +11,13 @@ import {SettingsPage} from '../pages/SettingsPage/SettingsPage'
 import { GeneralSchedulePage } from '../pages/GeneralSchedulePage/GeneralSchedulePage'
 import { GoogleCalendarPage } from '../pages/GoogleCalendarPage/GoogleCalendarPage'
 
-import {lessons} from '../features/schedule/mockSchedule'
+import {useSchedule} from '../features/schedule/useSchedule'
 
 function MainLayout() {
+    const {events} = useSchedule()
+
     return (
-        <AppLayout lessonCount={lessons.length}>
+        <AppLayout lessonCount={events.length}>
             <Outlet/>
         </AppLayout>
     )

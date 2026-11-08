@@ -1,23 +1,28 @@
-import type {Lesson} from '../../types/schedule'
+import type {CalendarEvent} from '../../types/schedule'
 import {DAYS, HOURS} from '../../features/schedule/scheduleConfig'
 import {ScheduleEvent} from './ScheduleEvent'
 
 type ScheduleGridProps = {
-    lessons: Lesson[]
+    events: CalendarEvent[]
     selectedDay: number | null
     onSelectDay: (dayIndex: number) => void
     weekOffset: number
 }
 
 export function ScheduleGrid({
-                                 lessons,
+                                 events,
                                  selectedDay,
                                  onSelectDay,
                                  weekOffset,
                              }: Readonly<ScheduleGridProps>) {
 
-    const visibleLessons = lessons.filter(
-        (lesson) => selectedDay === null || lesson.day === selectedDay,
+    const getDayIndex = (event: CalendarEvent) => {
+        const sundayBasedDay = new Date(event.startsAt).getDay()
+        return (sundayBasedDay + 6) % 7
+    }
+
+    const visibleEvents = events.filter(
+        (event) => selectedDay === null || getDayIndex(event) === selectedDay,
     )
 
     return (
@@ -60,12 +65,12 @@ export function ScheduleGrid({
                             <div className="hour-slot" key={hour}/>
                         ))}
 
-                        {visibleLessons
-                            .filter((lesson) => lesson.day === dayIndex)
-                            .map((lesson) => (
+                        {visibleEvents
+                            .filter((event) => getDayIndex(event) === dayIndex)
+                            .map((event) => (
                                 <ScheduleEvent
-                                    key={lesson.id}
-                                    lesson={lesson}
+                                    key={`${event.eventType}-${event.eventId}`}
+                                    event={event}
                                 />
                             ))}
                     </div>

@@ -1,10 +1,20 @@
-export type UserRole = 'student' | 'admin'
+import type {Speciality} from './catalog'
+
+export type UserRole = 'STUDENT' | 'ADMIN'
 
 export type User = {
-    id: string
-    name: string
+    id: number
+    speciality: Speciality
     email: string
-    initials: string
     role: UserRole
-    groupId?: string
+}
+
+export type UserCreate = {
+    specialityId: number
+    email: string
+    role: UserRole
+}
+
+export type UserUpdate = UserCreate & {
+    id: number
 }

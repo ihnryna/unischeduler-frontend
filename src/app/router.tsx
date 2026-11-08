@@ -14,10 +14,10 @@ import { GoogleCalendarPage } from '../pages/GoogleCalendarPage/GoogleCalendarPa
 import {useSchedule} from '../features/schedule/useSchedule'
 
 function MainLayout() {
-    const {lessons} = useSchedule()
+    const {events} = useSchedule()
 
     return (
-        <AppLayout lessonCount={lessons.length}>
+        <AppLayout lessonCount={events.length}>
             <Outlet/>
         </AppLayout>
     )

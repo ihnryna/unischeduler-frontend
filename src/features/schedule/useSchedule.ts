@@ -1,19 +1,19 @@
 import {useEffect, useState} from 'react'
 
-import type {Lesson} from '../../types/schedule'
+import type {CalendarEvent} from '../../types/schedule'
 import {scheduleService} from './scheduleService'
 
-const DEFAULT_USER_ID = 'user-student-diana'
+const DEFAULT_USER_ID = 1
 
 type UseScheduleResult = {
-    lessons: Lesson[]
+    events: CalendarEvent[]
     isLoading: boolean
     error: string | null
     refetch: () => void
 }
 
 export function useSchedule(userId = DEFAULT_USER_ID): UseScheduleResult {
-    const [lessons, setLessons] = useState<Lesson[]>([])
+    const [events, setEvents] = useState<CalendarEvent[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [requestVersion, setRequestVersion] = useState(0)
@@ -24,10 +24,10 @@ export function useSchedule(userId = DEFAULT_USER_ID): UseScheduleResult {
         setIsLoading(true)
         setError(null)
 
-        scheduleService.getPersonalSchedule(userId)
-            .then((nextLessons) => {
+        scheduleService.getCalendar({userId})
+            .then((nextEvents) => {
                 if (isActive) {
-                    setLessons(nextLessons)
+                    setEvents(nextEvents)
                 }
             })
             .catch((reason: unknown) => {
@@ -51,7 +51,7 @@ export function useSchedule(userId = DEFAULT_USER_ID): UseScheduleResult {
     }, [requestVersion, userId])
 
     return {
-        lessons,
+        events,
         isLoading,
         error,
         refetch: () => setRequestVersion((version) => version + 1),

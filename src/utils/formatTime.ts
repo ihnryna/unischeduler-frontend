@@ -1,6 +1,7 @@
-export function formatTime(time: number) {
-    const hours = Math.floor(time)
-    const minutes = time % 1 === 0 ? '00' : '30'
+export function formatTime(dateTime: string) {
+    const date = new Date(dateTime)
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
 
-    return `${String(hours).padStart(2, '0')}:${minutes}`
+    return `${hours}:${minutes}`
 }

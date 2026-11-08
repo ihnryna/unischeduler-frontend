@@ -6,7 +6,7 @@ import {useSchedule} from '../../features/schedule/useSchedule'
 export function SchedulePage() {
     const [weekOffset, setWeekOffset] = useState(0)
     const [selectedDay, setSelectedDay] = useState<number | null>(null)
-    const {lessons, isLoading, error} = useSchedule()
+    const {events, isLoading, error} = useSchedule()
 
     return (
         <>
@@ -83,7 +83,7 @@ export function SchedulePage() {
             )}
 
             <ScheduleGrid
-                lessons={lessons}
+                events={events}
                 selectedDay={selectedDay}
                 onSelectDay={(dayIndex) => {
                     setSelectedDay((current) =>
@@ -128,7 +128,7 @@ export function SchedulePage() {
 
                     <div className="overview-stats">
                         <div>
-                            <strong>{lessons.length}</strong>
+                            <strong>{events.length}</strong>
                             <span>подій</span>
                         </div>
 

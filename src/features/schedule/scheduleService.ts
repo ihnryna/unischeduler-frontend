@@ -1,54 +1,59 @@
-import {mockCourses, mockGroups, mockLessons, mockUsers} from '../../mocks'
-import type {Course, Group} from '../../types/catalog'
-import type {Lesson} from '../../types/schedule'
+import {
+    mockCalendarEvents,
+    mockCourses,
+    mockPersonalEvents,
+    mockSpecialities,
+    mockUsers,
+} from '../../mocks'
+import type {Course, Speciality} from '../../types/catalog'
+import type {CalendarEvent, CalendarEventFilter} from '../../types/schedule'
 
-export type ScheduleFilters = {
-    search?: string
-    courseId?: string
-    groupId?: string
-    date?: string
+function overlapsRequestedRange(
+    event: CalendarEvent,
+    {startsAt, endsAt}: CalendarEventFilter,
+) {
+    return (!startsAt || event.endsAt >= startsAt)
+        && (!endsAt || event.startsAt <= endsAt)
 }
 
-function matchesSearch(lesson: Lesson, search: string) {
-    const query = search.trim().toLocaleLowerCase('uk')
-    return !query || [lesson.title, lesson.teacher, lesson.room].some(
-        (value) => value.toLocaleLowerCase('uk').includes(query),
-    )
+function toCalendarEvent(personalEvent: typeof mockPersonalEvents[number]): CalendarEvent {
+    return {
+        eventId: personalEvent.id,
+        eventType: 'PERSONAL',
+        name: personalEvent.name,
+        teacher: null,
+        group: null,
+        location: personalEvent.location,
+        description: personalEvent.description,
+        startsAt: personalEvent.startsAt,
+        endsAt: personalEvent.endsAt,
+    }
 }
 
 export const scheduleService = {
-    getPersonalSchedule(userId: string): Promise<Lesson[]> {
-        const user = mockUsers.find((candidate) => candidate.id === userId)
+    getCalendar(filters: CalendarEventFilter = {}): Promise<CalendarEvent[]> {
+        const {userId} = filters
 
-        if (!user) {
+        if (userId !== undefined && !mockUsers.some((user) => user.id === userId)) {
             return Promise.reject(new Error('Тестового користувача не знайдено.'))
         }
 
-        const {groupId} = user
+        const personalEvents = mockPersonalEvents
+            .filter((event) => userId === undefined || event.userId === userId)
+            .map(toCalendarEvent)
 
-        const lessons = groupId
-            ? mockLessons.filter((lesson) => lesson.groupIds.includes(groupId))
-            : mockLessons
+        const events = [...mockCalendarEvents, ...personalEvents]
+            .filter((event) => overlapsRequestedRange(event, filters))
+            .sort((left, right) => left.startsAt.localeCompare(right.startsAt))
 
-        return Promise.resolve(structuredClone(lessons))
-    },
-
-    getGeneralSchedule(filters: ScheduleFilters = {}): Promise<Lesson[]> {
-        const lessons = mockLessons.filter((lesson) => (
-            matchesSearch(lesson, filters.search ?? '')
-            && (!filters.courseId || lesson.courseId === filters.courseId)
-            && (!filters.groupId || lesson.groupIds.includes(filters.groupId))
-            && (!filters.date || lesson.date === filters.date)
-        ))
-
-        return Promise.resolve(structuredClone(lessons))
+        return Promise.resolve(structuredClone(events))
     },
 
     getCourses(): Promise<Course[]> {
         return Promise.resolve(structuredClone(mockCourses))
     },
 
-    getGroups(): Promise<Group[]> {
-        return Promise.resolve(structuredClone(mockGroups))
+    getSpecialities(): Promise<Speciality[]> {
+        return Promise.resolve(structuredClone(mockSpecialities))
     },
 }

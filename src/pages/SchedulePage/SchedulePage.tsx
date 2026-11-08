@@ -1,11 +1,12 @@
 import {useState} from 'react'
 
-import {lessons} from '../../features/schedule/mockSchedule'
 import {ScheduleGrid} from '../../components/schedule/ScheduleGrid'
+import {useSchedule} from '../../features/schedule/useSchedule'
 
 export function SchedulePage() {
     const [weekOffset, setWeekOffset] = useState(0)
     const [selectedDay, setSelectedDay] = useState<number | null>(null)
+    const {lessons, isLoading, error} = useSchedule()
 
     return (
         <>
@@ -71,6 +72,14 @@ export function SchedulePage() {
                 <p className="demo-notice">
                     Демонстраційний режим: дані занять не змінюються між тижнями.
                 </p>
+            )}
+
+            {isLoading && (
+                <p className="demo-notice">Завантажуємо демонстраційний розклад…</p>
+            )}
+
+            {error && (
+                <p className="demo-notice" role="alert">{error}</p>
             )}
 
             <ScheduleGrid

@@ -18,6 +18,7 @@ export type CalendarEventFilter = {
     userId?: number
     startsAt?: LocalDateTime
     endsAt?: LocalDateTime
+    weekOffset?: number
 }
 
 export type PersonalEvent = {

@@ -12,7 +12,7 @@ type UseScheduleResult = {
     refetch: () => void
 }
 
-export function useSchedule(userId = DEFAULT_USER_ID): UseScheduleResult {
+export function useSchedule(userId = DEFAULT_USER_ID, weekOffset = 0): UseScheduleResult {
     const [events, setEvents] = useState<CalendarEvent[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -24,7 +24,8 @@ export function useSchedule(userId = DEFAULT_USER_ID): UseScheduleResult {
         setIsLoading(true)
         setError(null)
 
-        scheduleService.getCalendar({userId})
+        scheduleService
+            .getCalendar({userId, weekOffset})
             .then((nextEvents) => {
                 if (isActive) {
                     setEvents(nextEvents)
@@ -48,7 +49,7 @@ export function useSchedule(userId = DEFAULT_USER_ID): UseScheduleResult {
         return () => {
             isActive = false
         }
-    }, [requestVersion, userId])
+    }, [requestVersion, userId, weekOffset])
 
     return {
         events,

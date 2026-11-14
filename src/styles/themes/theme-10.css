@@ -38,31 +38,28 @@
 }
 
 /* Sidebar */
-.app[data-theme="theme-10"] .sidebar,
-.app[data-theme="theme-10"] aside {
+.app[data-theme="theme-10"] .sidebar {
     background: var(--retro-paper);
     color: var(--retro-ink);
     border: 2px solid var(--retro-line);
     border-radius: 24px;
-    padding: 22px 16px;
+    padding: 24px 16px;
     box-shadow: 4px 4px 0 var(--retro-ink);
 }
 
-.app[data-theme="theme-10"] .sidebar *,
-.app[data-theme="theme-10"] aside * {
+.app[data-theme="theme-10"] .sidebar * {
     color: inherit;
 }
 
+.app[data-theme="theme-10"] .sidebar .nav-link,
 .app[data-theme="theme-10"] .sidebar a,
-.app[data-theme="theme-10"] .sidebar button,
-.app[data-theme="theme-10"] aside a,
-.app[data-theme="theme-10"] aside button {
+.app[data-theme="theme-10"] .sidebar button {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     width: 100%;
-    padding: 11px 13px;
-    margin-bottom: 5px;
+    padding: 8px 16px;
+    margin-bottom: 8px;
     background: transparent;
     border: 2px solid transparent;
     border-radius: 14px;
@@ -71,34 +68,125 @@
     transition: transform 150ms ease, background 150ms ease;
 }
 
+.app[data-theme="theme-10"] .sidebar .nav-link:hover,
 .app[data-theme="theme-10"] .sidebar a:hover,
-.app[data-theme="theme-10"] .sidebar button:hover,
-.app[data-theme="theme-10"] aside a:hover,
-.app[data-theme="theme-10"] aside button:hover {
+.app[data-theme="theme-10"] .sidebar button:hover {
     background: var(--retro-pink);
     border-color: var(--retro-ink);
     transform: translateX(2px);
 }
 
+.app[data-theme="theme-10"] .sidebar .nav-link.active,
 .app[data-theme="theme-10"] .sidebar .active,
-.app[data-theme="theme-10"] .sidebar [aria-current="page"],
-.app[data-theme="theme-10"] aside [aria-current="page"] {
+.app[data-theme="theme-10"] .sidebar [aria-current="page"] {
     background: var(--retro-yellow);
     border-color: var(--retro-ink);
     font-weight: 700;
 }
 
 /* Page header */
-.app[data-theme="theme-10"] header,
 .app[data-theme="theme-10"] .topbar,
 .app[data-theme="theme-10"] .page-header {
-    background: transparent;
-    border-bottom: 2px solid var(--retro-ink);
-    padding: 20px 24px;
+    background: rgba(255, 253, 248, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 2px solid var(--retro-ink);
+    border-top: none;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 0 var(--retro-ink);
+    padding: 12px 24px;
 }
 
-.app[data-theme="theme-10"] h1,
-.app[data-theme="theme-10"] .page-title {
+.app[data-theme="theme-10"] .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .brand-logo {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    background: var(--retro-yellow);
+    border: 2px solid var(--retro-ink);
+    border-radius: 12px;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: -0.04em;
+    color: var(--retro-ink);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+    transform: rotate(-2deg);
+    transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.app[data-theme="theme-10"] .brand:hover .brand-logo {
+    transform: rotate(0deg) scale(1.05);
+    box-shadow: 3px 3px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.app[data-theme="theme-10"] .brand-text strong {
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.app[data-theme="theme-10"] .semester-label {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    background: var(--retro-green);
+    border: 2px solid var(--retro-ink);
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: var(--retro-ink);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .profile-button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    padding: 0;
+    background: var(--retro-pink);
+    border: 2px solid var(--retro-ink);
+    border-radius: 50%;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--retro-ink);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+    cursor: pointer;
+    transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.app[data-theme="theme-10"] .profile-button:hover {
+    background: var(--retro-yellow);
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .page-heading h1,
+.app[data-theme="theme-10"] .page-title,
+.app[data-theme="theme-10"] .main-content h1 {
     color: var(--retro-ink);
     font-size: clamp(2rem, 4vw, 3.4rem);
     font-weight: 700;
@@ -106,15 +194,22 @@
     line-height: 1.05;
 }
 
-.app[data-theme="theme-10"] h2,
-.app[data-theme="theme-10"] h3 {
+.app[data-theme="theme-10"] .widget-heading h2,
+.app[data-theme="theme-10"] .week-center h2,
+.app[data-theme="theme-10"] .settings-card-header h2,
+.app[data-theme="theme-10"] .widget h2,
+.app[data-theme="theme-10"] .widget h3,
+.app[data-theme="theme-10"] .main-content h2,
+.app[data-theme="theme-10"] .main-content h3 {
     color: var(--retro-ink);
     font-weight: 700;
     letter-spacing: -0.035em;
 }
 
-.app[data-theme="theme-10"] p,
-.app[data-theme="theme-10"] small,
+.app[data-theme="theme-10"] .page-heading p,
+.app[data-theme="theme-10"] .settings-card-description,
+.app[data-theme="theme-10"] .sidebar-stat small,
+.app[data-theme="theme-10"] .main-content p,
 .app[data-theme="theme-10"] .muted,
 .app[data-theme="theme-10"] .subtitle {
     color: var(--retro-muted);
@@ -129,7 +224,7 @@
     background: var(--retro-paper);
     border: 2px solid var(--retro-ink);
     border-radius: 22px;
-    padding: 20px;
+    padding: 16px;
     box-shadow: 4px 4px 0 var(--retro-ink);
     transition: transform 160ms ease, box-shadow 160ms ease;
 }
@@ -144,12 +239,18 @@
 }
 
 /* Buttons */
-.app[data-theme="theme-10"] button {
+.app[data-theme="theme-10"] .button,
+.app[data-theme="theme-10"] .btn,
+.app[data-theme="theme-10"] .primary-button,
+.app[data-theme="theme-10"] .today-button,
+.app[data-theme="theme-10"] .icon-button,
+.app[data-theme="theme-10"] .reset-button,
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header) {
     border: 2px solid var(--retro-ink);
     border-radius: 14px;
     background: var(--retro-paper);
     color: var(--retro-ink);
-    padding: 10px 16px;
+    padding: 8px 16px;
     font: inherit;
     font-weight: 600;
     box-shadow: 3px 3px 0 var(--retro-ink);
@@ -157,18 +258,36 @@
     transition: transform 120ms ease, box-shadow 120ms ease;
 }
 
-.app[data-theme="theme-10"] button:hover {
+.app[data-theme="theme-10"] .button:hover,
+.app[data-theme="theme-10"] .btn:hover,
+.app[data-theme="theme-10"] .primary-button:hover,
+.app[data-theme="theme-10"] .today-button:hover,
+.app[data-theme="theme-10"] .icon-button:hover,
+.app[data-theme="theme-10"] .reset-button:hover,
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):hover {
     background: var(--retro-yellow);
     transform: translate(2px, 2px);
     box-shadow: 1px 1px 0 var(--retro-ink);
 }
 
-.app[data-theme="theme-10"] button:active {
+.app[data-theme="theme-10"] .button:active,
+.app[data-theme="theme-10"] .btn:active,
+.app[data-theme="theme-10"] .primary-button:active,
+.app[data-theme="theme-10"] .today-button:active,
+.app[data-theme="theme-10"] .icon-button:active,
+.app[data-theme="theme-10"] .reset-button:active,
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):active {
     transform: translate(3px, 3px);
     box-shadow: none;
 }
 
-.app[data-theme="theme-10"] button:disabled {
+.app[data-theme="theme-10"] .button:disabled,
+.app[data-theme="theme-10"] .btn:disabled,
+.app[data-theme="theme-10"] .primary-button:disabled,
+.app[data-theme="theme-10"] .today-button:disabled,
+.app[data-theme="theme-10"] .icon-button:disabled,
+.app[data-theme="theme-10"] .reset-button:disabled,
+.app[data-theme="theme-10"] .main-content button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
@@ -176,21 +295,31 @@
 }
 
 /* Inputs */
-.app[data-theme="theme-10"] input,
-.app[data-theme="theme-10"] select,
-.app[data-theme="theme-10"] textarea {
+.app[data-theme="theme-10"] .input,
+.app[data-theme="theme-10"] .select,
+.app[data-theme="theme-10"] .textarea,
+.app[data-theme="theme-10"] .form-control,
+.app[data-theme="theme-10"] .form-input,
+.app[data-theme="theme-10"] .main-content input,
+.app[data-theme="theme-10"] .main-content select,
+.app[data-theme="theme-10"] .main-content textarea {
     width: 100%;
     border: 2px solid var(--retro-ink);
     border-radius: 12px;
     background: #fff;
     color: var(--retro-ink);
-    padding: 11px 13px;
+    padding: 8px 16px;
     font: inherit;
 }
 
-.app[data-theme="theme-10"] input:focus,
-.app[data-theme="theme-10"] select:focus,
-.app[data-theme="theme-10"] textarea:focus {
+.app[data-theme="theme-10"] .input:focus,
+.app[data-theme="theme-10"] .select:focus,
+.app[data-theme="theme-10"] .textarea:focus,
+.app[data-theme="theme-10"] .form-control:focus,
+.app[data-theme="theme-10"] .form-input:focus,
+.app[data-theme="theme-10"] .main-content input:focus,
+.app[data-theme="theme-10"] .main-content select:focus,
+.app[data-theme="theme-10"] .main-content textarea:focus {
     outline: 3px solid var(--retro-yellow);
     outline-offset: 2px;
 }
@@ -237,8 +366,8 @@
 .app[data-theme="theme-10"] .schedule-event,
 .app[data-theme="theme-10"] .lesson-card {
     display: block;
-    padding: 10px 12px;
-    margin: 3px 0;
+    padding: 8px;
+    margin: 0;
     border: 2px solid var(--retro-ink);
     border-radius: 13px;
     background: var(--retro-lilac);
@@ -278,7 +407,7 @@
     align-items: center;
     border: 2px solid var(--retro-ink);
     border-radius: 999px;
-    padding: 5px 10px;
+    padding: 8px;
     background: var(--retro-pink);
     color: var(--retro-ink);
     font-size: 0.75rem;
@@ -286,8 +415,8 @@
 }
 
 /* Decorative highlights */
-.app[data-theme="theme-10"] hr,
-.app[data-theme="theme-10"] .divider {
+.app[data-theme="theme-10"] .divider,
+.app[data-theme="theme-10"] .sidebar-divider {
     border: 0;
     border-top: 2px solid var(--retro-ink);
 }
@@ -304,10 +433,9 @@
 
 /* Responsive */
 @media (max-width: 900px) {
-    .app[data-theme="theme-10"] .sidebar,
-    .app[data-theme="theme-10"] aside {
-        padding: 14px 10px;
-        border-radius: 18px;
+    .app[data-theme="theme-10"] .sidebar {
+        padding: 16px 8px;
+        border-radius: 16px;
     }
 
     .app[data-theme="theme-10"] .card,
@@ -315,20 +443,20 @@
     .app[data-theme="theme-10"] .widget,
     .app[data-theme="theme-10"] .calendar-card,
     .app[data-theme="theme-10"] .content-card {
-        padding: 14px;
-        border-radius: 17px;
+        padding: 16px;
+        border-radius: 16px;
     }
 
-    .app[data-theme="theme-10"] header,
     .app[data-theme="theme-10"] .topbar,
     .app[data-theme="theme-10"] .page-header {
-        padding: 16px;
+        padding: 8px 16px;
     }
 }
 
 @media (max-width: 620px) {
-    .app[data-theme="theme-10"] h1,
-    .app[data-theme="theme-10"] .page-title {
+    .app[data-theme="theme-10"] .page-heading h1,
+    .app[data-theme="theme-10"] .page-title,
+    .app[data-theme="theme-10"] .main-content h1 {
         font-size: 2rem;
     }
 
@@ -339,8 +467,13 @@
         overflow-x: auto;
     }
 
-    .app[data-theme="theme-10"] button {
-        padding: 9px 12px;
+    .app[data-theme="theme-10"] .button,
+    .app[data-theme="theme-10"] .btn,
+    .app[data-theme="theme-10"] .primary-button,
+    .app[data-theme="theme-10"] .today-button,
+    .app[data-theme="theme-10"] .icon-button,
+    .app[data-theme="theme-10"] .reset-button {
+        padding: 8px;
     }
 }
 
@@ -360,7 +493,7 @@
 .app[data-theme="theme-10"] .layout,
 .app[data-theme="theme-10"] .dashboard,
 .app[data-theme="theme-10"] .main-layout,
-.app[data-theme="theme-10"] main {
+.app[data-theme="theme-10"] .main-content {
     background-color: #fff4e2;
 }
 
@@ -379,9 +512,7 @@
 /* Кольорові заголовки календаря */
 .app[data-theme="theme-10"] .weekday,
 .app[data-theme="theme-10"] .weekday-header,
-.app[data-theme="theme-10"] .day-header,
-.app[data-theme="theme-10"] thead,
-.app[data-theme="theme-10"] th {
+.app[data-theme="theme-10"] .day-header {
     background-color: #f5c928 !important;
     color: #29251f !important;
     border-color: #29251f;
@@ -392,31 +523,35 @@
 .app[data-theme="theme-10"] .event-card,
 .app[data-theme="theme-10"] .schedule-event,
 .app[data-theme="theme-10"] .lesson-card {
-    background-color: #d9c7f0 !important;
-    color: #29251f !important;
+    background-color: #d9c7f0;
+    color: #29251f;
     border: 2px solid #29251f;
     border-radius: 13px;
     box-shadow: 2px 2px 0 #29251f;
 }
 
 /* Пастельні варіанти для занять */
-.app[data-theme="theme-10"] .event:nth-of-type(3n + 1),
-.app[data-theme="theme-10"] .event-card:nth-of-type(3n + 1),
-.app[data-theme="theme-10"] .schedule-event:nth-of-type(3n + 1),
-.app[data-theme="theme-10"] .lesson-card:nth-of-type(3n + 1) {
-    background-color: #c7d8ff !important;
+.app[data-theme="theme-10"] .event:not([style*="background"]):nth-of-type(3n + 1),
+.app[data-theme="theme-10"] .event-card:not([style*="background"]):nth-of-type(3n + 1),
+.app[data-theme="theme-10"] .schedule-event:not([style*="background"]):nth-of-type(3n + 1),
+.app[data-theme="theme-10"] .lesson-card:not([style*="background"]):nth-of-type(3n + 1) {
+    background-color: #c7d8ff;
 }
 
-.app[data-theme="theme-10"] .event:nth-of-type(3n + 2),
-.app[data-theme="theme-10"] .event-card:nth-of-type(3n + 2),
-.app[data-theme="theme-10"] .schedule-event:nth-of-type(3n + 2),
-.app[data-theme="theme-10"] .lesson-card:nth-of-type(3n + 2) {
-    background-color: #f6c7d7 !important;
+.app[data-theme="theme-10"] .event:not([style*="background"]):nth-of-type(3n + 2),
+.app[data-theme="theme-10"] .event-card:not([style*="background"]):nth-of-type(3n + 2),
+.app[data-theme="theme-10"] .schedule-event:not([style*="background"]):nth-of-type(3n + 2),
+.app[data-theme="theme-10"] .lesson-card:not([style*="background"]):nth-of-type(3n + 2) {
+    background-color: #f6c7d7;
 }
 
 /* Акцентні кнопки */
-.app[data-theme="theme-10"] button,
-.app[data-theme="theme-10"] .button {
+.app[data-theme="theme-10"] .button,
+.app[data-theme="theme-10"] .btn,
+.app[data-theme="theme-10"] .primary-button,
+.app[data-theme="theme-10"] .today-button,
+.app[data-theme="theme-10"] .icon-button,
+.app[data-theme="theme-10"] .reset-button {
     border: 2px solid #29251f;
     border-radius: 14px;
     background-color: #fffdf8;
@@ -424,8 +559,12 @@
     box-shadow: 3px 3px 0 #29251f;
 }
 
-.app[data-theme="theme-10"] button:hover,
-.app[data-theme="theme-10"] .button:hover {
+.app[data-theme="theme-10"] .button:not(.color-swatch-btn):hover,
+.app[data-theme="theme-10"] .btn:not(.color-swatch-btn):hover,
+.app[data-theme="theme-10"] .primary-button:hover,
+.app[data-theme="theme-10"] .today-button:hover,
+.app[data-theme="theme-10"] .icon-button:hover,
+.app[data-theme="theme-10"] .reset-button:hover {
     background-color: #f5c928 !important;
     color: #29251f !important;
 }
@@ -433,22 +572,21 @@
 /* Основна дія — жовта */
 .app[data-theme="theme-10"] .primary,
 .app[data-theme="theme-10"] .primary-button,
-.app[data-theme="theme-10"] button[type="submit"] {
+.app[data-theme="theme-10"] .submit-button {
     background-color: #f5c928 !important;
     color: #29251f !important;
 }
 
 /* Навігація */
-.app[data-theme="theme-10"] .sidebar,
-.app[data-theme="theme-10"] aside {
+.app[data-theme="theme-10"] .sidebar {
     background-color: #fffdf8 !important;
     border: 2px solid #29251f;
     box-shadow: 4px 4px 0 #29251f;
 }
 
+.app[data-theme="theme-10"] .sidebar .nav-link.active,
 .app[data-theme="theme-10"] .sidebar .active,
-.app[data-theme="theme-10"] .sidebar [aria-current="page"],
-.app[data-theme="theme-10"] aside [aria-current="page"] {
+.app[data-theme="theme-10"] .sidebar [aria-current="page"] {
     background-color: #f5c928 !important;
     color: #29251f !important;
 }
@@ -468,16 +606,17 @@
 .app[data-theme="theme-10"] .calendar-day,
 .app[data-theme="theme-10"] .day-cell,
 .app[data-theme="theme-10"] .calendar-cell,
-.app[data-theme="theme-10"] .time-slot,
-.app[data-theme="theme-10"] td {
+.app[data-theme="theme-10"] .time-slot {
     background-color: #fffdf8;
     border-color: #e0d5c4;
 }
 
 /* Поля введення */
-.app[data-theme="theme-10"] input,
-.app[data-theme="theme-10"] select,
-.app[data-theme="theme-10"] textarea {
+.app[data-theme="theme-10"] .input,
+.app[data-theme="theme-10"] .select,
+.app[data-theme="theme-10"] .textarea,
+.app[data-theme="theme-10"] .form-control,
+.app[data-theme="theme-10"] .form-input {
     background-color: #fffdf8;
     color: #29251f;
     border: 2px solid #29251f;
@@ -498,13 +637,17 @@
    ========================================= */
 
 /* Page headings */
+.app[data-theme="theme-10"] .page-heading {
+    padding-top: 16px;
+}
+
 .app[data-theme="theme-10"] .page-heading h1,
 .app[data-theme="theme-10"] .page-heading .page-title {
     font-size: clamp(2.4rem, 4vw, 3.5rem);
     font-weight: 700;
     letter-spacing: -0.065em;
     line-height: 1.05;
-    margin-bottom: 8px;
+    margin: 0;
 }
 
 .app[data-theme="theme-10"] .page-heading p {
@@ -515,23 +658,114 @@
 
 /* Week toolbar */
 .app[data-theme="theme-10"] .week-toolbar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
     padding-block: 8px 16px;
-    border-bottom: 1px solid #d9cfc0;
-}
-
-.app[data-theme="theme-10"] .week-info {
-    gap: 14px;
+    border-bottom: none;
 }
 
 .app[data-theme="theme-10"] .week-controls {
+    justify-self: start;
+    display: flex;
+    align-items: center;
     gap: 8px;
 }
 
-.app[data-theme="theme-10"] .week-controls button {
-    padding: 8px 13px;
+.app[data-theme="theme-10"] .week-controls .icon-button,
+.app[data-theme="theme-10"] .week-controls .today-button,
+.app[data-theme="theme-10"] .week-controls .button {
+    padding: 8px 16px;
     box-shadow: none;
     border-width: 1px;
     border-radius: 9px;
+}
+
+.app[data-theme="theme-10"] .week-center {
+    justify-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+}
+
+.app[data-theme="theme-10"] .week-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.app[data-theme="theme-10"] .week-center h2 {
+    margin: 0;
+    font-size: clamp(1.15rem, 2vw, 1.45rem);
+    font-weight: 750;
+    letter-spacing: -0.03em;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .current-week-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 11px;
+    background: var(--retro-yellow);
+    border: 1.5px solid var(--retro-ink);
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--retro-ink);
+    box-shadow: 1.5px 1.5px 0 var(--retro-ink);
+    letter-spacing: 0.02em;
+}
+
+.app[data-theme="theme-10"] .week-offset-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 11px;
+    background: var(--retro-paper);
+    border: 1.5px solid var(--retro-ink);
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--retro-muted);
+}
+
+.app[data-theme="theme-10"] .week-right {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.app[data-theme="theme-10"] .week-parity-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    background: var(--retro-blue);
+    border: 1.5px solid var(--retro-ink);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 750;
+    color: var(--retro-ink);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+}
+
+@media (max-width: 860px) {
+    .app[data-theme="theme-10"] .week-toolbar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .app[data-theme="theme-10"] .week-controls,
+    .app[data-theme="theme-10"] .week-center,
+    .app[data-theme="theme-10"] .week-right {
+        justify-self: center;
+    }
 }
 
 /* Calendar — lighter frame */
@@ -544,7 +778,16 @@
 
 /* Weekday headers */
 .app[data-theme="theme-10"] .calendar-header {
-    border-bottom: 1px solid var(--retro-ink);
+    border-bottom: none;
+}
+
+/* Invisible corner */
+.app[data-theme="theme-10"] .time-header {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    border: none !important;
+    background: transparent !important;
 }
 
 .app[data-theme="theme-10"] .calendar-header .day-header {
@@ -552,17 +795,22 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 5px;
-    padding: 14px 6px;
+    gap: 8px;
+    padding: 16px 8px;
     border: 0;
     border-radius: 0;
     border-right: 1px solid #e3dacd;
+    border-bottom: 1px solid var(--retro-ink);
     background: transparent;
     box-shadow: none;
     font-size: 0.72rem;
     font-weight: 500;
     letter-spacing: 0.07em;
     text-transform: uppercase;
+}
+
+.app[data-theme="theme-10"] .calendar-header .day-header:first-of-type {
+    border-left: 1px solid #e3dacd;
 }
 
 .app[data-theme="theme-10"] .calendar-header .day-header strong {
@@ -579,6 +827,14 @@
 .app[data-theme="theme-10"] .calendar-header .day-header.selected {
     background: var(--retro-yellow);
     font-weight: 700;
+}
+
+.app[data-theme="theme-10"] .calendar-header .day-header.is-today:not(.selected) {
+    background: rgba(245, 201, 40, 0.22);
+}
+
+.app[data-theme="theme-10"] .day-column.day-column-today {
+    background-color: rgba(245, 201, 40, 0.04);
 }
 
 /* Time labels */
@@ -603,7 +859,7 @@
 
 /* Lesson cards */
 .app[data-theme="theme-10"] .lesson-card {
-    padding: 10px 11px;
+    padding: 8px;
     border: 1px solid var(--retro-ink);
     border-radius: 9px;
     box-shadow: 1px 1px 0 var(--retro-ink);
@@ -661,4 +917,247 @@
 .app[data-theme="theme-10"] .widget h2,
 .app[data-theme="theme-10"] .widget h3 {
     letter-spacing: -0.045em;
+}
+
+.app[data-theme="theme-10"] .upcoming-lesson {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.app[data-theme="theme-10"] .upcoming-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 58px;
+    padding: 8px 12px;
+    border: 2px solid var(--retro-ink);
+    border-radius: 12px;
+    background: var(--retro-yellow);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .upcoming-date strong {
+    font-size: 1.5rem;
+    font-weight: 850;
+    line-height: 1;
+}
+
+.app[data-theme="theme-10"] .upcoming-date span {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+}
+
+.app[data-theme="theme-10"] .upcoming-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.app[data-theme="theme-10"] .upcoming-details strong {
+    font-size: 1.05rem;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+}
+
+.app[data-theme="theme-10"] .upcoming-details span {
+    font-size: 0.82rem;
+    color: var(--retro-muted);
+}
+
+.app[data-theme="theme-10"] .upcoming-empty {
+    padding: 8px 0;
+    color: var(--retro-muted);
+    font-size: 0.9rem;
+}
+
+/* =========================================
+   SETTINGS PAGE & SUBJECT COLORS
+   ========================================= */
+
+.app[data-theme="theme-10"] .settings-page {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+.app[data-theme="theme-10"] .settings-card {
+    background: var(--retro-paper);
+    border: 2px solid var(--retro-ink);
+    border-radius: 22px;
+    padding: 24px;
+    box-shadow: 4px 4px 0 var(--retro-ink);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.app[data-theme="theme-10"] .settings-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    border-bottom: 2px solid var(--retro-line);
+    padding-bottom: 16px;
+}
+
+.app[data-theme="theme-10"] .settings-card-header h2 {
+    margin: 0 0 6px 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .settings-card-description {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--retro-muted);
+    max-width: 650px;
+}
+
+.app[data-theme="theme-10"] .settings-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.app[data-theme="theme-10"] .settings-saved-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    background: var(--retro-green);
+    border: 1.5px solid var(--retro-ink);
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 750;
+    color: var(--retro-ink);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .reset-button {
+    padding: 8px 16px;
+    border: 2px solid var(--retro-ink);
+    border-radius: 12px;
+    background: var(--retro-paper);
+    color: var(--retro-ink);
+    font-size: 0.85rem;
+    font-weight: 750;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--retro-ink);
+    transition: transform 120ms ease, background 120ms ease;
+}
+
+.app[data-theme="theme-10"] .reset-button:hover {
+    background: var(--retro-pink);
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .subject-color-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.app[data-theme="theme-10"] .subject-color-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 12px 18px;
+    border: 1.5px solid #dcd4c6;
+    border-radius: 16px;
+    background: #fffdf8;
+    transition: border-color 140ms ease, background-color 140ms ease, transform 140ms ease;
+}
+
+.app[data-theme="theme-10"] .subject-color-item:hover {
+    border-color: var(--retro-ink);
+    background-color: #fff9ed;
+}
+
+.app[data-theme="theme-10"] .subject-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.app[data-theme="theme-10"] .subject-preview-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 2px solid var(--retro-ink);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+    flex-shrink: 0;
+    transition: background-color 150ms ease;
+}
+
+.app[data-theme="theme-10"] .subject-names {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.app[data-theme="theme-10"] .subject-title {
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: var(--retro-ink);
+    letter-spacing: -0.02em;
+}
+
+.app[data-theme="theme-10"] .subject-preview-text {
+    font-size: 0.75rem;
+    color: var(--retro-muted);
+}
+
+.app[data-theme="theme-10"] .palette-swatches {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.app[data-theme="theme-10"] .color-swatch-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--retro-ink);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    box-shadow: 1.5px 1.5px 0 var(--retro-ink);
+    transition: transform 120ms ease, box-shadow 120ms ease;
+    padding: 0;
+    background-color: var(--swatch-bg) !important;
+}
+
+.app[data-theme="theme-10"] .color-swatch-btn:hover {
+    background-color: var(--swatch-bg) !important;
+    transform: scale(1.18);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .color-swatch-btn.is-selected {
+    outline: 3px solid var(--retro-ink);
+    outline-offset: 2px;
+    transform: scale(1.1);
+    background-color: var(--swatch-bg) !important;
+}
+
+.app[data-theme="theme-10"] .swatch-check {
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--retro-ink);
+    line-height: 1;
 }

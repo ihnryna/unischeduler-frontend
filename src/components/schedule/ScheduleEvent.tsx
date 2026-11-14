@@ -1,6 +1,7 @@
 import type {CalendarEvent, EventType} from '../../types/schedule'
 import {HOUR_HEIGHT} from '../../features/schedule/scheduleConfig'
-import {formatTime} from "../../utils/formatTime.ts";
+import {useSubjectColors} from '../../features/schedule/subjectColors'
+import {formatTime} from '../../utils/formatTime'
 
 type ScheduleEventProps = {
     event: CalendarEvent
@@ -26,19 +27,25 @@ function hoursFromStartOfDay(value: string) {
 export function ScheduleEvent({event}: Readonly<ScheduleEventProps>) {
     const startsAt = hoursFromStartOfDay(event.startsAt)
     const endsAt = hoursFromStartOfDay(event.endsAt)
+    const {colors} = useSubjectColors()
+
+    const cardBackground =
+        colors[event.name] ??
+        (event.eventType === 'PERSONAL' ? '#c7d8ff' : '#d9c7f0')
 
     return (
-        <article className={`lesson-card lesson-${eventColors[event.eventType]}`}
-                 style={{
-                     top: (startsAt - 8) * HOUR_HEIGHT + 4,
-                     height: (endsAt - startsAt) * HOUR_HEIGHT - 8,
-                 }}>
+        <article
+            className={`lesson-card lesson-${eventColors[event.eventType]}`}
+            style={{
+                top: (startsAt - 8) * HOUR_HEIGHT + 4,
+                height: (endsAt - startsAt) * HOUR_HEIGHT - 8,
+                backgroundColor: cardBackground,
+            }}
+        >
             <span className="lesson-time">
                 {formatTime(event.startsAt)} – {formatTime(event.endsAt)}
             </span>
-            <strong className="lesson-title">
-                {event.name}
-            </strong>
+            <strong className="lesson-title">{event.name}</strong>
             <span className="lesson-type">{eventLabels[event.eventType]}</span>
             {event.location && (
                 <span className="lesson-detail">

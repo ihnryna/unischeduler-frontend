@@ -345,7 +345,8 @@
     min-width: 0;
 }
 
-.app[data-theme] .page-heading h1 {
+.app[data-theme] .page-heading h1,
+.app[data-theme] .page-heading .page-title {
     margin: 0;
     padding: 0;
 }

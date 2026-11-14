@@ -38,8 +38,7 @@
 }
 
 /* Sidebar */
-.app[data-theme="theme-10"] .sidebar,
-.app[data-theme="theme-10"] aside {
+.app[data-theme="theme-10"] .sidebar {
     background: var(--retro-paper);
     color: var(--retro-ink);
     border: 2px solid var(--retro-line);
@@ -48,15 +47,13 @@
     box-shadow: 4px 4px 0 var(--retro-ink);
 }
 
-.app[data-theme="theme-10"] .sidebar *,
-.app[data-theme="theme-10"] aside * {
+.app[data-theme="theme-10"] .sidebar * {
     color: inherit;
 }
 
+.app[data-theme="theme-10"] .sidebar .nav-link,
 .app[data-theme="theme-10"] .sidebar a,
-.app[data-theme="theme-10"] .sidebar button,
-.app[data-theme="theme-10"] aside a,
-.app[data-theme="theme-10"] aside button {
+.app[data-theme="theme-10"] .sidebar button {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -71,25 +68,23 @@
     transition: transform 150ms ease, background 150ms ease;
 }
 
+.app[data-theme="theme-10"] .sidebar .nav-link:hover,
 .app[data-theme="theme-10"] .sidebar a:hover,
-.app[data-theme="theme-10"] .sidebar button:hover,
-.app[data-theme="theme-10"] aside a:hover,
-.app[data-theme="theme-10"] aside button:hover {
+.app[data-theme="theme-10"] .sidebar button:hover {
     background: var(--retro-pink);
     border-color: var(--retro-ink);
     transform: translateX(2px);
 }
 
+.app[data-theme="theme-10"] .sidebar .nav-link.active,
 .app[data-theme="theme-10"] .sidebar .active,
-.app[data-theme="theme-10"] .sidebar [aria-current="page"],
-.app[data-theme="theme-10"] aside [aria-current="page"] {
+.app[data-theme="theme-10"] .sidebar [aria-current="page"] {
     background: var(--retro-yellow);
     border-color: var(--retro-ink);
     font-weight: 700;
 }
 
 /* Page header */
-.app[data-theme="theme-10"] header,
 .app[data-theme="theme-10"] .topbar,
 .app[data-theme="theme-10"] .page-header {
     background: rgba(255, 253, 248, 0.6);
@@ -189,8 +184,9 @@
     box-shadow: 1px 1px 0 var(--retro-ink);
 }
 
-.app[data-theme="theme-10"] h1,
-.app[data-theme="theme-10"] .page-title {
+.app[data-theme="theme-10"] .page-heading h1,
+.app[data-theme="theme-10"] .page-title,
+.app[data-theme="theme-10"] .main-content h1 {
     color: var(--retro-ink);
     font-size: clamp(2rem, 4vw, 3.4rem);
     font-weight: 700;
@@ -198,15 +194,22 @@
     line-height: 1.05;
 }
 
-.app[data-theme="theme-10"] h2,
-.app[data-theme="theme-10"] h3 {
+.app[data-theme="theme-10"] .widget-heading h2,
+.app[data-theme="theme-10"] .week-center h2,
+.app[data-theme="theme-10"] .settings-card-header h2,
+.app[data-theme="theme-10"] .widget h2,
+.app[data-theme="theme-10"] .widget h3,
+.app[data-theme="theme-10"] .main-content h2,
+.app[data-theme="theme-10"] .main-content h3 {
     color: var(--retro-ink);
     font-weight: 700;
     letter-spacing: -0.035em;
 }
 
-.app[data-theme="theme-10"] p,
-.app[data-theme="theme-10"] small,
+.app[data-theme="theme-10"] .page-heading p,
+.app[data-theme="theme-10"] .settings-card-description,
+.app[data-theme="theme-10"] .sidebar-stat small,
+.app[data-theme="theme-10"] .main-content p,
 .app[data-theme="theme-10"] .muted,
 .app[data-theme="theme-10"] .subtitle {
     color: var(--retro-muted);
@@ -236,7 +239,13 @@
 }
 
 /* Buttons */
-.app[data-theme="theme-10"] button {
+.app[data-theme="theme-10"] .button,
+.app[data-theme="theme-10"] .btn,
+.app[data-theme="theme-10"] .primary-button,
+.app[data-theme="theme-10"] .today-button,
+.app[data-theme="theme-10"] .icon-button,
+.app[data-theme="theme-10"] .reset-button,
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header) {
     border: 2px solid var(--retro-ink);
     border-radius: 14px;
     background: var(--retro-paper);
@@ -249,18 +258,36 @@
     transition: transform 120ms ease, box-shadow 120ms ease;
 }
 
-.app[data-theme="theme-10"] button:hover {
+.app[data-theme="theme-10"] .button:hover,
+.app[data-theme="theme-10"] .btn:hover,
+.app[data-theme="theme-10"] .primary-button:hover,
+.app[data-theme="theme-10"] .today-button:hover,
+.app[data-theme="theme-10"] .icon-button:hover,
+.app[data-theme="theme-10"] .reset-button:hover,
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):hover {
     background: var(--retro-yellow);
     transform: translate(2px, 2px);
     box-shadow: 1px 1px 0 var(--retro-ink);
 }
 
-.app[data-theme="theme-10"] button:active {
+.app[data-theme="theme-10"] .button:active,
+.app[data-theme="theme-10"] .btn:active,
+.app[data-theme="theme-10"] .primary-button:active,
+.app[data-theme="theme-10"] .today-button:active,
+.app[data-theme="theme-10"] .icon-button:active,
+.app[data-theme="theme-10"] .reset-button:active,
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):active {
     transform: translate(3px, 3px);
     box-shadow: none;
 }
 
-.app[data-theme="theme-10"] button:disabled {
+.app[data-theme="theme-10"] .button:disabled,
+.app[data-theme="theme-10"] .btn:disabled,
+.app[data-theme="theme-10"] .primary-button:disabled,
+.app[data-theme="theme-10"] .today-button:disabled,
+.app[data-theme="theme-10"] .icon-button:disabled,
+.app[data-theme="theme-10"] .reset-button:disabled,
+.app[data-theme="theme-10"] .main-content button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
@@ -268,9 +295,14 @@
 }
 
 /* Inputs */
-.app[data-theme="theme-10"] input,
-.app[data-theme="theme-10"] select,
-.app[data-theme="theme-10"] textarea {
+.app[data-theme="theme-10"] .input,
+.app[data-theme="theme-10"] .select,
+.app[data-theme="theme-10"] .textarea,
+.app[data-theme="theme-10"] .form-control,
+.app[data-theme="theme-10"] .form-input,
+.app[data-theme="theme-10"] .main-content input,
+.app[data-theme="theme-10"] .main-content select,
+.app[data-theme="theme-10"] .main-content textarea {
     width: 100%;
     border: 2px solid var(--retro-ink);
     border-radius: 12px;
@@ -280,9 +312,14 @@
     font: inherit;
 }
 
-.app[data-theme="theme-10"] input:focus,
-.app[data-theme="theme-10"] select:focus,
-.app[data-theme="theme-10"] textarea:focus {
+.app[data-theme="theme-10"] .input:focus,
+.app[data-theme="theme-10"] .select:focus,
+.app[data-theme="theme-10"] .textarea:focus,
+.app[data-theme="theme-10"] .form-control:focus,
+.app[data-theme="theme-10"] .form-input:focus,
+.app[data-theme="theme-10"] .main-content input:focus,
+.app[data-theme="theme-10"] .main-content select:focus,
+.app[data-theme="theme-10"] .main-content textarea:focus {
     outline: 3px solid var(--retro-yellow);
     outline-offset: 2px;
 }
@@ -378,8 +415,8 @@
 }
 
 /* Decorative highlights */
-.app[data-theme="theme-10"] hr,
-.app[data-theme="theme-10"] .divider {
+.app[data-theme="theme-10"] .divider,
+.app[data-theme="theme-10"] .sidebar-divider {
     border: 0;
     border-top: 2px solid var(--retro-ink);
 }
@@ -396,8 +433,7 @@
 
 /* Responsive */
 @media (max-width: 900px) {
-    .app[data-theme="theme-10"] .sidebar,
-    .app[data-theme="theme-10"] aside {
+    .app[data-theme="theme-10"] .sidebar {
         padding: 16px 8px;
         border-radius: 16px;
     }
@@ -411,7 +447,6 @@
         border-radius: 16px;
     }
 
-    .app[data-theme="theme-10"] header,
     .app[data-theme="theme-10"] .topbar,
     .app[data-theme="theme-10"] .page-header {
         padding: 8px 16px;
@@ -419,8 +454,9 @@
 }
 
 @media (max-width: 620px) {
-    .app[data-theme="theme-10"] h1,
-    .app[data-theme="theme-10"] .page-title {
+    .app[data-theme="theme-10"] .page-heading h1,
+    .app[data-theme="theme-10"] .page-title,
+    .app[data-theme="theme-10"] .main-content h1 {
         font-size: 2rem;
     }
 
@@ -431,7 +467,12 @@
         overflow-x: auto;
     }
 
-    .app[data-theme="theme-10"] button {
+    .app[data-theme="theme-10"] .button,
+    .app[data-theme="theme-10"] .btn,
+    .app[data-theme="theme-10"] .primary-button,
+    .app[data-theme="theme-10"] .today-button,
+    .app[data-theme="theme-10"] .icon-button,
+    .app[data-theme="theme-10"] .reset-button {
         padding: 8px;
     }
 }
@@ -452,7 +493,7 @@
 .app[data-theme="theme-10"] .layout,
 .app[data-theme="theme-10"] .dashboard,
 .app[data-theme="theme-10"] .main-layout,
-.app[data-theme="theme-10"] main {
+.app[data-theme="theme-10"] .main-content {
     background-color: #fff4e2;
 }
 
@@ -471,9 +512,7 @@
 /* Кольорові заголовки календаря */
 .app[data-theme="theme-10"] .weekday,
 .app[data-theme="theme-10"] .weekday-header,
-.app[data-theme="theme-10"] .day-header,
-.app[data-theme="theme-10"] thead,
-.app[data-theme="theme-10"] th {
+.app[data-theme="theme-10"] .day-header {
     background-color: #f5c928 !important;
     color: #29251f !important;
     border-color: #29251f;
@@ -507,8 +546,12 @@
 }
 
 /* Акцентні кнопки */
-.app[data-theme="theme-10"] button,
-.app[data-theme="theme-10"] .button {
+.app[data-theme="theme-10"] .button,
+.app[data-theme="theme-10"] .btn,
+.app[data-theme="theme-10"] .primary-button,
+.app[data-theme="theme-10"] .today-button,
+.app[data-theme="theme-10"] .icon-button,
+.app[data-theme="theme-10"] .reset-button {
     border: 2px solid #29251f;
     border-radius: 14px;
     background-color: #fffdf8;
@@ -516,8 +559,12 @@
     box-shadow: 3px 3px 0 #29251f;
 }
 
-.app[data-theme="theme-10"] button:not(.color-swatch-btn):hover,
-.app[data-theme="theme-10"] .button:not(.color-swatch-btn):hover {
+.app[data-theme="theme-10"] .button:not(.color-swatch-btn):hover,
+.app[data-theme="theme-10"] .btn:not(.color-swatch-btn):hover,
+.app[data-theme="theme-10"] .primary-button:hover,
+.app[data-theme="theme-10"] .today-button:hover,
+.app[data-theme="theme-10"] .icon-button:hover,
+.app[data-theme="theme-10"] .reset-button:hover {
     background-color: #f5c928 !important;
     color: #29251f !important;
 }
@@ -525,22 +572,21 @@
 /* Основна дія — жовта */
 .app[data-theme="theme-10"] .primary,
 .app[data-theme="theme-10"] .primary-button,
-.app[data-theme="theme-10"] button[type="submit"] {
+.app[data-theme="theme-10"] .submit-button {
     background-color: #f5c928 !important;
     color: #29251f !important;
 }
 
 /* Навігація */
-.app[data-theme="theme-10"] .sidebar,
-.app[data-theme="theme-10"] aside {
+.app[data-theme="theme-10"] .sidebar {
     background-color: #fffdf8 !important;
     border: 2px solid #29251f;
     box-shadow: 4px 4px 0 #29251f;
 }
 
+.app[data-theme="theme-10"] .sidebar .nav-link.active,
 .app[data-theme="theme-10"] .sidebar .active,
-.app[data-theme="theme-10"] .sidebar [aria-current="page"],
-.app[data-theme="theme-10"] aside [aria-current="page"] {
+.app[data-theme="theme-10"] .sidebar [aria-current="page"] {
     background-color: #f5c928 !important;
     color: #29251f !important;
 }
@@ -560,16 +606,17 @@
 .app[data-theme="theme-10"] .calendar-day,
 .app[data-theme="theme-10"] .day-cell,
 .app[data-theme="theme-10"] .calendar-cell,
-.app[data-theme="theme-10"] .time-slot,
-.app[data-theme="theme-10"] td {
+.app[data-theme="theme-10"] .time-slot {
     background-color: #fffdf8;
     border-color: #e0d5c4;
 }
 
 /* Поля введення */
-.app[data-theme="theme-10"] input,
-.app[data-theme="theme-10"] select,
-.app[data-theme="theme-10"] textarea {
+.app[data-theme="theme-10"] .input,
+.app[data-theme="theme-10"] .select,
+.app[data-theme="theme-10"] .textarea,
+.app[data-theme="theme-10"] .form-control,
+.app[data-theme="theme-10"] .form-input {
     background-color: #fffdf8;
     color: #29251f;
     border: 2px solid #29251f;
@@ -626,7 +673,9 @@
     gap: 8px;
 }
 
-.app[data-theme="theme-10"] .week-controls button {
+.app[data-theme="theme-10"] .week-controls .icon-button,
+.app[data-theme="theme-10"] .week-controls .today-button,
+.app[data-theme="theme-10"] .week-controls .button {
     padding: 8px 16px;
     box-shadow: none;
     border-width: 1px;

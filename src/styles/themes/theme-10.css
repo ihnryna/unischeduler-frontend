@@ -611,15 +611,18 @@
 
 /* Week toolbar */
 .app[data-theme="theme-10"] .week-toolbar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
     padding-block: 8px 16px;
     border-bottom: none;
 }
 
-.app[data-theme="theme-10"] .week-info {
-    gap: 14px;
-}
-
 .app[data-theme="theme-10"] .week-controls {
+    justify-self: start;
+    display: flex;
+    align-items: center;
     gap: 8px;
 }
 
@@ -628,6 +631,92 @@
     box-shadow: none;
     border-width: 1px;
     border-radius: 9px;
+}
+
+.app[data-theme="theme-10"] .week-center {
+    justify-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+}
+
+.app[data-theme="theme-10"] .week-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.app[data-theme="theme-10"] .week-center h2 {
+    margin: 0;
+    font-size: clamp(1.15rem, 2vw, 1.45rem);
+    font-weight: 750;
+    letter-spacing: -0.03em;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .current-week-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 11px;
+    background: var(--retro-yellow);
+    border: 1.5px solid var(--retro-ink);
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--retro-ink);
+    box-shadow: 1.5px 1.5px 0 var(--retro-ink);
+    letter-spacing: 0.02em;
+}
+
+.app[data-theme="theme-10"] .week-offset-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 11px;
+    background: var(--retro-paper);
+    border: 1.5px solid var(--retro-ink);
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--retro-muted);
+}
+
+.app[data-theme="theme-10"] .week-right {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.app[data-theme="theme-10"] .week-parity-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    background: var(--retro-blue);
+    border: 1.5px solid var(--retro-ink);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 750;
+    color: var(--retro-ink);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+}
+
+@media (max-width: 860px) {
+    .app[data-theme="theme-10"] .week-toolbar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .app[data-theme="theme-10"] .week-controls,
+    .app[data-theme="theme-10"] .week-center,
+    .app[data-theme="theme-10"] .week-right {
+        justify-self: center;
+    }
 }
 
 /* Calendar — lighter frame */
@@ -689,6 +778,14 @@
 .app[data-theme="theme-10"] .calendar-header .day-header.selected {
     background: var(--retro-yellow);
     font-weight: 700;
+}
+
+.app[data-theme="theme-10"] .calendar-header .day-header.is-today:not(.selected) {
+    background: rgba(245, 201, 40, 0.22);
+}
+
+.app[data-theme="theme-10"] .day-column.day-column-today {
+    background-color: rgba(245, 201, 40, 0.04);
 }
 
 /* Time labels */
@@ -771,4 +868,59 @@
 .app[data-theme="theme-10"] .widget h2,
 .app[data-theme="theme-10"] .widget h3 {
     letter-spacing: -0.045em;
+}
+
+.app[data-theme="theme-10"] .upcoming-lesson {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.app[data-theme="theme-10"] .upcoming-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 58px;
+    padding: 8px 12px;
+    border: 2px solid var(--retro-ink);
+    border-radius: 12px;
+    background: var(--retro-yellow);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .upcoming-date strong {
+    font-size: 1.5rem;
+    font-weight: 850;
+    line-height: 1;
+}
+
+.app[data-theme="theme-10"] .upcoming-date span {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+}
+
+.app[data-theme="theme-10"] .upcoming-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.app[data-theme="theme-10"] .upcoming-details strong {
+    font-size: 1.05rem;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+}
+
+.app[data-theme="theme-10"] .upcoming-details span {
+    font-size: 0.82rem;
+    color: var(--retro-muted);
+}
+
+.app[data-theme="theme-10"] .upcoming-empty {
+    padding: 8px 0;
+    color: var(--retro-muted);
+    font-size: 0.9rem;
 }

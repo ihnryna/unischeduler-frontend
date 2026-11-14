@@ -484,26 +484,26 @@
 .app[data-theme="theme-10"] .event-card,
 .app[data-theme="theme-10"] .schedule-event,
 .app[data-theme="theme-10"] .lesson-card {
-    background-color: #d9c7f0 !important;
-    color: #29251f !important;
+    background-color: #d9c7f0;
+    color: #29251f;
     border: 2px solid #29251f;
     border-radius: 13px;
     box-shadow: 2px 2px 0 #29251f;
 }
 
 /* Пастельні варіанти для занять */
-.app[data-theme="theme-10"] .event:nth-of-type(3n + 1),
-.app[data-theme="theme-10"] .event-card:nth-of-type(3n + 1),
-.app[data-theme="theme-10"] .schedule-event:nth-of-type(3n + 1),
-.app[data-theme="theme-10"] .lesson-card:nth-of-type(3n + 1) {
-    background-color: #c7d8ff !important;
+.app[data-theme="theme-10"] .event:not([style*="background"]):nth-of-type(3n + 1),
+.app[data-theme="theme-10"] .event-card:not([style*="background"]):nth-of-type(3n + 1),
+.app[data-theme="theme-10"] .schedule-event:not([style*="background"]):nth-of-type(3n + 1),
+.app[data-theme="theme-10"] .lesson-card:not([style*="background"]):nth-of-type(3n + 1) {
+    background-color: #c7d8ff;
 }
 
-.app[data-theme="theme-10"] .event:nth-of-type(3n + 2),
-.app[data-theme="theme-10"] .event-card:nth-of-type(3n + 2),
-.app[data-theme="theme-10"] .schedule-event:nth-of-type(3n + 2),
-.app[data-theme="theme-10"] .lesson-card:nth-of-type(3n + 2) {
-    background-color: #f6c7d7 !important;
+.app[data-theme="theme-10"] .event:not([style*="background"]):nth-of-type(3n + 2),
+.app[data-theme="theme-10"] .event-card:not([style*="background"]):nth-of-type(3n + 2),
+.app[data-theme="theme-10"] .schedule-event:not([style*="background"]):nth-of-type(3n + 2),
+.app[data-theme="theme-10"] .lesson-card:not([style*="background"]):nth-of-type(3n + 2) {
+    background-color: #f6c7d7;
 }
 
 /* Акцентні кнопки */
@@ -516,8 +516,8 @@
     box-shadow: 3px 3px 0 #29251f;
 }
 
-.app[data-theme="theme-10"] button:hover,
-.app[data-theme="theme-10"] .button:hover {
+.app[data-theme="theme-10"] button:not(.color-swatch-btn):hover,
+.app[data-theme="theme-10"] .button:not(.color-swatch-btn):hover {
     background-color: #f5c928 !important;
     color: #29251f !important;
 }
@@ -923,4 +923,192 @@
     padding: 8px 0;
     color: var(--retro-muted);
     font-size: 0.9rem;
+}
+
+/* =========================================
+   SETTINGS PAGE & SUBJECT COLORS
+   ========================================= */
+
+.app[data-theme="theme-10"] .settings-page {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+.app[data-theme="theme-10"] .settings-card {
+    background: var(--retro-paper);
+    border: 2px solid var(--retro-ink);
+    border-radius: 22px;
+    padding: 24px;
+    box-shadow: 4px 4px 0 var(--retro-ink);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.app[data-theme="theme-10"] .settings-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    border-bottom: 2px solid var(--retro-line);
+    padding-bottom: 16px;
+}
+
+.app[data-theme="theme-10"] .settings-card-header h2 {
+    margin: 0 0 6px 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .settings-card-description {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--retro-muted);
+    max-width: 650px;
+}
+
+.app[data-theme="theme-10"] .settings-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.app[data-theme="theme-10"] .settings-saved-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    background: var(--retro-green);
+    border: 1.5px solid var(--retro-ink);
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 750;
+    color: var(--retro-ink);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .reset-button {
+    padding: 8px 16px;
+    border: 2px solid var(--retro-ink);
+    border-radius: 12px;
+    background: var(--retro-paper);
+    color: var(--retro-ink);
+    font-size: 0.85rem;
+    font-weight: 750;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--retro-ink);
+    transition: transform 120ms ease, background 120ms ease;
+}
+
+.app[data-theme="theme-10"] .reset-button:hover {
+    background: var(--retro-pink);
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .subject-color-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.app[data-theme="theme-10"] .subject-color-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 12px 18px;
+    border: 1.5px solid #dcd4c6;
+    border-radius: 16px;
+    background: #fffdf8;
+    transition: border-color 140ms ease, background-color 140ms ease, transform 140ms ease;
+}
+
+.app[data-theme="theme-10"] .subject-color-item:hover {
+    border-color: var(--retro-ink);
+    background-color: #fff9ed;
+}
+
+.app[data-theme="theme-10"] .subject-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.app[data-theme="theme-10"] .subject-preview-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 2px solid var(--retro-ink);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+    flex-shrink: 0;
+    transition: background-color 150ms ease;
+}
+
+.app[data-theme="theme-10"] .subject-names {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.app[data-theme="theme-10"] .subject-title {
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: var(--retro-ink);
+    letter-spacing: -0.02em;
+}
+
+.app[data-theme="theme-10"] .subject-preview-text {
+    font-size: 0.75rem;
+    color: var(--retro-muted);
+}
+
+.app[data-theme="theme-10"] .palette-swatches {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.app[data-theme="theme-10"] .color-swatch-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--retro-ink);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    box-shadow: 1.5px 1.5px 0 var(--retro-ink);
+    transition: transform 120ms ease, box-shadow 120ms ease;
+    padding: 0;
+    background-color: var(--swatch-bg) !important;
+}
+
+.app[data-theme="theme-10"] .color-swatch-btn:hover {
+    background-color: var(--swatch-bg) !important;
+    transform: scale(1.18);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .color-swatch-btn.is-selected {
+    outline: 3px solid var(--retro-ink);
+    outline-offset: 2px;
+    transform: scale(1.1);
+    background-color: var(--swatch-bg) !important;
+}
+
+.app[data-theme="theme-10"] .swatch-check {
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--retro-ink);
+    line-height: 1;
 }

@@ -44,7 +44,7 @@
     color: var(--retro-ink);
     border: 2px solid var(--retro-line);
     border-radius: 24px;
-    padding: 22px 16px;
+    padding: 24px 16px;
     box-shadow: 4px 4px 0 var(--retro-ink);
 }
 
@@ -59,10 +59,10 @@
 .app[data-theme="theme-10"] aside button {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     width: 100%;
-    padding: 11px 13px;
-    margin-bottom: 5px;
+    padding: 8px 16px;
+    margin-bottom: 8px;
     background: transparent;
     border: 2px solid transparent;
     border-radius: 14px;
@@ -92,9 +92,101 @@
 .app[data-theme="theme-10"] header,
 .app[data-theme="theme-10"] .topbar,
 .app[data-theme="theme-10"] .page-header {
-    background: transparent;
-    border-bottom: 2px solid var(--retro-ink);
-    padding: 20px 24px;
+    background: rgba(255, 253, 248, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 2px solid var(--retro-ink);
+    border-top: none;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 0 var(--retro-ink);
+    padding: 12px 24px;
+}
+
+.app[data-theme="theme-10"] .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .brand-logo {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    background: var(--retro-yellow);
+    border: 2px solid var(--retro-ink);
+    border-radius: 12px;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: -0.04em;
+    color: var(--retro-ink);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+    transform: rotate(-2deg);
+    transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.app[data-theme="theme-10"] .brand:hover .brand-logo {
+    transform: rotate(0deg) scale(1.05);
+    box-shadow: 3px 3px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.app[data-theme="theme-10"] .brand-text strong {
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.app[data-theme="theme-10"] .semester-label {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    background: var(--retro-green);
+    border: 2px solid var(--retro-ink);
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: var(--retro-ink);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .profile-button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    padding: 0;
+    background: var(--retro-pink);
+    border: 2px solid var(--retro-ink);
+    border-radius: 50%;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--retro-ink);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+    cursor: pointer;
+    transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.app[data-theme="theme-10"] .profile-button:hover {
+    background: var(--retro-yellow);
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--retro-ink);
 }
 
 .app[data-theme="theme-10"] h1,
@@ -129,7 +221,7 @@
     background: var(--retro-paper);
     border: 2px solid var(--retro-ink);
     border-radius: 22px;
-    padding: 20px;
+    padding: 16px;
     box-shadow: 4px 4px 0 var(--retro-ink);
     transition: transform 160ms ease, box-shadow 160ms ease;
 }
@@ -149,7 +241,7 @@
     border-radius: 14px;
     background: var(--retro-paper);
     color: var(--retro-ink);
-    padding: 10px 16px;
+    padding: 8px 16px;
     font: inherit;
     font-weight: 600;
     box-shadow: 3px 3px 0 var(--retro-ink);
@@ -184,7 +276,7 @@
     border-radius: 12px;
     background: #fff;
     color: var(--retro-ink);
-    padding: 11px 13px;
+    padding: 8px 16px;
     font: inherit;
 }
 
@@ -237,8 +329,8 @@
 .app[data-theme="theme-10"] .schedule-event,
 .app[data-theme="theme-10"] .lesson-card {
     display: block;
-    padding: 10px 12px;
-    margin: 3px 0;
+    padding: 8px;
+    margin: 0;
     border: 2px solid var(--retro-ink);
     border-radius: 13px;
     background: var(--retro-lilac);
@@ -278,7 +370,7 @@
     align-items: center;
     border: 2px solid var(--retro-ink);
     border-radius: 999px;
-    padding: 5px 10px;
+    padding: 8px;
     background: var(--retro-pink);
     color: var(--retro-ink);
     font-size: 0.75rem;
@@ -306,8 +398,8 @@
 @media (max-width: 900px) {
     .app[data-theme="theme-10"] .sidebar,
     .app[data-theme="theme-10"] aside {
-        padding: 14px 10px;
-        border-radius: 18px;
+        padding: 16px 8px;
+        border-radius: 16px;
     }
 
     .app[data-theme="theme-10"] .card,
@@ -315,14 +407,14 @@
     .app[data-theme="theme-10"] .widget,
     .app[data-theme="theme-10"] .calendar-card,
     .app[data-theme="theme-10"] .content-card {
-        padding: 14px;
-        border-radius: 17px;
+        padding: 16px;
+        border-radius: 16px;
     }
 
     .app[data-theme="theme-10"] header,
     .app[data-theme="theme-10"] .topbar,
     .app[data-theme="theme-10"] .page-header {
-        padding: 16px;
+        padding: 8px 16px;
     }
 }
 
@@ -340,7 +432,7 @@
     }
 
     .app[data-theme="theme-10"] button {
-        padding: 9px 12px;
+        padding: 8px;
     }
 }
 
@@ -498,13 +590,17 @@
    ========================================= */
 
 /* Page headings */
+.app[data-theme="theme-10"] .page-heading {
+    padding-top: 16px;
+}
+
 .app[data-theme="theme-10"] .page-heading h1,
 .app[data-theme="theme-10"] .page-heading .page-title {
     font-size: clamp(2.4rem, 4vw, 3.5rem);
     font-weight: 700;
     letter-spacing: -0.065em;
     line-height: 1.05;
-    margin-bottom: 8px;
+    margin: 0;
 }
 
 .app[data-theme="theme-10"] .page-heading p {
@@ -516,7 +612,7 @@
 /* Week toolbar */
 .app[data-theme="theme-10"] .week-toolbar {
     padding-block: 8px 16px;
-    border-bottom: 1px solid #d9cfc0;
+    border-bottom: none;
 }
 
 .app[data-theme="theme-10"] .week-info {
@@ -528,7 +624,7 @@
 }
 
 .app[data-theme="theme-10"] .week-controls button {
-    padding: 8px 13px;
+    padding: 8px 16px;
     box-shadow: none;
     border-width: 1px;
     border-radius: 9px;
@@ -544,7 +640,16 @@
 
 /* Weekday headers */
 .app[data-theme="theme-10"] .calendar-header {
-    border-bottom: 1px solid var(--retro-ink);
+    border-bottom: none;
+}
+
+/* Invisible corner */
+.app[data-theme="theme-10"] .time-header {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    border: none !important;
+    background: transparent !important;
 }
 
 .app[data-theme="theme-10"] .calendar-header .day-header {
@@ -552,17 +657,22 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 5px;
-    padding: 14px 6px;
+    gap: 8px;
+    padding: 16px 8px;
     border: 0;
     border-radius: 0;
     border-right: 1px solid #e3dacd;
+    border-bottom: 1px solid var(--retro-ink);
     background: transparent;
     box-shadow: none;
     font-size: 0.72rem;
     font-weight: 500;
     letter-spacing: 0.07em;
     text-transform: uppercase;
+}
+
+.app[data-theme="theme-10"] .calendar-header .day-header:first-of-type {
+    border-left: 1px solid #e3dacd;
 }
 
 .app[data-theme="theme-10"] .calendar-header .day-header strong {
@@ -603,7 +713,7 @@
 
 /* Lesson cards */
 .app[data-theme="theme-10"] .lesson-card {
-    padding: 10px 11px;
+    padding: 8px;
     border: 1px solid var(--retro-ink);
     border-radius: 9px;
     box-shadow: 1px 1px 0 var(--retro-ink);

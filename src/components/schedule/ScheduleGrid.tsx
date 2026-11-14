@@ -28,7 +28,7 @@ export function ScheduleGrid({
     return (
         <section className="calendar" id="calendar">
             <div className="calendar-header">
-                <div className="time-header">ЧАС</div>
+                <div className="time-header" aria-hidden="true" />
 
                 {DAYS.map((day, index) => (
                     <button

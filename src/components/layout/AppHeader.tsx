@@ -1,4 +1,9 @@
+import {useLocation} from 'react-router'
+
 export function AppHeader() {
+    const location = useLocation()
+    const isAdminPage = location.pathname.startsWith('/admin')
+
     return (
         <header className="topbar">
             <a className="brand" href="#" aria-label="UNIScheduler — головна">
@@ -10,6 +15,12 @@ export function AppHeader() {
             </a>
 
             <div className="topbar-right">
+                {isAdminPage && (
+                    <span className="admin-badge admin-badge-admin-role">
+                        🛡️ Адміністратор системи · admin@ukma.edu.ua
+                    </span>
+                )}
+
                 <span className="semester-label">
                     Осінній семестр · 2026
                 </span>

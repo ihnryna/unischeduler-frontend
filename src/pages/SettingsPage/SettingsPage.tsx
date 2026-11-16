@@ -1,16 +1,28 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 
 import {
     RETRO_COLOR_PALETTE,
     useSubjectColors,
 } from '../../features/schedule/subjectColors'
-import {mockCourses} from '../../mocks'
+import {adminService} from '../../features/admin/adminService'
+import type {Course} from '../../types/catalog'
 
 export function SettingsPage() {
     const {colors, setColor, resetColors} = useSubjectColors()
     const [savedNotification, setSavedNotification] = useState<string | null>(null)
+    const [courses, setCourses] = useState<Course[]>(() => adminService.getCourses())
 
-    const subjects = mockCourses.map((c) => c.name)
+    useEffect(() => {
+        const handleUpdate = () => {
+            setCourses(adminService.getCourses())
+        }
+        window.addEventListener('unischeduler_courses_updated', handleUpdate)
+        return () => {
+            window.removeEventListener('unischeduler_courses_updated', handleUpdate)
+        }
+    }, [])
+
+    const subjects = courses.map((c) => c.name)
 
     const handleSelectColor = (subject: string, colorHex: string, colorName: string) => {
         setColor(subject, colorHex)

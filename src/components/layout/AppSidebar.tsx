@@ -1,10 +1,10 @@
 import {NavLink} from 'react-router'
 
 type AppSidebarProps = {
-    lessonCount: number
+    lessonCount?: number
 }
 
-export function AppSidebar({lessonCount}: AppSidebarProps) {
+export function AppSidebar({lessonCount: _lessonCount}: AppSidebarProps) {
     return (
         <aside className="sidebar">
             <p className="sidebar-label">РОЗКЛАД</p>
@@ -59,27 +59,19 @@ export function AppSidebar({lessonCount}: AppSidebarProps) {
 
             <div className="sidebar-divider"/>
 
-            <p className="sidebar-label">ЦЬОГО ТИЖНЯ</p>
+            <p className="sidebar-label">АДМІНІСТРУВАННЯ</p>
 
-            <div className="sidebar-stat">
-                <span className="stat-icon purple-icon">▦</span>
-                <span>
-                    <strong>{lessonCount}</strong>
-                    <small> навчальних блоків</small>
-                </span>
-            </div>
-
-            <div className="sidebar-stat">
-                <span className="stat-icon mint-icon">◷</span>
-                <span>
-                    <strong>16,5 год</strong>
-                    <small> у розкладі</small>
-                </span>
-            </div>
-
-            <div className="sidebar-footer">
-                Зроблено спудеями для спудеїв
-            </div>
+            <nav className="navigation" aria-label="Адміністрування системи">
+                <NavLink
+                    to="/admin"
+                    className={({isActive}) =>
+                        `nav-link ${isActive ? 'active' : ''}`
+                    }
+                >
+                    <span className="nav-icon">🛡</span>
+                    Адмін-панель
+                </NavLink>
+            </nav>
         </aside>
     )
 }

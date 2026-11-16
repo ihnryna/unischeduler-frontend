@@ -19,6 +19,18 @@ export function useSchedule(userId = DEFAULT_USER_ID, weekOffset = 0): UseSchedu
     const [requestVersion, setRequestVersion] = useState(0)
 
     useEffect(() => {
+        const handleUpdate = () => {
+            setRequestVersion((version) => version + 1)
+        }
+        window.addEventListener('unischeduler_classes_updated', handleUpdate)
+        window.addEventListener('unischeduler_courses_updated', handleUpdate)
+        return () => {
+            window.removeEventListener('unischeduler_classes_updated', handleUpdate)
+            window.removeEventListener('unischeduler_courses_updated', handleUpdate)
+        }
+    }, [])
+
+    useEffect(() => {
         let isActive = true
 
         setIsLoading(true)

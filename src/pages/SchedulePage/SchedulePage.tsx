@@ -2,11 +2,46 @@ import {useState} from 'react'
 
 import {ScheduleGrid} from '../../components/schedule/ScheduleGrid'
 import {useSchedule} from '../../features/schedule/useSchedule'
+import {
+    formatWeekRange,
+    getAcademicWeekInfo,
+    getMondayOfWeek,
+    MONTH_SHORT_UA,
+} from '../../utils/dateUtils'
+import {formatTime} from '../../utils/formatTime'
 
 export function SchedulePage() {
     const [weekOffset, setWeekOffset] = useState(0)
     const [selectedDay, setSelectedDay] = useState<number | null>(null)
-    const {events, isLoading, error} = useSchedule()
+    const {events, isLoading, error} = useSchedule(1, weekOffset)
+
+    const monday = getMondayOfWeek()
+    monday.setDate(monday.getDate() + weekOffset * 7)
+
+    const sunday = new Date(monday)
+    sunday.setDate(monday.getDate() + 6)
+
+    const weekRangeLabel = formatWeekRange(monday, sunday)
+    const academicWeekInfo = getAcademicWeekInfo(monday)
+
+    // Дані для блоку "Найближче заняття" (перше заняття у вибраному тижні)
+    const upcomingEvent = events[0] ?? null
+    let upcomingDay = '--'
+    let upcomingMonth = ''
+    if (upcomingEvent) {
+        const eventDate = new Date(upcomingEvent.startsAt)
+        upcomingDay = String(eventDate.getDate())
+        upcomingMonth = MONTH_SHORT_UA[eventDate.getMonth()]
+    }
+
+    // Дані для блоку "Тиждень у цифрах"
+    const uniqueDaysCount = new Set(
+        events.map((e) => new Date(e.startsAt).getDay()),
+    ).size
+    const totalHours = events.reduce((sum, e) => {
+        const diffMs = new Date(e.endsAt).getTime() - new Date(e.startsAt).getTime()
+        return sum + diffMs / (1000 * 60 * 60)
+    }, 0)
 
     return (
         <>
@@ -26,19 +61,6 @@ export function SchedulePage() {
             </div>
 
             <section className="week-toolbar">
-                <div className="week-info">
-
-                    <div>
-                        <h2>26 жовтня — 1 листопада</h2>
-
-                        <p>
-                            {weekOffset === 0
-                                ? 'Поточний тиждень'
-                                : `${weekOffset > 0 ? '+' : ''}${weekOffset} тиж. від поточного`}
-                        </p>
-                    </div>
-                </div>
-
                 <div className="week-controls">
                     <button
                         className="icon-button"
@@ -66,16 +88,29 @@ export function SchedulePage() {
                         →
                     </button>
                 </div>
+
+                <div className="week-center">
+                    <div className="week-title-row">
+                        <h2>{weekRangeLabel}</h2>
+                        {weekOffset === 0 ? (
+                            <span className="current-week-badge">Поточний тиждень</span>
+                        ) : (
+                            <span className="week-offset-badge">
+                                {weekOffset > 0 ? `+${weekOffset}` : weekOffset} тиж. від поточного
+                            </span>
+                        )}
+                    </div>
+                </div>
+
+                <div className="week-right">
+                    <span className="week-parity-badge">
+                        {academicWeekInfo.fullLabel}
+                    </span>
+                </div>
             </section>
 
-            {weekOffset !== 0 && (
-                <p className="demo-notice">
-                    Демонстраційний режим: дані занять не змінюються між тижнями.
-                </p>
-            )}
-
             {isLoading && (
-                <p className="demo-notice">Завантажуємо демонстраційний розклад…</p>
+                <p className="demo-notice">Завантажуємо розклад…</p>
             )}
 
             {error && (
@@ -104,18 +139,29 @@ export function SchedulePage() {
                         <span className="status-dot"/>
                     </div>
 
-                    <div className="upcoming-lesson">
-                        <div className="upcoming-date">
-                            <strong>26</strong>
-                            <span>ЖОВ</span>
-                        </div>
+                    {upcomingEvent ? (
+                        <div className="upcoming-lesson">
+                            <div className="upcoming-date">
+                                <strong>{upcomingDay}</strong>
+                                <span>{upcomingMonth}</span>
+                            </div>
 
-                        <div className="upcoming-details">
-                            <strong>Проєктування програмних систем</strong>
-                            <span>09:00 · Аудиторія 3-214</span>
-                            <span>В. Бублик</span>
+                            <div className="upcoming-details">
+                                <strong>{upcomingEvent.name}</strong>
+                                <span>
+                                    {formatTime(upcomingEvent.startsAt)} ·{' '}
+                                    {upcomingEvent.location ?? 'Онлайн'}
+                                </span>
+                                <span>
+                                    {upcomingEvent.teacher ?? upcomingEvent.description ?? 'Навчальна група'}
+                                </span>
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="upcoming-empty">
+                            <p>На цьому тижні немає запланованих занять.</p>
+                        </div>
+                    )}
                 </section>
 
                 <section className="widget" id="overview">
@@ -133,12 +179,16 @@ export function SchedulePage() {
                         </div>
 
                         <div>
-                            <strong>5</strong>
+                            <strong>{uniqueDaysCount}</strong>
                             <span>навчальних днів</span>
                         </div>
 
                         <div>
-                            <strong>16,5</strong>
+                            <strong>
+                                {totalHours.toLocaleString('uk-UA', {
+                                    maximumFractionDigits: 1,
+                                })}
+                            </strong>
                             <span>годин</span>
                         </div>
                     </div>

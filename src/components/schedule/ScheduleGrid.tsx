@@ -1,5 +1,6 @@
 import type {CalendarEvent} from '../../types/schedule'
-import {DAYS, HOURS} from '../../features/schedule/scheduleConfig'
+import {HOURS} from '../../features/schedule/scheduleConfig'
+import {getWeekDays} from '../../utils/dateUtils'
 import {ScheduleEvent} from './ScheduleEvent'
 
 type ScheduleGridProps = {
@@ -10,11 +11,12 @@ type ScheduleGridProps = {
 }
 
 export function ScheduleGrid({
-                                 events,
-                                 selectedDay,
-                                 onSelectDay,
-                                 weekOffset,
-                             }: Readonly<ScheduleGridProps>) {
+    events,
+    selectedDay,
+    onSelectDay,
+    weekOffset,
+}: Readonly<ScheduleGridProps>) {
+    const weekDays = getWeekDays(weekOffset)
 
     const getDayIndex = (event: CalendarEvent) => {
         const sundayBasedDay = new Date(event.startsAt).getDay()
@@ -28,19 +30,20 @@ export function ScheduleGrid({
     return (
         <section className="calendar" id="calendar">
             <div className="calendar-header">
-                <div className="time-header">ЧАС</div>
+                <div className="time-header" aria-hidden="true" />
 
-                {DAYS.map((day, index) => (
+                {weekDays.map((day) => (
                     <button
                         className={`day-header ${
-                            selectedDay === index ? 'selected' : ''
-                        }`}
-                        key={day.name}
-                        onClick={() => onSelectDay(index)}
-                        aria-pressed={selectedDay === index}
+                            selectedDay === day.dayIndex ? 'selected' : ''
+                        } ${day.isToday ? 'is-today' : ''}`}
+                        key={day.isoDate}
+                        onClick={() => onSelectDay(day.dayIndex)}
+                        aria-pressed={selectedDay === day.dayIndex}
+                        title={day.isToday ? `${day.fullName} (Сьогодні)` : day.fullName}
                     >
                         <span>{day.name}</span>
-                        <strong>{day.date + weekOffset * 7}</strong>
+                        <strong>{day.date}</strong>
                     </button>
                 ))}
             </div>
@@ -54,19 +57,19 @@ export function ScheduleGrid({
                     ))}
                 </div>
 
-                {DAYS.map((day, dayIndex) => (
+                {weekDays.map((day) => (
                     <div
                         className={`day-column ${
-                            selectedDay === dayIndex ? 'day-column-selected' : ''
-                        }`}
-                        key={day.name}
+                            selectedDay === day.dayIndex ? 'day-column-selected' : ''
+                        } ${day.isToday ? 'day-column-today' : ''}`}
+                        key={day.isoDate}
                     >
                         {HOURS.map((hour) => (
-                            <div className="hour-slot" key={hour}/>
+                            <div className="hour-slot" key={hour} />
                         ))}
 
                         {visibleEvents
-                            .filter((event) => getDayIndex(event) === dayIndex)
+                            .filter((event) => getDayIndex(event) === day.dayIndex)
                             .map((event) => (
                                 <ScheduleEvent
                                     key={`${event.eventType}-${event.eventId}`}

@@ -21,27 +21,13 @@ export function AdminScheduleInspectorTab({
     classes,
     onEditClass,
 }: Readonly<AdminScheduleInspectorTabProps>) {
-    const [filterMode, setFilterMode] = useState<'GROUP' | 'SPECIALITY'>('GROUP')
-    const [selectedGroup, setSelectedGroup] = useState('ІПЗ-4')
     const [selectedSpeciality, setSelectedSpeciality] = useState(mockSpecialities[0].name)
 
-    const availableGroups = useMemo(() => {
-        const groups = new Set<string>()
-        classes.forEach((c) => {
-            if (c.group) groups.add(c.group)
-        })
-        return Array.from(groups).sort()
-    }, [classes])
-
     const inspectedClasses = useMemo(() => {
-        if (filterMode === 'GROUP') {
-            return classes.filter((c) => c.group === selectedGroup)
-        } else {
-            return classes.filter((c) =>
-                c.course.specialities.some((s) => s.name === selectedSpeciality),
-            )
-        }
-    }, [classes, filterMode, selectedGroup, selectedSpeciality])
+        return classes.filter((c) =>
+            c.course.specialities.some((s) => s.name === selectedSpeciality),
+        )
+    }, [classes, selectedSpeciality])
 
     const getDayIndex = (startsAt: string) => {
         const date = new Date(startsAt)
@@ -55,69 +41,30 @@ export function AdminScheduleInspectorTab({
                     <div>
                         <h3 className="admin-card-title">Діагностика та аудит розкладів</h3>
                         <p className="admin-card-subtitle">
-                            Швидкий перегляд зведеного розкладу для перевірки звернень студентів і викладачів (Вимога 2.4)
+                            Швидкий перегляд зведеного розкладу для перевірки звернень студентів і викладачів
                         </p>
                     </div>
 
-                    <div className="admin-switch-control" role="group" aria-label="Режим фільтрації розкладу">
-                        <button
-                            type="button"
-                            className={`admin-switch-btn ${filterMode === 'GROUP' ? 'is-active' : ''}`}
-                            onClick={() => setFilterMode('GROUP')}
-                            aria-pressed={filterMode === 'GROUP'}
+                    <div className="admin-inspector-select-wrap">
+                        <label className="admin-inspector-label" htmlFor="inspector-spec">
+                            Спеціальність НаУКМА:
+                        </label>
+                        <select
+                            id="inspector-spec"
+                            className="select admin-form-select"
+                            value={selectedSpeciality}
+                            onChange={(e) => setSelectedSpeciality(e.target.value)}
                         >
-                            За групою
-                        </button>
-                        <button
-                            type="button"
-                            className={`admin-switch-btn ${filterMode === 'SPECIALITY' ? 'is-active' : ''}`}
-                            onClick={() => setFilterMode('SPECIALITY')}
-                            aria-pressed={filterMode === 'SPECIALITY'}
-                        >
-                            За спеціальністю
-                        </button>
+                            {mockSpecialities.map((spec) => (
+                                <option key={spec.id} value={spec.name}>
+                                    {spec.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                 </div>
 
                 <div className="admin-inspector-controls">
-                    {filterMode === 'GROUP' ? (
-                        <div className="admin-inspector-select-wrap">
-                            <label className="admin-inspector-label" htmlFor="inspector-group">
-                                Навчальна група:
-                            </label>
-                            <select
-                                id="inspector-group"
-                                className="select admin-form-select"
-                                value={selectedGroup}
-                                onChange={(e) => setSelectedGroup(e.target.value)}
-                            >
-                                {availableGroups.map((grp) => (
-                                    <option key={grp} value={grp}>
-                                        Група {grp}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    ) : (
-                        <div className="admin-inspector-select-wrap">
-                            <label className="admin-inspector-label" htmlFor="inspector-spec">
-                                Спеціальність НаУКМА:
-                            </label>
-                            <select
-                                id="inspector-spec"
-                                className="select admin-form-select"
-                                value={selectedSpeciality}
-                                onChange={(e) => setSelectedSpeciality(e.target.value)}
-                            >
-                                {mockSpecialities.map((spec) => (
-                                    <option key={spec.id} value={spec.name}>
-                                        {spec.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
-
                     <div className="admin-inspector-stats">
                         <span className="admin-badge admin-badge-info">
                             {inspectedClasses.length} навчальних пар

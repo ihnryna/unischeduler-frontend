@@ -116,7 +116,7 @@ export function AdminAuditLogsTab({
                         Записів: <strong>{filteredLogs.length}</strong> (збережено останніх <strong>{logs.length}</strong>)
                     </span>
                     <span className="admin-subtext">
-                        Вимоги 8.9 та 11.1: Аудит дій адміністратора та системних помилок
+                        Аудит дій адміністратора та системних помилок
                     </span>
                 </div>
 

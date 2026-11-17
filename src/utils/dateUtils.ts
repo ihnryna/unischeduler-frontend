@@ -84,6 +84,13 @@ export function getWeekDays(weekOffset = 0, baseDate = new Date()): WeekDayInfo[
     })
 }
 
+/** Whole weeks between the current week and the week containing `date` (0 = this week). */
+export function getWeekOffsetFor(date: Date, today: Date = new Date()): number {
+    const diffMs = getMondayOfWeek(date).getTime() - getMondayOfWeek(today).getTime()
+    // Round to absorb the 1-hour shift on daylight-saving weeks.
+    return Math.round(diffMs / (7 * 24 * 60 * 60 * 1000))
+}
+
 export function formatWeekRange(monday: Date, sunday: Date): string {
     const startDay = monday.getDate()
     const startMonth = monday.getMonth()

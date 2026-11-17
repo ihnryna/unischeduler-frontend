@@ -3,9 +3,12 @@ import {
     mockUsers,
 } from '../../mocks'
 import {adminService} from '../admin/adminService'
+import {personalEventService} from '../events/personalEventService'
 import type {Course, Speciality} from '../../types/catalog'
 import type {CalendarEvent, CalendarEventFilter} from '../../types/schedule'
 import {getAcademicWeekInfo, getMondayOfWeek} from '../../utils/dateUtils'
+
+const DEFAULT_MOCK_USER_ID = 1
 
 function generateWeekCalendarEvents(weekOffset = 0, userId?: number): CalendarEvent[] {
     const monday = getMondayOfWeek()
@@ -130,7 +133,26 @@ function generateWeekCalendarEvents(weekOffset = 0, userId?: number): CalendarEv
         }
     }
 
-    return [...courseEvents, ...personalEvents].sort((left, right) =>
+    // 3. Personal events created by the user in this session (mock store)
+    const createdEvents: CalendarEvent[] = personalEventService
+        .listCreatedInRange(
+            userId ?? DEFAULT_MOCK_USER_ID,
+            makeDateTime(0, '00:00:00'),
+            makeDateTime(7, '00:00:00'),
+        )
+        .map((event) => ({
+            eventId: event.id,
+            eventType: 'PERSONAL' as const,
+            name: event.name,
+            teacher: null,
+            group: null,
+            location: event.location,
+            description: event.description,
+            startsAt: event.startsAt,
+            endsAt: event.endsAt,
+        }))
+
+    return [...courseEvents, ...personalEvents, ...createdEvents].sort((left, right) =>
         left.startsAt.localeCompare(right.startsAt),
     )
 }

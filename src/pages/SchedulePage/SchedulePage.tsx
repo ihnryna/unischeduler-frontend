@@ -1,19 +1,49 @@
 import {useState} from 'react'
 
+import {CreatePersonalEventModal} from '../../components/events/CreatePersonalEventModal'
 import {ScheduleGrid} from '../../components/schedule/ScheduleGrid'
 import {useSchedule} from '../../features/schedule/useSchedule'
+import type {PersonalEvent} from '../../types/schedule'
 import {
     formatWeekRange,
     getAcademicWeekInfo,
     getMondayOfWeek,
+    getWeekDays,
+    getWeekOffsetFor,
+    MONTH_NAMES_GENITIVE,
     MONTH_SHORT_UA,
 } from '../../utils/dateUtils'
 import {formatTime} from '../../utils/formatTime'
 
+// TODO(FE-13): replace with useAuth().user.id
+const CURRENT_USER_ID = 1
+
 export function SchedulePage() {
     const [weekOffset, setWeekOffset] = useState(0)
     const [selectedDay, setSelectedDay] = useState<number | null>(null)
-    const {events, isLoading, error} = useSchedule(1, weekOffset)
+    const [isCreateOpen, setIsCreateOpen] = useState(false)
+    const [successMessage, setSuccessMessage] = useState<string | null>(null)
+    const {events, isLoading, error, refetch} = useSchedule(CURRENT_USER_ID, weekOffset)
+
+    // New events default to the selected day, else today (if visible), else Monday.
+    const weekDays = getWeekDays(weekOffset)
+    const defaultEventDate =
+        (selectedDay !== null ? weekDays[selectedDay]?.isoDate : undefined) ??
+        weekDays.find((day) => day.isToday)?.isoDate ??
+        weekDays[0].isoDate
+
+    const handleEventCreated = (event: PersonalEvent) => {
+        const startsAt = new Date(event.startsAt)
+        setIsCreateOpen(false)
+        setWeekOffset(getWeekOffsetFor(startsAt))
+        setSelectedDay(null)
+        refetch()
+        setSuccessMessage(
+            `Подію «${event.name}» додано: ${startsAt.getDate()} ${
+                MONTH_NAMES_GENITIVE[startsAt.getMonth()]
+            }, ${formatTime(event.startsAt)}–${formatTime(event.endsAt)}.`,
+        )
+    }
 
     const monday = getMondayOfWeek()
     monday.setDate(monday.getDate() + weekOffset * 7)
@@ -51,13 +81,35 @@ export function SchedulePage() {
                 </div>
 
                 <button
+                    type="button"
                     className="primary-button"
-                    onClick={() =>
-                        window.alert('Створення особистої події додамо пізніше.')
-                    }
+                    onClick={() => {
+                        setSuccessMessage(null)
+                        setIsCreateOpen(true)
+                    }}
+                    aria-haspopup="dialog"
                 >
-                    <span>＋</span> Нова подія
+                    <span aria-hidden="true">＋</span> Нова подія
                 </button>
+            </div>
+
+            {isCreateOpen && (
+                <CreatePersonalEventModal
+                    userId={CURRENT_USER_ID}
+                    defaultDate={defaultEventDate}
+                    onClose={() => setIsCreateOpen(false)}
+                    onCreated={handleEventCreated}
+                />
+            )}
+
+            {/* Live region stays mounted so the success message is announced. */}
+            <div role="status" aria-live="polite">
+                {successMessage && (
+                    <p className="form-success-notice">
+                        <span aria-hidden="true">✓ </span>
+                        {successMessage}
+                    </p>
+                )}
             </div>
 
             <section className="week-toolbar">

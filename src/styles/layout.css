@@ -750,6 +750,21 @@
     resize: vertical;
 }
 
+.app[data-theme] .modal-footer .modal-footer-start {
+    margin-right: auto;
+}
+
+.app[data-theme] .confirm-dialog-text {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.app[data-theme] .confirm-dialog-text p {
+    margin: 0;
+}
+
 @media (max-width: 480px) {
     .app[data-theme] .modal-overlay {
         padding: 8px;
@@ -769,28 +784,49 @@
     }
 }
 
-/* Editable event card (own personal events, FE-23): a <button> laid out like the
-   <article> card — full column width, content from the top, not centred. */
-.app[data-theme] .lesson-card.lesson-card-editable {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-    width: calc(100% - 8px);
-    text-align: left;
+.app[data-theme] .lesson-card-editable .lesson-card-hit {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: inherit;
+    background: transparent;
     cursor: pointer;
 }
 
-.app[data-theme] .lesson-card-editable .lesson-edit-icon {
+.app[data-theme] .lesson-card-editable .lesson-card-actions {
     position: absolute;
-    top: 4px;
-    right: 6px;
-    font-size: 0.8em;
-    line-height: 1;
-    opacity: 0.7;
+    top: 3px;
+    right: 4px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    pointer-events: none;
 }
 
-.app[data-theme] .lesson-card-editable:hover .lesson-edit-icon,
-.app[data-theme] .lesson-card-editable:focus-visible .lesson-edit-icon {
-    opacity: 1;
+.app[data-theme] .lesson-card-editable .lesson-edit-icon,
+.app[data-theme] .lesson-card-editable .lesson-delete-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    padding: 0;
+    border-radius: 6px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.app[data-theme] .lesson-card-editable .lesson-delete-btn {
+    pointer-events: auto;
+}
+
+.app[data-theme] .lesson-card-editable .lesson-time {
+    padding-right: 52px;
 }

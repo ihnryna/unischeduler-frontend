@@ -15,6 +15,8 @@ type ModalProps = {
     closeOnBackdropClick?: boolean
     /** Element that receives focus on open. Defaults to the first focusable element. */
     initialFocusRef?: RefObject<HTMLElement | null>
+    role?: 'dialog' | 'alertdialog'
+    describedById?: string
 }
 
 const FOCUSABLE_SELECTOR = [
@@ -29,6 +31,9 @@ const FOCUSABLE_SELECTOR = [
 function getFocusable(container: HTMLElement): HTMLElement[] {
     return Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
 }
+
+const openModals: object[] = []
+let overflowBeforeLock = ''
 
 /**
  * Accessible modal dialog (FE-09).
@@ -46,6 +51,8 @@ export function Modal({
     footer,
     closeOnBackdropClick = true,
     initialFocusRef,
+    role = 'dialog',
+    describedById,
 }: Readonly<ModalProps>) {
     const titleId = useId()
     const cardRef = useRef<HTMLDivElement>(null)
@@ -62,8 +69,12 @@ export function Modal({
         if (!isOpen) return
 
         const previouslyFocused = document.activeElement as HTMLElement | null
-        const previousOverflow = document.body.style.overflow
-        document.body.style.overflow = 'hidden'
+        const token = {}
+        if (openModals.length === 0) {
+            overflowBeforeLock = document.body.style.overflow
+            document.body.style.overflow = 'hidden'
+        }
+        openModals.push(token)
 
         const card = cardRef.current
         if (card) {
@@ -73,6 +84,7 @@ export function Modal({
         }
 
         const handleKeyDown = (event: KeyboardEvent) => {
+            if (openModals[openModals.length - 1] !== token) return
             if (event.key === 'Escape') {
                 event.stopPropagation()
                 onCloseRef.current()
@@ -104,7 +116,10 @@ export function Modal({
 
         return () => {
             document.removeEventListener('keydown', handleKeyDown)
-            document.body.style.overflow = previousOverflow
+            openModals.splice(openModals.indexOf(token), 1)
+            if (openModals.length === 0) {
+                document.body.style.overflow = overflowBeforeLock
+            }
             previouslyFocused?.focus()
         }
     }, [isOpen])
@@ -125,9 +140,10 @@ export function Modal({
             <div
                 ref={cardRef}
                 className="modal-card"
-                role="dialog"
+                role={role}
                 aria-modal="true"
                 aria-labelledby={titleId}
+                aria-describedby={describedById}
                 tabIndex={-1}
             >
                 <div className="modal-header">

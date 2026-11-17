@@ -11,6 +11,7 @@ type ScheduleEventProps = {
      * events only; university classes are always read-only).
      */
     onEdit?: () => void
+    onDelete?: () => void
 }
 
 const eventLabels: Record<EventType, string> = {
@@ -34,7 +35,7 @@ function hoursFromStartOfDay(value: string) {
  * One event card in the week grid, positioned by its start/end time. Read-only by default;
  * with `onEdit` it becomes a button that opens the edit form (FE-23).
  */
-export function ScheduleEvent({event, onEdit}: Readonly<ScheduleEventProps>) {
+export function ScheduleEvent({event, onEdit, onDelete}: Readonly<ScheduleEventProps>) {
     const startsAt = hoursFromStartOfDay(event.startsAt)
     const endsAt = hoursFromStartOfDay(event.endsAt)
     const {colors} = useSubjectColors()
@@ -74,20 +75,49 @@ export function ScheduleEvent({event, onEdit}: Readonly<ScheduleEventProps>) {
         </>
     )
 
-    if (onEdit) {
+    if (onEdit || onDelete) {
         return (
-            <button
-                type="button"
-                className={`${className} lesson-card-editable`}
-                style={style}
-                onClick={onEdit}
-                aria-haspopup="dialog"
-                title="Редагувати подію"
-            >
-                <span className="visually-hidden">Редагувати подію: </span>
-                <span className="lesson-edit-icon" aria-hidden="true">✎</span>
+            <article className={`${className} lesson-card-editable`} style={style}>
+                {onEdit && (
+                    <button
+                        type="button"
+                        className="lesson-card-hit"
+                        onClick={onEdit}
+                        aria-haspopup="dialog"
+                        title="Редагувати подію"
+                    >
+                        <span className="visually-hidden">Редагувати подію: {event.name}</span>
+                    </button>
+                )}
+                <span className="lesson-card-actions">
+                    {onEdit && (
+                        <span className="lesson-edit-icon" aria-hidden="true">
+                            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M9.5 2.5l2 2L5 11l-2.5.5L3 9z"/>
+                                <path d="M8.5 3.5l2 2"/>
+                            </svg>
+                        </span>
+                    )}
+                    {onDelete && (
+                        <button
+                            type="button"
+                            className="lesson-delete-btn"
+                            onClick={onDelete}
+                            aria-haspopup="dialog"
+                            aria-label={`Видалити подію: ${event.name}`}
+                            title="Видалити подію"
+                        >
+                            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <path d="M2 3.5h10"/>
+                                <path d="M5.5 3.5V2h3v1.5"/>
+                                <path d="M3.5 3.5l.6 8.5h5.8l.6-8.5"/>
+                                <path d="M6 6v3.5M8 6v3.5"/>
+                            </svg>
+                        </button>
+                    )}
+                </span>
                 {content}
-            </button>
+            </article>
         )
     }
 

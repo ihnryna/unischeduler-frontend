@@ -10,6 +10,7 @@ type ScheduleGridProps = {
     weekOffset: number
     /** Opens the edit form for an event; only called for events `canEditEvent` allows. */
     onEditEvent?: (event: CalendarEvent) => void
+    onDeleteEvent?: (event: CalendarEvent) => void
     /** Which events are editable. Without it (or `onEditEvent`) the grid is read-only. */
     canEditEvent?: (event: CalendarEvent) => boolean
 }
@@ -20,6 +21,7 @@ export function ScheduleGrid({
     onSelectDay,
     weekOffset,
     onEditEvent,
+    onDeleteEvent,
     canEditEvent,
 }: Readonly<ScheduleGridProps>) {
     const weekDays = getWeekDays(weekOffset)
@@ -83,6 +85,11 @@ export function ScheduleGrid({
                                     onEdit={
                                         onEditEvent && canEditEvent?.(event)
                                             ? () => onEditEvent(event)
+                                            : undefined
+                                    }
+                                    onDelete={
+                                        onDeleteEvent && canEditEvent?.(event)
+                                            ? () => onDeleteEvent(event)
                                             : undefined
                                     }
                                 />

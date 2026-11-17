@@ -1,6 +1,10 @@
 import {useState} from 'react'
 
 import {
+    ConfirmDeleteDialog,
+    type DeletablePersonalEvent,
+} from '../../components/events/ConfirmDeleteDialog'
+import {
     PersonalEventModal,
     type EditablePersonalEvent,
 } from '../../components/events/PersonalEventModal'
@@ -27,6 +31,7 @@ export function SchedulePage() {
     const [selectedDay, setSelectedDay] = useState<number | null>(null)
     const [isCreateOpen, setIsCreateOpen] = useState(false)
     const [editingEvent, setEditingEvent] = useState<EditablePersonalEvent | null>(null)
+    const [deletingEvent, setDeletingEvent] = useState<DeletablePersonalEvent | null>(null)
     const [successMessage, setSuccessMessage] = useState<string | null>(null)
     const {events, isLoading, error, refetch} = useSchedule(CURRENT_USER_ID, weekOffset)
 
@@ -55,6 +60,23 @@ export function SchedulePage() {
                 MONTH_NAMES_GENITIVE[startsAt.getMonth()]
             }, ${formatTime(event.startsAt)}–${formatTime(event.endsAt)}.`,
         )
+    }
+
+    const handleEventDeleted = (event: {name: string}) => {
+        setEditingEvent(null)
+        setDeletingEvent(null)
+        refetch()
+        setSuccessMessage(`Подію «${event.name}» видалено.`)
+    }
+
+    const handleDeleteEvent = (event: CalendarEvent) => {
+        setSuccessMessage(null)
+        setDeletingEvent({
+            id: event.eventId,
+            name: event.name,
+            startsAt: event.startsAt,
+            endsAt: event.endsAt,
+        })
     }
 
     const handleEditEvent = (event: CalendarEvent) => {
@@ -133,6 +155,15 @@ export function SchedulePage() {
                     event={editingEvent}
                     onClose={() => setEditingEvent(null)}
                     onSaved={(event) => handleEventSaved(event, 'оновлено')}
+                    onDeleted={handleEventDeleted}
+                />
+            )}
+
+            {deletingEvent && (
+                <ConfirmDeleteDialog
+                    event={deletingEvent}
+                    onCancel={() => setDeletingEvent(null)}
+                    onDeleted={handleEventDeleted}
                 />
             )}
 
@@ -213,6 +244,7 @@ export function SchedulePage() {
                 }}
                 weekOffset={weekOffset}
                 onEditEvent={handleEditEvent}
+                onDeleteEvent={handleDeleteEvent}
                 canEditEvent={isEditablePersonalEvent}
             />
 

@@ -2,6 +2,7 @@ import {useId, useRef, useState, type FormEvent} from 'react'
 
 import {Modal} from '../ui/Modal'
 import {FormField} from '../ui/FormField'
+import {ConfirmDeleteDialog} from './ConfirmDeleteDialog'
 import {PAIR_TIME_SLOTS} from '../../features/schedule/scheduleConfig'
 import {usePersonalEventMutations} from '../../features/events/usePersonalEventMutations'
 import {
@@ -42,6 +43,7 @@ type PersonalEventModalProps = {
     | {
           mode: 'edit'
           event: EditablePersonalEvent
+          onDeleted: (event: EditablePersonalEvent) => void
       }
 )
 
@@ -103,6 +105,7 @@ export function PersonalEventModal(props: Readonly<PersonalEventModalProps>) {
     const [values, setValues] = useState<PersonalEventFormValues>(initialValues)
     const [touched, setTouched] = useState<Partial<Record<PersonalEventFormField, boolean>>>({})
     const [submitAttempted, setSubmitAttempted] = useState(false)
+    const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
     const {create, update: updateEvent, isSaving, error: saveError, resetError} =
         usePersonalEventMutations()
 
@@ -141,7 +144,6 @@ export function PersonalEventModal(props: Readonly<PersonalEventModalProps>) {
             return
         }
 
-        // Nothing changed in edit mode: no request, just close.
         if (isEdit && !isDirty) {
             onClose()
             return
@@ -175,200 +177,221 @@ export function PersonalEventModal(props: Readonly<PersonalEventModalProps>) {
             : 'Номер аудиторії (наприклад, 3-214) або посилання на онлайн-зустріч.'
 
     return (
-        <Modal
-            isOpen
-            title={isEdit ? 'Редагування події' : 'Нова особиста подія'}
-            onClose={handleClose}
-            closeOnBackdropClick={false}
-            initialFocusRef={nameRef}
-            footer={
-                <>
-                    <button
-                        type="button"
-                        className="button modal-btn-secondary"
-                        onClick={handleClose}
-                        disabled={isSaving}
-                    >
-                        Скасувати
-                    </button>
-                    <button
-                        type="submit"
-                        form={formId}
-                        className="primary-button"
-                        disabled={isSaving}
-                        aria-busy={isSaving}
-                    >
-                        {isSaving ? 'Зберігаємо…' : isEdit ? 'Зберегти зміни' : 'Створити подію'}
-                    </button>
-                </>
-            }
-        >
-            <form
-                id={formId}
-                className="modal-form"
-                onSubmit={handleSubmit}
-                noValidate
-                aria-busy={isSaving}
+        <>
+            <Modal
+                isOpen
+                title={isEdit ? 'Редагування події' : 'Нова особиста подія'}
+                onClose={handleClose}
+                closeOnBackdropClick={false}
+                initialFocusRef={nameRef}
+                footer={
+                    <>
+                        {isEdit && (
+                            <button
+                                type="button"
+                                className="button modal-btn-danger modal-footer-start"
+                                onClick={() => setIsConfirmingDelete(true)}
+                                disabled={isSaving}
+                                aria-haspopup="dialog"
+                            >
+                                Видалити
+                            </button>
+                        )}
+                        <button
+                            type="button"
+                            className="button modal-btn-secondary"
+                            onClick={handleClose}
+                            disabled={isSaving}
+                        >
+                            Скасувати
+                        </button>
+                        <button
+                            type="submit"
+                            form={formId}
+                            className="primary-button"
+                            disabled={isSaving}
+                            aria-busy={isSaving}
+                        >
+                            {isSaving ? 'Зберігаємо…' : isEdit ? 'Зберегти зміни' : 'Створити подію'}
+                        </button>
+                    </>
+                }
             >
-                <p className="form-required-note">
-                    Обов’язкові поля позначено{' '}
-                    <span className="form-field-required" aria-hidden="true">*</span>
-                    <span className="visually-hidden">зірочкою</span>.
-                </p>
-
-                {submitAttempted && hasErrors && (
-                    <div className="form-error-alert" role="alert">
-                        <span aria-hidden="true">!! </span>
-                        {isEdit
-                            ? 'Перевірте позначені поля — зміни ще не збережено.'
-                            : 'Перевірте позначені поля — подію ще не збережено.'}
-                    </div>
-                )}
-
-                {saveError && (
-                    <div className="form-error-alert" role="alert">
-                        <span aria-hidden="true">!! </span>
-                        {saveError}
-                    </div>
-                )}
-
-                <FormField
-                    label="Назва"
-                    id={fieldId('name')}
-                    required
-                    error={visibleError('name')}
+                <form
+                    id={formId}
+                    className="modal-form"
+                    onSubmit={handleSubmit}
+                    noValidate
+                    aria-busy={isSaving}
                 >
-                    <input
-                        ref={nameRef}
-                        className="input"
-                        type="text"
-                        autoComplete="off"
-                        maxLength={NAME_MAX_LENGTH + 20}
-                        placeholder="наприклад, Консультація з курсової"
-                        value={values.name}
-                        onChange={(e) => update('name', e.target.value)}
-                        onBlur={() => markTouched('name')}
-                    />
-                </FormField>
+                    <p className="form-required-note">
+                        Обов’язкові поля позначено{' '}
+                        <span className="form-field-required" aria-hidden="true">*</span>
+                        <span className="visually-hidden">зірочкою</span>.
+                    </p>
 
-                <FormField
-                    label="Дата"
-                    id={fieldId('date')}
-                    required
-                    error={visibleError('date')}
-                >
-                    <input
-                        className="input"
-                        type="date"
-                        value={values.date}
-                        onChange={(e) => update('date', e.target.value)}
-                        onBlur={() => markTouched('date')}
-                    />
-                </FormField>
+                    {submitAttempted && hasErrors && (
+                        <div className="form-error-alert" role="alert">
+                            <span aria-hidden="true">!! </span>
+                            {isEdit
+                                ? 'Перевірте позначені поля — зміни ще не збережено.'
+                                : 'Перевірте позначені поля — подію ще не збережено.'}
+                        </div>
+                    )}
 
-                <div className="form-row">
+                    {saveError && (
+                        <div className="form-error-alert" role="alert">
+                            <span aria-hidden="true">!! </span>
+                            {saveError}
+                        </div>
+                    )}
+
                     <FormField
-                        label="Початок"
-                        id={fieldId('startTime')}
+                        label="Назва"
+                        id={fieldId('name')}
                         required
-                        error={visibleError('startTime')}
+                        error={visibleError('name')}
                     >
                         <input
+                            ref={nameRef}
                             className="input"
-                            type="time"
-                            step={300}
-                            value={values.startTime}
-                            onChange={(e) => update('startTime', e.target.value)}
-                            onBlur={() => markTouched('startTime')}
+                            type="text"
+                            autoComplete="off"
+                            maxLength={NAME_MAX_LENGTH + 20}
+                            placeholder="наприклад, Консультація з курсової"
+                            value={values.name}
+                            onChange={(e) => update('name', e.target.value)}
+                            onBlur={() => markTouched('name')}
                         />
                     </FormField>
 
                     <FormField
-                        label="Кінець"
-                        id={fieldId('endTime')}
+                        label="Дата"
+                        id={fieldId('date')}
                         required
-                        error={visibleError('endTime')}
-                        hint={duration ? `Тривалість: ${duration}` : undefined}
+                        error={visibleError('date')}
                     >
                         <input
                             className="input"
-                            type="time"
-                            step={300}
-                            value={values.endTime}
-                            onChange={(e) => update('endTime', e.target.value)}
-                            onBlur={() => markTouched('endTime')}
+                            type="date"
+                            value={values.date}
+                            onChange={(e) => update('date', e.target.value)}
+                            onBlur={() => markTouched('date')}
                         />
                     </FormField>
-                </div>
 
-                <div className="form-field">
-                    <span className="form-field-label" id={`${idPrefix}-slots`}>
-                        Швидкий вибір пари
-                    </span>
-                    <div className="admin-slot-presets" role="group" aria-labelledby={`${idPrefix}-slots`}>
-                        {PAIR_TIME_SLOTS.map((slot) => {
-                            const isActive =
-                                values.startTime === slot.start && values.endTime === slot.end
-                            return (
-                                <button
-                                    key={slot.start}
-                                    type="button"
-                                    className={`admin-slot-pill ${isActive ? 'is-selected' : ''}`}
-                                    aria-pressed={isActive}
-                                    onClick={() => {
-                                        setValues((current) => ({
-                                            ...current,
-                                            startTime: slot.start,
-                                            endTime: slot.end,
-                                        }))
-                                        setTouched((current) => ({
-                                            ...current,
-                                            startTime: true,
-                                            endTime: true,
-                                        }))
-                                    }}
-                                >
-                                    {slot.start} – {slot.end}
-                                </button>
-                            )
-                        })}
+                    <div className="form-row">
+                        <FormField
+                            label="Початок"
+                            id={fieldId('startTime')}
+                            required
+                            error={visibleError('startTime')}
+                        >
+                            <input
+                                className="input"
+                                type="time"
+                                step={300}
+                                value={values.startTime}
+                                onChange={(e) => update('startTime', e.target.value)}
+                                onBlur={() => markTouched('startTime')}
+                            />
+                        </FormField>
+
+                        <FormField
+                            label="Кінець"
+                            id={fieldId('endTime')}
+                            required
+                            error={visibleError('endTime')}
+                            hint={duration ? `Тривалість: ${duration}` : undefined}
+                        >
+                            <input
+                                className="input"
+                                type="time"
+                                step={300}
+                                value={values.endTime}
+                                onChange={(e) => update('endTime', e.target.value)}
+                                onBlur={() => markTouched('endTime')}
+                            />
+                        </FormField>
                     </div>
-                </div>
 
-                <FormField
-                    label="Аудиторія або посилання"
-                    id={fieldId('location')}
-                    error={visibleError('location')}
-                    hint={locationHint}
-                >
-                    <input
-                        className="input"
-                        type="text"
-                        autoComplete="off"
-                        maxLength={LOCATION_MAX_LENGTH + 20}
-                        placeholder="3-214 або https://meet.google.com/…"
-                        value={values.location}
-                        onChange={(e) => update('location', e.target.value)}
-                        onBlur={() => markTouched('location')}
-                    />
-                </FormField>
+                    <div className="form-field">
+                        <span className="form-field-label" id={`${idPrefix}-slots`}>
+                            Швидкий вибір пари
+                        </span>
+                        <div className="admin-slot-presets" role="group" aria-labelledby={`${idPrefix}-slots`}>
+                            {PAIR_TIME_SLOTS.map((slot) => {
+                                const isActive =
+                                    values.startTime === slot.start && values.endTime === slot.end
+                                return (
+                                    <button
+                                        key={slot.start}
+                                        type="button"
+                                        className={`admin-slot-pill ${isActive ? 'is-selected' : ''}`}
+                                        aria-pressed={isActive}
+                                        onClick={() => {
+                                            setValues((current) => ({
+                                                ...current,
+                                                startTime: slot.start,
+                                                endTime: slot.end,
+                                            }))
+                                            setTouched((current) => ({
+                                                ...current,
+                                                startTime: true,
+                                                endTime: true,
+                                            }))
+                                        }}
+                                    >
+                                        {slot.start} – {slot.end}
+                                    </button>
+                                )
+                            })}
+                        </div>
+                    </div>
 
-                <FormField
-                    label="Опис"
-                    id={fieldId('description')}
-                    error={visibleError('description')}
-                    hint={`${values.description.trim().length} / ${DESCRIPTION_MAX_LENGTH}`}
-                >
-                    <textarea
-                        className="textarea"
-                        rows={3}
-                        placeholder="Що потрібно підготувати, з ким зустріч…"
-                        value={values.description}
-                        onChange={(e) => update('description', e.target.value)}
-                        onBlur={() => markTouched('description')}
-                    />
-                </FormField>
-            </form>
-        </Modal>
+                    <FormField
+                        label="Аудиторія або посилання"
+                        id={fieldId('location')}
+                        error={visibleError('location')}
+                        hint={locationHint}
+                    >
+                        <input
+                            className="input"
+                            type="text"
+                            autoComplete="off"
+                            maxLength={LOCATION_MAX_LENGTH + 20}
+                            placeholder="3-214 або https://meet.google.com/…"
+                            value={values.location}
+                            onChange={(e) => update('location', e.target.value)}
+                            onBlur={() => markTouched('location')}
+                        />
+                    </FormField>
+
+                    <FormField
+                        label="Опис"
+                        id={fieldId('description')}
+                        error={visibleError('description')}
+                        hint={`${values.description.trim().length} / ${DESCRIPTION_MAX_LENGTH}`}
+                    >
+                        <textarea
+                            className="textarea"
+                            rows={3}
+                            placeholder="Що потрібно підготувати, з ким зустріч…"
+                            value={values.description}
+                            onChange={(e) => update('description', e.target.value)}
+                            onBlur={() => markTouched('description')}
+                        />
+                    </FormField>
+                </form>
+            </Modal>
+
+            {props.mode === 'edit' && isConfirmingDelete && (
+                <ConfirmDeleteDialog
+                    event={props.event}
+                    onCancel={() => setIsConfirmingDelete(false)}
+                    onDeleted={() => props.onDeleted(props.event)}
+                />
+            )}
+        </>
     )
 }

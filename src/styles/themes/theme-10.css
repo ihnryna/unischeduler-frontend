@@ -246,7 +246,7 @@
 .app[data-theme="theme-10"] .today-button,
 .app[data-theme="theme-10"] .icon-button,
 .app[data-theme="theme-10"] .reset-button,
-.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill) {
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn) {
     border: 2px solid var(--retro-ink);
     border-radius: 14px;
     background: var(--retro-paper);
@@ -265,7 +265,7 @@
 .app[data-theme="theme-10"] .today-button:hover,
 .app[data-theme="theme-10"] .icon-button:hover,
 .app[data-theme="theme-10"] .reset-button:hover,
-.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):hover {
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):hover {
     background: var(--retro-yellow);
     transform: translate(2px, 2px);
     box-shadow: 1px 1px 0 var(--retro-ink);
@@ -277,7 +277,7 @@
 .app[data-theme="theme-10"] .today-button:active,
 .app[data-theme="theme-10"] .icon-button:active,
 .app[data-theme="theme-10"] .reset-button:active,
-.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):active {
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):active {
     transform: translate(3px, 3px);
     box-shadow: none;
 }
@@ -288,7 +288,7 @@
 .app[data-theme="theme-10"] .today-button:disabled,
 .app[data-theme="theme-10"] .icon-button:disabled,
 .app[data-theme="theme-10"] .reset-button:disabled,
-.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):disabled {
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
@@ -2414,6 +2414,16 @@
     background-color: #efe8dc;
 }
 
+.app[data-theme="theme-10"] .modal-btn-danger {
+    background-color: var(--retro-pink);
+    border: 2px solid var(--retro-ink);
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .modal-btn-danger:hover:not(:disabled) {
+    background-color: #f1a9c1;
+}
+
 .app[data-theme="theme-10"] .form-field-label {
     font-size: 0.82rem;
     font-weight: 750;
@@ -2499,9 +2509,40 @@
     box-shadow: 3px 3px 0 var(--retro-ink);
 }
 
-.app[data-theme="theme-10"] .lesson-card-editable:active {
+.app[data-theme="theme-10"] .lesson-card-editable:has(.lesson-card-hit:active) {
     transform: translate(1px, 1px);
     box-shadow: 0 0 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .lesson-card-editable:has(.lesson-card-hit:focus-visible) {
+    outline: 3px solid var(--retro-ink);
+    outline-offset: 2px;
+}
+
+.app[data-theme="theme-10"] .lesson-card-hit:focus-visible {
+    outline: none;
+}
+
+.app[data-theme="theme-10"] .lesson-edit-icon,
+.app[data-theme="theme-10"] .lesson-delete-btn {
+    border: 1.5px solid var(--retro-ink);
+    background-color: var(--retro-paper);
+    color: var(--retro-ink);
+    box-shadow: 1px 1px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .lesson-delete-btn:hover {
+    background-color: var(--retro-pink);
+}
+
+.app[data-theme="theme-10"] .lesson-card-editable:has(.lesson-card-hit:hover) .lesson-edit-icon,
+.app[data-theme="theme-10"] .lesson-card-editable:has(.lesson-card-hit:focus-visible) .lesson-edit-icon {
+    background-color: var(--retro-yellow);
+}
+
+.app[data-theme="theme-10"] .lesson-delete-btn:focus-visible {
+    outline: 2px solid var(--retro-ink);
+    outline-offset: 1px;
 }
 
 @media (prefers-reduced-motion: reduce) {

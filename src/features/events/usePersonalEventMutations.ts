@@ -13,6 +13,7 @@ type UsePersonalEventMutationsResult = {
     create: (data: PersonalEventCreate) => Promise<PersonalEvent | null>
     /** Saves changes to an existing event; resolves with the stored event or `null` on failure. */
     update: (data: PersonalEventUpdate) => Promise<PersonalEvent | null>
+    remove: (eventId: number) => Promise<boolean>
     isSaving: boolean
     /** Plain-Ukrainian error of the last attempt, if it failed. */
     error: string | null
@@ -29,7 +30,7 @@ export function usePersonalEventMutations(): UsePersonalEventMutationsResult {
     const [error, setError] = useState<string | null>(null)
 
     const run = useCallback(
-        async (save: () => Promise<PersonalEvent>, failureMessage: string) => {
+        async <T>(save: () => Promise<T>, failureMessage: string): Promise<T | null> => {
             setIsSaving(true)
             setError(null)
             try {
@@ -62,9 +63,23 @@ export function usePersonalEventMutations(): UsePersonalEventMutationsResult {
         [run],
     )
 
+    const remove = useCallback(
+        async (eventId: number) => {
+            const result = await run(
+                async () => {
+                    await personalEventService.remove(eventId)
+                    return true
+                },
+                'Не вдалося видалити подію. Спробуйте ще раз.',
+            )
+            return result === true
+        },
+        [run],
+    )
+
     const resetError = useCallback(() => setError(null), [])
 
-    return {create, update, isSaving, error, resetError}
+    return {create, update, remove, isSaving, error, resetError}
 }
 
 /**

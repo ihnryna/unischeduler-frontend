@@ -2,10 +2,8 @@ import {mockPersonalEvents} from '../../mocks'
 import type {LocalDateTime} from '../../types/common'
 import type {PersonalEvent, PersonalEventCreate, PersonalEventUpdate} from '../../types/schedule'
 
-/** Simulated network latency of the mock, so loading states are visible. */
 const MOCK_LATENCY_MS = 400
 
-// In-memory copy: fixtures stay untouched, created events live until page reload.
 let storedEvents: PersonalEvent[] = []
 let nextId = Math.max(0, ...mockPersonalEvents.map((event) => event.id)) + 1000
 
@@ -16,7 +14,7 @@ function delay(ms: number) {
 /**
  * Personal-event data access (mock implementation of `POST` / `PUT /personal-event`).
  *
- * TODO(FE-21): add `remove` and the HTTP variant once `apiClient` exists.
+ * TODO(FE-21): add the HTTP variant once `apiClient` exists.
  */
 export const personalEventService = {
     /** Creates a personal event and resolves with the stored DTO. */
@@ -58,6 +56,15 @@ export const personalEventService = {
         storedEvents = storedEvents.map((event) => (event.id === data.id ? updated : event))
 
         return structuredClone(updated)
+    },
+
+    async remove(eventId: number): Promise<void> {
+        await delay(MOCK_LATENCY_MS)
+
+        if (!storedEvents.some((event) => event.id === eventId)) {
+            throw new Error(`Personal event ${eventId} not found`)
+        }
+        storedEvents = storedEvents.filter((event) => event.id !== eventId)
     },
 
     /**

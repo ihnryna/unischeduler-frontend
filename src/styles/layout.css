@@ -768,3 +768,29 @@
         flex: 1 1 auto;
     }
 }
+
+/* Editable event card (own personal events, FE-23): a <button> laid out like the
+   <article> card — full column width, content from the top, not centred. */
+.app[data-theme] .lesson-card.lesson-card-editable {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: calc(100% - 8px);
+    text-align: left;
+    cursor: pointer;
+}
+
+.app[data-theme] .lesson-card-editable .lesson-edit-icon {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 0.8em;
+    line-height: 1;
+    opacity: 0.7;
+}
+
+.app[data-theme] .lesson-card-editable:hover .lesson-edit-icon,
+.app[data-theme] .lesson-card-editable:focus-visible .lesson-edit-icon {
+    opacity: 1;
+}

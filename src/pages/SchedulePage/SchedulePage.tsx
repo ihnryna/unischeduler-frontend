@@ -1,9 +1,13 @@
 import {useState} from 'react'
 
-import {CreatePersonalEventModal} from '../../components/events/CreatePersonalEventModal'
+import {
+    PersonalEventModal,
+    type EditablePersonalEvent,
+} from '../../components/events/PersonalEventModal'
 import {ScheduleGrid} from '../../components/schedule/ScheduleGrid'
+import {isEditablePersonalEvent} from '../../features/events/usePersonalEventMutations'
 import {useSchedule} from '../../features/schedule/useSchedule'
-import type {PersonalEvent} from '../../types/schedule'
+import type {CalendarEvent, PersonalEvent} from '../../types/schedule'
 import {
     formatWeekRange,
     getAcademicWeekInfo,
@@ -22,6 +26,7 @@ export function SchedulePage() {
     const [weekOffset, setWeekOffset] = useState(0)
     const [selectedDay, setSelectedDay] = useState<number | null>(null)
     const [isCreateOpen, setIsCreateOpen] = useState(false)
+    const [editingEvent, setEditingEvent] = useState<EditablePersonalEvent | null>(null)
     const [successMessage, setSuccessMessage] = useState<string | null>(null)
     const {events, isLoading, error, refetch} = useSchedule(CURRENT_USER_ID, weekOffset)
 
@@ -32,17 +37,36 @@ export function SchedulePage() {
         weekDays.find((day) => day.isToday)?.isoDate ??
         weekDays[0].isoDate
 
-    const handleEventCreated = (event: PersonalEvent) => {
+    // Saved (created or edited): close the form, show the event's week, refetch.
+    const handleEventSaved = (event: PersonalEvent, verb: string) => {
         const startsAt = new Date(event.startsAt)
+        const nextWeekOffset = getWeekOffsetFor(startsAt)
         setIsCreateOpen(false)
-        setWeekOffset(getWeekOffsetFor(startsAt))
-        setSelectedDay(null)
+        setEditingEvent(null)
+        const dayIndex = (startsAt.getDay() + 6) % 7
+        // Keep the day filter only if the saved event is still visible under it.
+        if (nextWeekOffset !== weekOffset || (selectedDay !== null && selectedDay !== dayIndex)) {
+            setSelectedDay(null)
+        }
+        setWeekOffset(nextWeekOffset)
         refetch()
         setSuccessMessage(
-            `Подію «${event.name}» додано: ${startsAt.getDate()} ${
+            `Подію «${event.name}» ${verb}: ${startsAt.getDate()} ${
                 MONTH_NAMES_GENITIVE[startsAt.getMonth()]
             }, ${formatTime(event.startsAt)}–${formatTime(event.endsAt)}.`,
         )
+    }
+
+    const handleEditEvent = (event: CalendarEvent) => {
+        setSuccessMessage(null)
+        setEditingEvent({
+            id: event.eventId,
+            name: event.name,
+            location: event.location,
+            description: event.description,
+            startsAt: event.startsAt,
+            endsAt: event.endsAt,
+        })
     }
 
     const monday = getMondayOfWeek()
@@ -94,11 +118,21 @@ export function SchedulePage() {
             </div>
 
             {isCreateOpen && (
-                <CreatePersonalEventModal
+                <PersonalEventModal
+                    mode="create"
                     userId={CURRENT_USER_ID}
                     defaultDate={defaultEventDate}
                     onClose={() => setIsCreateOpen(false)}
-                    onCreated={handleEventCreated}
+                    onSaved={(event) => handleEventSaved(event, 'додано')}
+                />
+            )}
+
+            {editingEvent && (
+                <PersonalEventModal
+                    mode="edit"
+                    event={editingEvent}
+                    onClose={() => setEditingEvent(null)}
+                    onSaved={(event) => handleEventSaved(event, 'оновлено')}
                 />
             )}
 
@@ -178,6 +212,8 @@ export function SchedulePage() {
                     )
                 }}
                 weekOffset={weekOffset}
+                onEditEvent={handleEditEvent}
+                canEditEvent={isEditablePersonalEvent}
             />
 
             <div className="bottom-widgets">

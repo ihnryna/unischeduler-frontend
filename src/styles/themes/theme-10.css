@@ -2488,3 +2488,24 @@
         animation: none;
     }
 }
+
+/* Editable event card (FE-23): lifts on hover like the other retro buttons */
+.app[data-theme="theme-10"] .lesson-card-editable {
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.app[data-theme="theme-10"] .lesson-card-editable:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .lesson-card-editable:active {
+    transform: translate(1px, 1px);
+    box-shadow: 0 0 0 var(--retro-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app[data-theme="theme-10"] .lesson-card-editable {
+        transition: none;
+    }
+}

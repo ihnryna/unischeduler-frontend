@@ -3,7 +3,7 @@ import {useId, useRef, useState, type FormEvent} from 'react'
 import {Modal} from '../ui/Modal'
 import {FormField} from '../ui/FormField'
 import {PAIR_TIME_SLOTS} from '../../features/schedule/scheduleConfig'
-import {useCreatePersonalEvent} from '../../features/events/useCreatePersonalEvent'
+import {usePersonalEventMutations} from '../../features/events/usePersonalEventMutations'
 import {
     DESCRIPTION_MAX_LENGTH,
     isLinkLike,
@@ -14,16 +14,62 @@ import {
     type PersonalEventFormField,
     type PersonalEventFormValues,
 } from '../../features/events/personalEventValidation'
+import type {LocalDateTime} from '../../types/common'
 import type {PersonalEvent} from '../../types/schedule'
 
-type CreatePersonalEventModalProps = {
-    /** Owner of the new event. TODO(FE-13): take from `useAuth()` instead of props. */
-    userId: number
-    /** Initial value of the date field, `YYYY-MM-DD`. */
-    defaultDate: string
+/** Current values of the event being edited. */
+export type EditablePersonalEvent = {
+    id: number
+    name: string
+    location: string | null
+    description: string | null
+    startsAt: LocalDateTime
+    endsAt: LocalDateTime
+}
+
+type PersonalEventModalProps = {
     onClose: () => void
     /** Called after the event was saved successfully. */
-    onCreated: (event: PersonalEvent) => void
+    onSaved: (event: PersonalEvent) => void
+} & (
+    | {
+          mode: 'create'
+          /** Owner of the new event. TODO(FE-13): take from `useAuth()` instead of props. */
+          userId: number
+          /** Initial value of the date field, `YYYY-MM-DD`. */
+          defaultDate: string
+      }
+    | {
+          mode: 'edit'
+          event: EditablePersonalEvent
+      }
+)
+
+/** `YYYY-MM-DDTHH:mm[:ss]` → `{date, time}` in the form's formats. */
+function splitDateTime(value: LocalDateTime): {date: string; time: string} {
+    return {date: value.slice(0, 10), time: value.slice(11, 16)}
+}
+
+function getInitialValues(props: Readonly<PersonalEventModalProps>): PersonalEventFormValues {
+    if (props.mode === 'create') {
+        return {
+            name: '',
+            date: props.defaultDate,
+            startTime: '',
+            endTime: '',
+            location: '',
+            description: '',
+        }
+    }
+    const start = splitDateTime(props.event.startsAt)
+    return {
+        name: props.event.name,
+        date: start.date,
+        startTime: start.time,
+        endTime: splitDateTime(props.event.endsAt).time,
+        location: props.event.location ?? '',
+        description: props.event.description ?? '',
+    }
 }
 
 function formatDuration(startTime: string, endTime: string): string | null {
@@ -37,41 +83,36 @@ function formatDuration(startTime: string, endTime: string): string | null {
 }
 
 /**
- * Modal with the "new personal event" form (FE-22).
+ * Modal with the personal-event form: `mode="create"` adds a new event (FE-22),
+ * `mode="edit"` changes an existing one, prefilled with its current values (FE-23).
  *
  * Fields: name*, date*, start*, end*, room or online link, description. Validates on blur
  * and on submit, shows inline errors, focuses the first invalid field, sends nothing while
  * the form is invalid and keeps the entered data if saving fails. Mount it only while open
- * so every opening starts with a clean form.
+ * so every opening starts from the event's current values.
  */
-export function CreatePersonalEventModal({
-    userId,
-    defaultDate,
-    onClose,
-    onCreated,
-}: Readonly<CreatePersonalEventModalProps>) {
+export function PersonalEventModal(props: Readonly<PersonalEventModalProps>) {
+    const {onClose, onSaved} = props
+    const isEdit = props.mode === 'edit'
     const idPrefix = useId()
     const formId = `${idPrefix}-form`
     const fieldId = (field: PersonalEventFormField) => `${idPrefix}-${field}`
     const nameRef = useRef<HTMLInputElement>(null)
 
-    const [initialValues] = useState<PersonalEventFormValues>(() => ({
-        name: '',
-        date: defaultDate,
-        startTime: '',
-        endTime: '',
-        location: '',
-        description: '',
-    }))
+    const [initialValues] = useState<PersonalEventFormValues>(() => getInitialValues(props))
     const [values, setValues] = useState<PersonalEventFormValues>(initialValues)
     const [touched, setTouched] = useState<Partial<Record<PersonalEventFormField, boolean>>>({})
     const [submitAttempted, setSubmitAttempted] = useState(false)
-    const {create, isSaving, error: saveError, resetError} = useCreatePersonalEvent()
+    const {create, update: updateEvent, isSaving, error: saveError, resetError} =
+        usePersonalEventMutations()
 
     const errors = validatePersonalEvent(values)
     const visibleError = (field: PersonalEventFormField) =>
         submitAttempted || touched[field] ? errors[field] : undefined
     const hasErrors = Object.keys(errors).length > 0
+    const isDirty = PERSONAL_EVENT_FIELD_ORDER.some(
+        (field) => values[field] !== initialValues[field],
+    )
 
     const update = (field: PersonalEventFormField, value: string) => {
         setValues((current) => ({...current, [field]: value}))
@@ -100,18 +141,27 @@ export function CreatePersonalEventModal({
             return
         }
 
+        // Nothing changed in edit mode: no request, just close.
+        if (isEdit && !isDirty) {
+            onClose()
+            return
+        }
+
         const location = values.location.trim()
         const description = values.description.trim()
-        const created = await create({
-            userId,
+        const fields = {
             name: values.name.trim(),
             location: location || null,
             description: description || null,
             startsAt: `${values.date}T${values.startTime}:00`,
             endsAt: `${values.date}T${values.endTime}:00`,
-        })
+        }
+        const saved =
+            props.mode === 'edit'
+                ? await updateEvent({id: props.event.id, ...fields})
+                : await create({userId: props.userId, ...fields})
 
-        if (created) onCreated(created)
+        if (saved) onSaved(saved)
     }
 
     const duration =
@@ -127,7 +177,7 @@ export function CreatePersonalEventModal({
     return (
         <Modal
             isOpen
-            title="Нова особиста подія"
+            title={isEdit ? 'Редагування події' : 'Нова особиста подія'}
             onClose={handleClose}
             closeOnBackdropClick={false}
             initialFocusRef={nameRef}
@@ -148,7 +198,7 @@ export function CreatePersonalEventModal({
                         disabled={isSaving}
                         aria-busy={isSaving}
                     >
-                        {isSaving ? 'Зберігаємо…' : 'Створити подію'}
+                        {isSaving ? 'Зберігаємо…' : isEdit ? 'Зберегти зміни' : 'Створити подію'}
                     </button>
                 </>
             }
@@ -169,7 +219,9 @@ export function CreatePersonalEventModal({
                 {submitAttempted && hasErrors && (
                     <div className="form-error-alert" role="alert">
                         <span aria-hidden="true">!! </span>
-                        Перевірте позначені поля — подію ще не збережено.
+                        {isEdit
+                            ? 'Перевірте позначені поля — зміни ще не збережено.'
+                            : 'Перевірте позначені поля — подію ще не збережено.'}
                     </div>
                 )}
 

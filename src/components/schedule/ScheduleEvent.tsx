@@ -6,6 +6,11 @@ import {formatWeeksList} from '../../utils/dateUtils'
 
 type ScheduleEventProps = {
     event: CalendarEvent
+    /**
+     * When set, the card is a button that opens the event's edit form (own personal
+     * events only; university classes are always read-only).
+     */
+    onEdit?: () => void
 }
 
 const eventLabels: Record<EventType, string> = {
@@ -25,7 +30,11 @@ function hoursFromStartOfDay(value: string) {
     return date.getHours() + date.getMinutes() / 60
 }
 
-export function ScheduleEvent({event}: Readonly<ScheduleEventProps>) {
+/**
+ * One event card in the week grid, positioned by its start/end time. Read-only by default;
+ * with `onEdit` it becomes a button that opens the edit form (FE-23).
+ */
+export function ScheduleEvent({event, onEdit}: Readonly<ScheduleEventProps>) {
     const startsAt = hoursFromStartOfDay(event.startsAt)
     const endsAt = hoursFromStartOfDay(event.endsAt)
     const {colors} = useSubjectColors()
@@ -34,15 +43,15 @@ export function ScheduleEvent({event}: Readonly<ScheduleEventProps>) {
         colors[event.name] ??
         (event.eventType === 'PERSONAL' ? '#c7d8ff' : '#d9c7f0')
 
-    return (
-        <article
-            className={`lesson-card lesson-${eventColors[event.eventType]}`}
-            style={{
-                top: (startsAt - 8) * HOUR_HEIGHT + 4,
-                height: (endsAt - startsAt) * HOUR_HEIGHT - 8,
-                backgroundColor: cardBackground,
-            }}
-        >
+    const className = `lesson-card lesson-${eventColors[event.eventType]}`
+    const style = {
+        top: (startsAt - 8) * HOUR_HEIGHT + 4,
+        height: (endsAt - startsAt) * HOUR_HEIGHT - 8,
+        backgroundColor: cardBackground,
+    }
+
+    const content = (
+        <>
             <span className="lesson-time">
                 {formatTime(event.startsAt)} – {formatTime(event.endsAt)}
             </span>
@@ -62,6 +71,29 @@ export function ScheduleEvent({event}: Readonly<ScheduleEventProps>) {
                     🗓️ {formatWeeksList(event.weeks)} тиж.
                 </span>
             )}
+        </>
+    )
+
+    if (onEdit) {
+        return (
+            <button
+                type="button"
+                className={`${className} lesson-card-editable`}
+                style={style}
+                onClick={onEdit}
+                aria-haspopup="dialog"
+                title="Редагувати подію"
+            >
+                <span className="visually-hidden">Редагувати подію: </span>
+                <span className="lesson-edit-icon" aria-hidden="true">✎</span>
+                {content}
+            </button>
+        )
+    }
+
+    return (
+        <article className={className} style={style}>
+            {content}
         </article>
     )
 }

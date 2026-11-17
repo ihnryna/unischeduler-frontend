@@ -123,3 +123,43 @@ export function getAcademicWeekInfo(monday: Date) {
         fullLabel: `${semesterWeek}-й тиждень · ${isNumerator ? 'Чисельник' : 'Знаменник'}`,
     }
 }
+
+export function formatWeeksList(weeks?: number[]): string {
+    if (!weeks || weeks.length === 0) return 'Усі тижні'
+    const sorted = Array.from(new Set(weeks)).sort((a, b) => a - b)
+    if (sorted.length === 15 && sorted[0] === 1 && sorted[14] === 15) {
+        return '1–15'
+    }
+    const isConsecutive =
+        sorted.length >= 4 &&
+        sorted.every((w, i) => i === 0 || w === sorted[i - 1] + 1)
+    if (isConsecutive) {
+        return `${sorted[0]}–${sorted[sorted.length - 1]}`
+    }
+    return sorted.join(', ')
+}
+
+export function parseWeeksInput(input: string): number[] {
+    const tokens = input.split(/[,;\s]+/).map((s) => s.trim()).filter(Boolean)
+    const weeksSet = new Set<number>()
+
+    for (const token of tokens) {
+        if (token.includes('-') || token.includes('–')) {
+            const [startStr, endStr] = token.split(/[-–]/)
+            const start = parseInt(startStr, 10)
+            const end = parseInt(endStr, 10)
+            if (!isNaN(start) && !isNaN(end) && start > 0 && end >= start) {
+                for (let w = start; w <= Math.min(end, 30); w++) {
+                    weeksSet.add(w)
+                }
+            }
+        } else {
+            const num = parseInt(token, 10)
+            if (!isNaN(num) && num > 0 && num <= 30) {
+                weeksSet.add(num)
+            }
+        }
+    }
+
+    return Array.from(weeksSet).sort((a, b) => a - b)
+}

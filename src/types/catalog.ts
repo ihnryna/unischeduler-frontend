@@ -39,6 +39,7 @@ export type CourseClass = {
     location: string
     startsAt: LocalDateTime
     endsAt: LocalDateTime
+    weeks?: number[]
 }
 
 export type CourseClassCreate = Omit<CourseClass, 'id' | 'course'> & {

@@ -1,8 +1,8 @@
 import {
-    mockCourses,
     mockSpecialities,
     mockUsers,
 } from '../../mocks'
+import {adminService} from '../admin/adminService'
 import type {Course, Speciality} from '../../types/catalog'
 import type {CalendarEvent, CalendarEventFilter} from '../../types/schedule'
 import {getAcademicWeekInfo, getMondayOfWeek} from '../../utils/dateUtils'
@@ -11,7 +11,7 @@ function generateWeekCalendarEvents(weekOffset = 0, userId?: number): CalendarEv
     const monday = getMondayOfWeek()
     monday.setDate(monday.getDate() + weekOffset * 7)
 
-    const {isNumerator} = getAcademicWeekInfo(monday)
+    const {semesterWeek, isNumerator} = getAcademicWeekInfo(monday)
 
     const makeDateTime = (dayOffset: number, timeStr: string) => {
         const d = new Date(monday)
@@ -22,186 +22,49 @@ function generateWeekCalendarEvents(weekOffset = 0, userId?: number): CalendarEv
         return `${yyyy}-${mm}-${dd}T${timeStr}`
     }
 
-    let eventIdCounter = 1
+    const cleanTime = (isoOrTime: string, defaultTime: string) => {
+        if (!isoOrTime) return defaultTime
+        const part = isoOrTime.includes('T') ? isoOrTime.split('T')[1] : isoOrTime
+        const trimmed = part.trim()
+        if (trimmed.length === 5) return `${trimmed}:00`
+        if (trimmed.length >= 8) return trimmed.slice(0, 8)
+        return defaultTime
+    }
 
-    // 1. Щотижневі заняття (базовий розклад)
-    const recurringClasses: CalendarEvent[] = [
-        {
-            eventId: eventIdCounter++,
-            eventType: 'COURSE_CLASS',
-            name: 'Проєктування програмних систем',
-            teacher: 'В. Бублик',
-            group: 'ІПЗ-4',
-            location: '3-214',
-            description: 'Лекція',
-            startsAt: makeDateTime(0, '09:00:00'),
-            endsAt: makeDateTime(0, '10:30:00'),
-        },
-        {
-            eventId: eventIdCounter++,
-            eventType: 'COURSE_CLASS',
-            name: 'Сучасний C++',
-            teacher: 'В. Бублик',
-            group: 'ІПЗ-4',
-            location: '1-8',
-            description: 'Лекція',
-            startsAt: makeDateTime(1, '10:00:00'),
-            endsAt: makeDateTime(1, '11:30:00'),
-        },
-        {
-            eventId: eventIdCounter++,
-            eventType: 'COURSE_CLASS',
-            name: 'Комп’ютерні мережі',
-            teacher: 'М. Савчук',
-            group: 'ІПЗ-4',
-            location: '2-208',
-            description: 'Лекція',
-            startsAt: makeDateTime(2, '09:00:00'),
-            endsAt: makeDateTime(2, '10:30:00'),
-        },
-        {
-            eventId: eventIdCounter++,
-            eventType: 'COURSE_CLASS',
-            name: 'Англійська мова',
-            teacher: 'N. Smith',
-            group: 'ІПЗ-4',
-            location: '5-402',
-            description: 'Практичне заняття',
-            startsAt: makeDateTime(3, '11:00:00'),
-            endsAt: makeDateTime(3, '12:30:00'),
-        },
-        {
-            eventId: eventIdCounter++,
-            eventType: 'COURSE_CLASS',
-            name: 'Тестування програмного забезпечення',
-            teacher: 'О. Петренко',
-            group: 'ІПЗ-4',
-            location: '4-210',
-            description: 'Семінар',
-            startsAt: makeDateTime(4, '09:00:00'),
-            endsAt: makeDateTime(4, '10:30:00'),
-        },
-    ]
+    // 1. Навчальні заняття, керовані адміністратором (через adminService)
+    const adminClasses = adminService.getCourseClasses()
+    const activeClasses = adminClasses.filter((cls) => {
+        if (cls.weeks && cls.weeks.length > 0 && semesterWeek >= 1 && semesterWeek <= 20) {
+            return cls.weeks.includes(semesterWeek)
+        }
+        return true
+    })
 
-    // 2. Заняття за чисельником (непарні тижні)
-    const numeratorClasses: CalendarEvent[] = [
-        {
-            eventId: eventIdCounter++,
-            eventType: 'COURSE_CLASS',
-            name: 'Інженерія програмного забезпечення',
-            teacher: 'О. Петренко',
-            group: 'ІПЗ-4',
-            location: '4-105',
-            description: 'Лекція (чисельник)',
-            startsAt: makeDateTime(0, '12:00:00'),
-            endsAt: makeDateTime(0, '13:30:00'),
-        },
-        {
-            eventId: eventIdCounter++,
-            eventType: 'COURSE_CLASS',
-            name: 'Проєкт UNIScheduler',
-            teacher: 'Команда',
-            group: 'ІПЗ-4',
-            location: 'Онлайн',
-            description: 'Командний воркшоп',
-            startsAt: makeDateTime(2, '12:00:00'),
-            endsAt: makeDateTime(2, '13:30:00'),
-        },
-        {
-            eventId: eventIdCounter++,
-            eventType: 'COURSE_CLASS',
-            name: 'Алгоритми та структури даних',
-            teacher: 'А. Мельник',
-            group: 'ІПЗ-4',
-            location: '3-102',
-            description: 'Семінар (чисельник)',
-            startsAt: makeDateTime(3, '14:00:00'),
-            endsAt: makeDateTime(3, '15:30:00'),
-        },
-        {
-            eventId: eventIdCounter++,
-            eventType: 'COURSE_CLASS',
-            name: 'Архітектура програмного забезпечення',
-            teacher: 'І. Коваль',
-            group: 'ІПЗ-4',
-            location: '3-216',
-            description: 'Лекція',
-            startsAt: makeDateTime(4, '12:00:00'),
-            endsAt: makeDateTime(4, '13:30:00'),
-        },
-        {
-            eventId: eventIdCounter++,
-            eventType: 'COURSE_CLASS',
-            name: 'Самостійна робота',
-            teacher: null,
-            group: 'ІПЗ-4',
-            location: 'Бібліотека',
-            description: 'Підготовка до модульного контролю',
-            startsAt: makeDateTime(5, '10:00:00'),
-            endsAt: makeDateTime(5, '11:30:00'),
-        },
-    ]
+    const courseEvents: CalendarEvent[] = activeClasses.map((cls) => {
+        const startDate = new Date(cls.startsAt)
+        const dayOffset = !isNaN(startDate.getTime())
+            ? (startDate.getDay() + 6) % 7
+            : 0
 
-    // 3. Заняття за знаменником (парні тижні)
-    const denominatorClasses: CalendarEvent[] = [
-        {
-            eventId: eventIdCounter++,
-            eventType: 'COURSE_CLASS',
-            name: 'Бази даних',
-            teacher: 'І. Коваль',
-            group: 'ІПЗ-4',
-            location: '3-301',
-            description: 'Лабораторний практикум (знаменник)',
-            startsAt: makeDateTime(1, '14:00:00'),
-            endsAt: makeDateTime(1, '15:30:00'),
-        },
-        {
-            eventId: eventIdCounter++,
-            eventType: 'COURSE_CLASS',
-            name: 'Комп’ютерні мережі',
-            teacher: 'М. Савчук',
-            group: 'ІПЗ-4',
-            location: '2-208',
-            description: 'Лабораторна робота',
-            startsAt: makeDateTime(2, '14:00:00'),
-            endsAt: makeDateTime(2, '15:30:00'),
-        },
-        {
-            eventId: eventIdCounter++,
-            eventType: 'COURSE_CLASS',
-            name: 'Інженерія програмного забезпечення',
-            teacher: 'О. Петренко',
-            group: 'ІПЗ-4',
-            location: '4-105',
-            description: 'Практикум (знаменник)',
-            startsAt: makeDateTime(3, '14:00:00'),
-            endsAt: makeDateTime(3, '15:30:00'),
-        },
-        {
-            eventId: eventIdCounter++,
-            eventType: 'COURSE_CLASS',
-            name: 'Проєктування програмних систем',
-            teacher: 'В. Бублик',
-            group: 'ІПЗ-4',
-            location: '3-214',
-            description: 'Колоквіум (знаменник)',
-            startsAt: makeDateTime(4, '12:00:00'),
-            endsAt: makeDateTime(4, '13:30:00'),
-        },
-        {
-            eventId: eventIdCounter++,
-            eventType: 'COURSE_CLASS',
-            name: 'Сучасний C++',
-            teacher: 'В. Бублик',
-            group: 'ІПЗ-4',
-            location: '1-8',
-            description: 'Лабораторна робота',
-            startsAt: makeDateTime(4, '14:00:00'),
-            endsAt: makeDateTime(4, '15:30:00'),
-        },
-    ]
+        const startTime = cleanTime(cls.startsAt, '08:30:00')
+        const endTime = cleanTime(cls.endsAt, '09:50:00')
 
-    // 4. Персональні події залежно від тижня
+        return {
+            eventId: cls.id,
+            eventType: 'COURSE_CLASS' as const,
+            name: cls.course?.name || 'Навчальне заняття',
+            teacher: cls.teacher || null,
+            group: cls.group || null,
+            location: cls.location || null,
+            description: cls.course?.department || cls.course?.faculty || null,
+            startsAt: makeDateTime(dayOffset, startTime),
+            endsAt: makeDateTime(dayOffset, endTime),
+            weeks: cls.weeks,
+        }
+    })
+
+    // 2. Персональні події залежно від тижня
+    let eventIdCounter = 10000
     const personalEvents: CalendarEvent[] = []
     if (userId === undefined || userId === 1) {
         if (weekOffset === 0) {
@@ -267,9 +130,7 @@ function generateWeekCalendarEvents(weekOffset = 0, userId?: number): CalendarEv
         }
     }
 
-    const parityClasses = isNumerator ? numeratorClasses : denominatorClasses
-
-    return [...recurringClasses, ...parityClasses, ...personalEvents].sort((left, right) =>
+    return [...courseEvents, ...personalEvents].sort((left, right) =>
         left.startsAt.localeCompare(right.startsAt),
     )
 }
@@ -299,7 +160,7 @@ export const scheduleService = {
     },
 
     getCourses(): Promise<Course[]> {
-        return Promise.resolve(structuredClone(mockCourses))
+        return Promise.resolve(structuredClone(adminService.getCourses()))
     },
 
     getSpecialities(): Promise<Speciality[]> {

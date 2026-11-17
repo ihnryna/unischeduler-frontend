@@ -2,6 +2,7 @@ import type {CalendarEvent, EventType} from '../../types/schedule'
 import {HOUR_HEIGHT} from '../../features/schedule/scheduleConfig'
 import {useSubjectColors} from '../../features/schedule/subjectColors'
 import {formatTime} from '../../utils/formatTime'
+import {formatWeeksList} from '../../utils/dateUtils'
 
 type ScheduleEventProps = {
     event: CalendarEvent
@@ -55,6 +56,11 @@ export function ScheduleEvent({event}: Readonly<ScheduleEventProps>) {
             )}
             {event.teacher && (
                 <span className="lesson-teacher">{event.teacher}</span>
+            )}
+            {event.weeks && event.weeks.length > 0 && (
+                <span className="lesson-weeks" title={`Тижні: ${event.weeks.join(', ')}`}>
+                    🗓️ {formatWeeksList(event.weeks)} тиж.
+                </span>
             )}
         </article>
     )

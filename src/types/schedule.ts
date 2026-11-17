@@ -12,6 +12,7 @@ export type CalendarEvent = {
     description: string | null
     startsAt: LocalDateTime
     endsAt: LocalDateTime
+    weeks?: number[]
 }
 
 export type CalendarEventFilter = {

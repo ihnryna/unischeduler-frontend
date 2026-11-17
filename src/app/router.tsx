@@ -10,6 +10,7 @@ import {SchedulePage} from '../pages/SchedulePage/SchedulePage'
 import {SettingsPage} from '../pages/SettingsPage/SettingsPage'
 import { GeneralSchedulePage } from '../pages/GeneralSchedulePage/GeneralSchedulePage'
 import { GoogleCalendarPage } from '../pages/GoogleCalendarPage/GoogleCalendarPage'
+import { AdminPage } from '../pages/AdminPage/AdminPage'
 
 import {useSchedule} from '../features/schedule/useSchedule'
 
@@ -52,26 +53,10 @@ export const router = createBrowserRouter([
                 path: 'settings',
                 element: <SettingsPage />,
             },
-            /*{
+            {
                 path: 'admin',
                 element: <AdminPage />,
             },
-            {
-                path: 'admin/courses',
-                element: <AdminCoursesPage />,
-            },
-            {
-                path: 'admin/sync',
-                element: <AdminSyncPage />,
-            },
-            {
-                path: 'admin/integrations',
-                element: <AdminIntegrationsPage />,
-            },
-            {
-                path: 'admin/logs',
-                element: <AdminLogsPage />,
-            },*/
         ],
     }
 ])

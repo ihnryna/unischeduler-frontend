@@ -10,15 +10,16 @@ import type {Course} from '../../types/catalog'
 export function SettingsPage() {
     const {colors, setColor, resetColors} = useSubjectColors()
     const [savedNotification, setSavedNotification] = useState<string | null>(null)
-    const [courses, setCourses] = useState<Course[]>(() => adminService.getCourses())
+    const [courses, setCourses] = useState<Course[]>([])
 
     useEffect(() => {
-        const handleUpdate = () => {
-            setCourses(adminService.getCourses())
+        const load = () => {
+            adminService.getCourses().then(setCourses).catch(() => {})
         }
-        window.addEventListener('unischeduler_courses_updated', handleUpdate)
+        load()
+        window.addEventListener('unischeduler_courses_updated', load)
         return () => {
-            window.removeEventListener('unischeduler_courses_updated', handleUpdate)
+            window.removeEventListener('unischeduler_courses_updated', load)
         }
     }, [])
 

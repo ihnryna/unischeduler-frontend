@@ -1,11 +1,12 @@
 import {useEffect, useState} from 'react'
-import type {Course, Semester} from '../../../types/catalog'
+import type {Course, Semester, Speciality} from '../../../types/catalog'
 import {mockSpecialities} from '../../../mocks/specialities'
 import type {CourseFormData} from '../../../features/admin/adminTypes'
 
 type CourseModalProps = {
     isOpen: boolean
     courseToEdit: Course | null
+    specialities?: Speciality[]
     onSave: (data: CourseFormData) => void
     onClose: () => void
 }
@@ -21,16 +22,18 @@ const DEFAULT_FACULTIES = [
 export function CourseModal({
     isOpen,
     courseToEdit,
+    specialities = [],
     onSave,
     onClose,
 }: Readonly<CourseModalProps>) {
+    const activeSpecialities = specialities.length > 0 ? specialities : mockSpecialities
     const [name, setName] = useState('')
     const [faculty, setFaculty] = useState(DEFAULT_FACULTIES[0])
     const [department, setDepartment] = useState('Кафедра інформатики')
     const [semester, setSemester] = useState<Semester>('AUTUMN')
     const [year, setYear] = useState(2026)
     const [selectedSpecialities, setSelectedSpecialities] = useState<string[]>([
-        mockSpecialities[0].name,
+        activeSpecialities[0]?.name ?? 'Інженерія програмного забезпечення',
     ])
     const [error, setError] = useState<string | null>(null)
 
@@ -208,7 +211,7 @@ export function CourseModal({
                                 Спеціальності (закріплення) <span className="admin-required">*</span>
                             </span>
                             <div className="admin-checkbox-grid">
-                                {mockSpecialities.map((spec) => {
+                                {activeSpecialities.map((spec) => {
                                     const isChecked = selectedSpecialities.includes(spec.name)
                                     return (
                                         <label

@@ -1,19 +1,95 @@
 import {useState} from 'react'
 
+import {
+    ConfirmDeleteDialog,
+    type DeletablePersonalEvent,
+} from '../../components/events/ConfirmDeleteDialog'
+import {
+    PersonalEventModal,
+    type EditablePersonalEvent,
+} from '../../components/events/PersonalEventModal'
 import {ScheduleGrid} from '../../components/schedule/ScheduleGrid'
+import {isEditablePersonalEvent} from '../../features/events/usePersonalEventMutations'
 import {useSchedule} from '../../features/schedule/useSchedule'
+import type {CalendarEvent, PersonalEvent} from '../../types/schedule'
 import {
     formatWeekRange,
     getAcademicWeekInfo,
     getMondayOfWeek,
+    getWeekDays,
+    getWeekOffsetFor,
+    MONTH_NAMES_GENITIVE,
     MONTH_SHORT_UA,
 } from '../../utils/dateUtils'
 import {formatTime} from '../../utils/formatTime'
 
+// TODO(FE-13): replace with useAuth().user.id
+const CURRENT_USER_ID = 1
+
 export function SchedulePage() {
     const [weekOffset, setWeekOffset] = useState(0)
     const [selectedDay, setSelectedDay] = useState<number | null>(null)
-    const {events, isLoading, error} = useSchedule(1, weekOffset)
+    const [isCreateOpen, setIsCreateOpen] = useState(false)
+    const [editingEvent, setEditingEvent] = useState<EditablePersonalEvent | null>(null)
+    const [deletingEvent, setDeletingEvent] = useState<DeletablePersonalEvent | null>(null)
+    const [successMessage, setSuccessMessage] = useState<string | null>(null)
+    const {events, isLoading, error, refetch} = useSchedule(CURRENT_USER_ID, weekOffset)
+
+    // New events default to the selected day, else today (if visible), else Monday.
+    const weekDays = getWeekDays(weekOffset)
+    const defaultEventDate =
+        (selectedDay !== null ? weekDays[selectedDay]?.isoDate : undefined) ??
+        weekDays.find((day) => day.isToday)?.isoDate ??
+        weekDays[0].isoDate
+
+    // Saved (created or edited): close the form, show the event's week, refetch.
+    const handleEventSaved = (event: PersonalEvent, verb: string) => {
+        const startsAt = new Date(event.startsAt)
+        const nextWeekOffset = getWeekOffsetFor(startsAt)
+        setIsCreateOpen(false)
+        setEditingEvent(null)
+        const dayIndex = (startsAt.getDay() + 6) % 7
+        // Keep the day filter only if the saved event is still visible under it.
+        if (nextWeekOffset !== weekOffset || (selectedDay !== null && selectedDay !== dayIndex)) {
+            setSelectedDay(null)
+        }
+        setWeekOffset(nextWeekOffset)
+        refetch()
+        setSuccessMessage(
+            `Подію «${event.name}» ${verb}: ${startsAt.getDate()} ${
+                MONTH_NAMES_GENITIVE[startsAt.getMonth()]
+            }, ${formatTime(event.startsAt)}–${formatTime(event.endsAt)}.`,
+        )
+    }
+
+    const handleEventDeleted = (event: {name: string}) => {
+        setEditingEvent(null)
+        setDeletingEvent(null)
+        refetch()
+        setSuccessMessage(`Подію «${event.name}» видалено.`)
+    }
+
+    const handleDeleteEvent = (event: CalendarEvent) => {
+        setSuccessMessage(null)
+        setDeletingEvent({
+            id: event.eventId,
+            name: event.name,
+            startsAt: event.startsAt,
+            endsAt: event.endsAt,
+        })
+    }
+
+    const handleEditEvent = (event: CalendarEvent) => {
+        setSuccessMessage(null)
+        setEditingEvent({
+            id: event.eventId,
+            name: event.name,
+            location: event.location,
+            description: event.description,
+            startsAt: event.startsAt,
+            endsAt: event.endsAt,
+        })
+    }
 
     const monday = getMondayOfWeek()
     monday.setDate(monday.getDate() + weekOffset * 7)
@@ -51,13 +127,54 @@ export function SchedulePage() {
                 </div>
 
                 <button
+                    type="button"
                     className="primary-button"
-                    onClick={() =>
-                        window.alert('Створення особистої події додамо пізніше.')
-                    }
+                    onClick={() => {
+                        setSuccessMessage(null)
+                        setIsCreateOpen(true)
+                    }}
+                    aria-haspopup="dialog"
                 >
-                    <span>＋</span> Нова подія
+                    <span aria-hidden="true">＋</span> Нова подія
                 </button>
+            </div>
+
+            {isCreateOpen && (
+                <PersonalEventModal
+                    mode="create"
+                    userId={CURRENT_USER_ID}
+                    defaultDate={defaultEventDate}
+                    onClose={() => setIsCreateOpen(false)}
+                    onSaved={(event) => handleEventSaved(event, 'додано')}
+                />
+            )}
+
+            {editingEvent && (
+                <PersonalEventModal
+                    mode="edit"
+                    event={editingEvent}
+                    onClose={() => setEditingEvent(null)}
+                    onSaved={(event) => handleEventSaved(event, 'оновлено')}
+                    onDeleted={handleEventDeleted}
+                />
+            )}
+
+            {deletingEvent && (
+                <ConfirmDeleteDialog
+                    event={deletingEvent}
+                    onCancel={() => setDeletingEvent(null)}
+                    onDeleted={handleEventDeleted}
+                />
+            )}
+
+            {/* Live region stays mounted so the success message is announced. */}
+            <div role="status" aria-live="polite">
+                {successMessage && (
+                    <p className="form-success-notice">
+                        <span aria-hidden="true">✓ </span>
+                        {successMessage}
+                    </p>
+                )}
             </div>
 
             <section className="week-toolbar">
@@ -126,6 +243,9 @@ export function SchedulePage() {
                     )
                 }}
                 weekOffset={weekOffset}
+                onEditEvent={handleEditEvent}
+                onDeleteEvent={handleDeleteEvent}
+                canEditEvent={isEditablePersonalEvent}
             />
 
             <div className="bottom-widgets">

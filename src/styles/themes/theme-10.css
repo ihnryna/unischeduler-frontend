@@ -246,7 +246,7 @@
 .app[data-theme="theme-10"] .today-button,
 .app[data-theme="theme-10"] .icon-button,
 .app[data-theme="theme-10"] .reset-button,
-.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill) {
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn) {
     border: 2px solid var(--retro-ink);
     border-radius: 14px;
     background: var(--retro-paper);
@@ -265,7 +265,7 @@
 .app[data-theme="theme-10"] .today-button:hover,
 .app[data-theme="theme-10"] .icon-button:hover,
 .app[data-theme="theme-10"] .reset-button:hover,
-.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):hover {
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):hover {
     background: var(--retro-yellow);
     transform: translate(2px, 2px);
     box-shadow: 1px 1px 0 var(--retro-ink);
@@ -277,7 +277,7 @@
 .app[data-theme="theme-10"] .today-button:active,
 .app[data-theme="theme-10"] .icon-button:active,
 .app[data-theme="theme-10"] .reset-button:active,
-.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):active {
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):active {
     transform: translate(3px, 3px);
     box-shadow: none;
 }
@@ -288,7 +288,7 @@
 .app[data-theme="theme-10"] .today-button:disabled,
 .app[data-theme="theme-10"] .icon-button:disabled,
 .app[data-theme="theme-10"] .reset-button:disabled,
-.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):disabled {
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
@@ -2338,3 +2338,215 @@
     max-width: 440px;
 }
 
+
+/* =========================================
+   Generic modal + form fields (FE-09, FE-11, FE-22)
+   Geometry lives in layout.css; this is the theme-10 look,
+   matching the admin modal.
+   ========================================= */
+
+.app[data-theme="theme-10"] .modal-overlay {
+    background-color: rgba(41, 37, 31, 0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: retro-modal-fade 140ms ease-out;
+}
+
+.app[data-theme="theme-10"] .modal-card {
+    background-color: var(--retro-paper);
+    color: var(--retro-ink);
+    border: 2px solid var(--retro-ink);
+    border-radius: 22px;
+    box-shadow: 6px 6px 0 var(--retro-ink);
+    animation: retro-modal-pop 160ms ease-out;
+}
+
+.app[data-theme="theme-10"] .modal-header {
+    padding: 16px 22px;
+    background-color: var(--retro-yellow);
+    border-bottom: 2px solid var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .modal-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 850;
+    color: var(--retro-ink);
+    letter-spacing: -0.025em;
+}
+
+.app[data-theme="theme-10"] .modal-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 2px solid var(--retro-ink);
+    border-radius: 50%;
+    background-color: var(--retro-paper);
+    color: var(--retro-ink);
+    box-shadow: 1.5px 1.5px 0 var(--retro-ink);
+    cursor: pointer;
+    transition: background-color 140ms ease;
+}
+
+.app[data-theme="theme-10"] .modal-close-btn:hover {
+    background-color: var(--retro-pink);
+}
+
+.app[data-theme="theme-10"] .modal-body {
+    padding: 22px;
+}
+
+.app[data-theme="theme-10"] .modal-footer {
+    padding: 16px 22px;
+    background-color: #faf5ea;
+    border-top: 2px solid var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .modal-btn-secondary {
+    background-color: var(--retro-paper);
+}
+
+.app[data-theme="theme-10"] .modal-btn-secondary:hover:not(:disabled) {
+    background-color: #efe8dc;
+}
+
+.app[data-theme="theme-10"] .modal-btn-danger {
+    background-color: var(--retro-pink);
+    border: 2px solid var(--retro-ink);
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .modal-btn-danger:hover:not(:disabled) {
+    background-color: #f1a9c1;
+}
+
+.app[data-theme="theme-10"] .form-field-label {
+    font-size: 0.82rem;
+    font-weight: 750;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .form-field-required {
+    color: #c92a2a;
+}
+
+.app[data-theme="theme-10"] .form-field-hint,
+.app[data-theme="theme-10"] .form-required-note {
+    font-size: 0.78rem;
+    color: var(--retro-muted);
+}
+
+.app[data-theme="theme-10"] .form-field-error {
+    font-size: 0.8rem;
+    font-weight: 750;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .modal-form .input,
+.app[data-theme="theme-10"] .modal-form .textarea {
+    padding: 9px 14px;
+    font-size: 0.88rem;
+}
+
+.app[data-theme="theme-10"] .modal-form [aria-invalid="true"] {
+    background-color: var(--retro-pink);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .form-error-alert {
+    padding: 10px 14px;
+    background-color: var(--retro-pink);
+    border: 1.5px solid var(--retro-ink);
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 750;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .admin-slot-pill[aria-pressed="true"] {
+    background-color: var(--retro-yellow);
+}
+
+.app[data-theme="theme-10"] .form-success-notice {
+    margin: 0 0 16px;
+    padding: 10px 16px;
+    background-color: var(--retro-green);
+    border: 2px solid var(--retro-ink);
+    border-radius: 14px;
+    box-shadow: 2px 2px 0 var(--retro-ink);
+    font-weight: 700;
+    color: var(--retro-ink);
+}
+
+@keyframes retro-modal-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes retro-modal-pop {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+    to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app[data-theme="theme-10"] .modal-overlay,
+    .app[data-theme="theme-10"] .modal-card {
+        animation: none;
+    }
+}
+
+/* Editable event card (FE-23): lifts on hover like the other retro buttons */
+.app[data-theme="theme-10"] .lesson-card-editable {
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.app[data-theme="theme-10"] .lesson-card-editable:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .lesson-card-editable:has(.lesson-card-hit:active) {
+    transform: translate(1px, 1px);
+    box-shadow: 0 0 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .lesson-card-editable:has(.lesson-card-hit:focus-visible) {
+    outline: 3px solid var(--retro-ink);
+    outline-offset: 2px;
+}
+
+.app[data-theme="theme-10"] .lesson-card-hit:focus-visible {
+    outline: none;
+}
+
+.app[data-theme="theme-10"] .lesson-edit-icon,
+.app[data-theme="theme-10"] .lesson-delete-btn {
+    border: 1.5px solid var(--retro-ink);
+    background-color: var(--retro-paper);
+    color: var(--retro-ink);
+    box-shadow: 1px 1px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .lesson-delete-btn:hover {
+    background-color: var(--retro-pink);
+}
+
+.app[data-theme="theme-10"] .lesson-card-editable:has(.lesson-card-hit:hover) .lesson-edit-icon,
+.app[data-theme="theme-10"] .lesson-card-editable:has(.lesson-card-hit:focus-visible) .lesson-edit-icon {
+    background-color: var(--retro-yellow);
+}
+
+.app[data-theme="theme-10"] .lesson-delete-btn:focus-visible {
+    outline: 2px solid var(--retro-ink);
+    outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app[data-theme="theme-10"] .lesson-card-editable {
+        transition: none;
+    }
+}

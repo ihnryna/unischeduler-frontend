@@ -83,38 +83,34 @@ export function GoogleCalendarPage() {
     }
 
     return (
-        <section style={{padding: '1.5rem', maxWidth: '800px', margin: '0 auto'}}>
-            <div className="page-heading" style={{marginBottom: '1.5rem'}}>
-                <h1>Інтеграція з Google Calendar</h1>
-                <p style={{margin: '6px 0 0 0', color: 'var(--color-muted, #64748b)'}}>
-                    Автоматичний експорт розкладу пар та персональних подій НаУКМА у ваш персональний Google-календар
-                </p>
+        <section className="page-section">
+            <div className="page-heading">
+                <div>
+                    <h1>Інтеграція з Google Calendar</h1>
+                </div>
             </div>
+            <p className="page-intro text-muted">
+                Автоматичний експорт розкладу пар та персональних подій НаУКМА у ваш персональний Google-календар
+            </p>
 
             {notification && (
                 <div
-                    className="card"
-                    style={{
-                        padding: '1rem 1.25rem',
-                        marginBottom: '1.5rem',
-                        backgroundColor: notification.type === 'error' ? '#fee2e2' : notification.type === 'success' ? '#dcfce7' : '#e0f2fe',
-                        borderColor: notification.type === 'error' ? '#f87171' : notification.type === 'success' ? '#86efac' : '#7dd3fc',
-                        color: notification.type === 'error' ? '#991b1b' : notification.type === 'success' ? '#166534' : '#0369a1',
-                    }}
+                    className={`notice notice-${notification.type}`}
+                    role={notification.type === 'error' ? 'alert' : 'status'}
                 >
-                    {notification.type === 'error' ? '⚠️ ' : '✓ '}
+                    <span aria-hidden="true">{notification.type === 'error' ? '⚠️ ' : '✓ '}</span>
                     {notification.message}
                 </div>
             )}
 
-            <div className="card" style={{padding: '1.5rem', marginBottom: '1.5rem'}}>
-                <div style={{display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem'}}>
-                    <div style={{fontSize: '2.5rem'}}>📅</div>
+            <div className="card">
+                <div className="gcal-status">
+                    <div className="gcal-status-icon" aria-hidden="true">📅</div>
                     <div>
-                        <h2 style={{fontSize: '1.25rem', margin: 0, fontWeight: 700}}>
+                        <h2>
                             Статус підключення: {isConnected ? 'Підключено' : 'Не підключено'}
                         </h2>
-                        <p style={{margin: '4px 0 0 0', color: 'var(--color-muted, #64748b)', fontSize: '0.9rem'}}>
+                        <p className="text-muted">
                             {isConnected
                                 ? `Акаунт: ${connectedEmail}`
                                 : 'Для синхронізації надайте доступ до додавання подій у Google Calendar'}
@@ -122,16 +118,15 @@ export function GoogleCalendarPage() {
                     </div>
                 </div>
 
-                <div style={{display: 'flex', flexWrap: 'wrap', gap: '0.75rem'}}>
+                <div className="button-row">
                     {!isConnected ? (
                         <button
                             type="button"
                             className="button primary-button"
                             disabled={isConnecting}
                             onClick={handleConnectGoogle}
-                            style={{padding: '10px 18px', display: 'flex', alignItems: 'center', gap: '8px'}}
                         >
-                            <span>🔗</span>
+                            <span aria-hidden="true">🔗</span>
                             <span>{isConnecting ? 'Підключення…' : 'Підключити Google Calendar'}</span>
                         </button>
                     ) : (
@@ -141,16 +136,14 @@ export function GoogleCalendarPage() {
                                 className="button primary-button"
                                 disabled={isSyncing}
                                 onClick={handleSync}
-                                style={{padding: '10px 18px', display: 'flex', alignItems: 'center', gap: '8px'}}
                             >
-                                <span>🔄</span>
+                                <span aria-hidden="true">🔄</span>
                                 <span>{isSyncing ? 'Синхронізація розкладу…' : 'Синхронізувати розклад зараз'}</span>
                             </button>
                             <button
                                 type="button"
                                 className="button"
                                 onClick={handleDisconnect}
-                                style={{padding: '10px 18px'}}
                             >
                                 Від’єднати акаунт
                             </button>
@@ -160,22 +153,20 @@ export function GoogleCalendarPage() {
             </div>
 
             {isConnected && (
-                <div className="card" style={{padding: '1.5rem'}}>
-                    <h3 style={{fontSize: '1.1rem', margin: '0 0 1rem 0', fontWeight: 600}}>
-                        Параметри та статистика синхронізації
-                    </h3>
-                    <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem'}}>
-                        <div style={{padding: '0.75rem', borderRadius: '6px', background: 'var(--color-surface)'}}>
-                            <span style={{fontSize: '0.85rem', color: 'var(--color-muted, #64748b)', display: 'block'}}>Остання синхронізація</span>
-                            <strong style={{fontSize: '1rem'}}>{lastSyncedAt || 'Ще не проводилась'}</strong>
+                <div className="card">
+                    <h3 className="card-title">Параметри та статистика синхронізації</h3>
+                    <div className="stat-grid">
+                        <div className="stat-tile">
+                            <span className="text-muted">Остання синхронізація</span>
+                            <strong>{lastSyncedAt || 'Ще не проводилась'}</strong>
                         </div>
-                        <div style={{padding: '0.75rem', borderRadius: '6px', background: 'var(--color-surface)'}}>
-                            <span style={{fontSize: '0.85rem', color: 'var(--color-muted, #64748b)', display: 'block'}}>Передано подій</span>
-                            <strong style={{fontSize: '1rem'}}>{syncedEventsCount !== null ? `${syncedEventsCount} занять` : '—'}</strong>
+                        <div className="stat-tile">
+                            <span className="text-muted">Передано подій</span>
+                            <strong>{syncedEventsCount !== null ? `${syncedEventsCount} занять` : '—'}</strong>
                         </div>
-                        <div style={{padding: '0.75rem', borderRadius: '6px', background: 'var(--color-surface)'}}>
-                            <span style={{fontSize: '0.85rem', color: 'var(--color-muted, #64748b)', display: 'block'}}>Захист від дублікатів</span>
-                            <strong style={{fontSize: '1rem', color: '#16a34a'}}>✓ Активний (eventId hashing)</strong>
+                        <div className="stat-tile">
+                            <span className="text-muted">Захист від дублікатів</span>
+                            <strong className="text-success">✓ Активний (eventId hashing)</strong>
                         </div>
                     </div>
                 </div>

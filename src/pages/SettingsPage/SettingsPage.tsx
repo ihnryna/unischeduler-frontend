@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react'
 
 import {
+    FALLBACK_CLASS_COLOR,
     RETRO_COLOR_PALETTE,
     useSubjectColors,
 } from '../../features/schedule/subjectColors'
@@ -79,7 +80,7 @@ export function SettingsPage() {
 
                     <div className="subject-color-list">
                         {subjects.map((subject) => {
-                            const activeColor = colors[subject] ?? '#d9c7f0'
+                            const activeColor = colors[subject] ?? FALLBACK_CLASS_COLOR
 
                             return (
                                 <div className="subject-color-item" key={subject}>

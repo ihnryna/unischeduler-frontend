@@ -19,7 +19,10 @@
     background: var(--retro-bg);
     color: var(--retro-ink);
     font-family: "Kyiv Type Sans", sans-serif;
-    min-height: 100%;
+    /* Fill the whole viewport so short pages never show the browser canvas below
+       (black in dark-mode browsers). `100%` did nothing: the parents have no height. */
+    min-height: 100vh;
+    min-height: 100dvh;
     scrollbar-gutter: stable;
 }
 
@@ -246,7 +249,7 @@
 .app[data-theme="theme-10"] .today-button,
 .app[data-theme="theme-10"] .icon-button,
 .app[data-theme="theme-10"] .reset-button,
-.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn) {
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):not(.toast-close) {
     border: 2px solid var(--retro-ink);
     border-radius: 14px;
     background: var(--retro-paper);
@@ -265,7 +268,7 @@
 .app[data-theme="theme-10"] .today-button:hover,
 .app[data-theme="theme-10"] .icon-button:hover,
 .app[data-theme="theme-10"] .reset-button:hover,
-.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):hover {
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):not(.toast-close):hover {
     background: var(--retro-yellow);
     transform: translate(2px, 2px);
     box-shadow: 1px 1px 0 var(--retro-ink);
@@ -277,7 +280,7 @@
 .app[data-theme="theme-10"] .today-button:active,
 .app[data-theme="theme-10"] .icon-button:active,
 .app[data-theme="theme-10"] .reset-button:active,
-.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):active {
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):not(.toast-close):active {
     transform: translate(3px, 3px);
     box-shadow: none;
 }
@@ -288,7 +291,7 @@
 .app[data-theme="theme-10"] .today-button:disabled,
 .app[data-theme="theme-10"] .icon-button:disabled,
 .app[data-theme="theme-10"] .reset-button:disabled,
-.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):disabled {
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):not(.toast-close):disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
@@ -2784,4 +2787,104 @@
     .app[data-theme="theme-10"] .user-menu-item {
         transition: none;
     }
+}
+
+/* Week stats: number above its label (layout: layout.css "OVERVIEW STATS") */
+.app[data-theme="theme-10"] .overview-stats strong {
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+}
+
+.app[data-theme="theme-10"] .overview-stats span {
+    font-size: 0.8rem;
+    color: var(--retro-muted);
+}
+
+/* Success toast (layout: layout.css "TOAST") */
+.app[data-theme="theme-10"] .toast {
+    box-shadow: 4px 4px 0 var(--retro-ink);
+    animation: retro-modal-fade 160ms ease-out;
+}
+
+.app[data-theme="theme-10"] .toast-close {
+    background: transparent;
+    border: 2px solid var(--retro-ink);
+    border-radius: 50%;
+    color: var(--retro-ink);
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.app[data-theme="theme-10"] .toast-close:hover {
+    background: var(--retro-paper);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app[data-theme="theme-10"] .toast {
+        animation: none;
+    }
+}
+
+/* Shared page pieces (layout: layout.css "SHARED PAGE PIECES") */
+.app[data-theme="theme-10"] .text-muted {
+    color: var(--retro-muted);
+}
+
+.app[data-theme="theme-10"] .text-success {
+    color: #2f6a1c;
+}
+
+.app[data-theme="theme-10"] .notice {
+    border: 2px solid var(--retro-ink);
+    border-radius: 14px;
+    box-shadow: 2px 2px 0 var(--retro-ink);
+    color: var(--retro-ink);
+    font-weight: 700;
+}
+
+.app[data-theme="theme-10"] .notice-error {
+    background-color: var(--retro-pink);
+}
+
+.app[data-theme="theme-10"] .notice-success {
+    background-color: var(--retro-green);
+}
+
+.app[data-theme="theme-10"] .notice-info {
+    background-color: var(--retro-blue);
+}
+
+.app[data-theme="theme-10"] .stat-tile {
+    background-color: var(--retro-bg);
+    border: 1.5px solid var(--retro-ink);
+    border-radius: 12px;
+}
+
+.app[data-theme="theme-10"] .login-page {
+    background: var(--retro-bg);
+}
+
+.app[data-theme="theme-10"] .login-brand .brand-logo {
+    width: 56px;
+    height: 56px;
+    font-size: 1.2rem;
+}
+
+.app[data-theme="theme-10"] .gs-day-header {
+    background-color: var(--retro-bg);
+    border-bottom: 2px solid var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .gs-class {
+    background-color: var(--retro-paper);
+    border: 1.5px solid var(--retro-ink);
+    border-radius: 12px;
+}
+
+.app[data-theme="theme-10"] .loader {
+    border-color: #e3dacd;
+    border-top-color: var(--retro-ink);
 }

@@ -91,3 +91,9 @@ button {
     outline: 3px solid currentColor;
     outline-offset: 3px;
 }
+
+/* The app has only a light theme: keep the browser canvas, scrollbars and form controls
+   light even when the OS is in dark mode. */
+:root {
+    color-scheme: light;
+}

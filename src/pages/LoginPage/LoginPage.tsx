@@ -32,80 +32,45 @@ export function LoginPage() {
     }
 
     return (
-        <main
-            style={{
-                minHeight: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '1.5rem',
-                backgroundColor: 'var(--color-background, #f8fafc)',
-            }}
-        >
-            <div
-                className="card"
-                style={{
-                    maxWidth: '460px',
-                    width: '100%',
-                    padding: '2.5rem 2rem',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
-                }}
-            >
-                <div style={{textAlign: 'center', marginBottom: '2rem'}}>
-                    <div style={{fontSize: '3rem', marginBottom: '0.5rem'}}>🏛️</div>
-                    <h1 style={{fontSize: '1.6rem', fontWeight: 800, margin: '0 0 0.5rem 0'}}>
-                        UNIScheduler
-                    </h1>
-                    <p style={{margin: 0, color: 'var(--color-muted, #64748b)', fontSize: '0.95rem'}}>
+        <main className="login-page">
+            <div className="card login-card">
+                <div className="login-brand">
+                    {/* Same logo as the app header, so the sign-in page looks like the app. */}
+                    <span className="brand-logo" aria-hidden="true">UNI</span>
+                    <h1>UNIScheduler</h1>
+                    <p className="text-muted">
                         Єдиний сервіс розкладу та планування для студентів і викладачів НаУКМА
                     </p>
                 </div>
 
                 {error && (
-                    <div
-                        style={{
-                            padding: '0.75rem 1rem',
-                            marginBottom: '1.25rem',
-                            backgroundColor: '#fee2e2',
-                            color: '#991b1b',
-                            borderRadius: '6px',
-                            fontSize: '0.875rem',
-                            border: '1px solid #f87171',
-                        }}
-                    >
-                        ⚠️ {error}
+                    <div className="notice notice-error" role="alert">
+                        <span aria-hidden="true">⚠️ </span>
+                        {error}
                     </div>
                 )}
 
-                <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
-                    <div>
-                        <label
-                            htmlFor="login-email"
-                            style={{display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px'}}
-                        >
-                            Корпоративна пошта НаУКМА
-                        </label>
+                <div className="login-form">
+                    <div className="form-field">
+                        <label htmlFor="login-email">Корпоративна пошта НаУКМА</label>
                         <input
                             id="login-email"
                             type="email"
                             className="input"
-                            style={{width: '100%', padding: '10px 12px'}}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="username@ukma.edu.ua"
                         />
                     </div>
 
-                    <div style={{display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem'}}>
+                    <div className="login-actions">
                         <button
                             type="button"
                             className="button primary-button"
                             disabled={isLoading}
                             onClick={() => handleLogin('STUDENT')}
-                            style={{padding: '12px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}
                         >
-                            <span>🎓</span>
+                            <span aria-hidden="true">🎓</span>
                             <span>Увійти як Студент (Microsoft SSO)</span>
                         </button>
 
@@ -117,16 +82,15 @@ export function LoginPage() {
                                 setEmail('admin@ukma.edu.ua')
                                 handleLogin('ADMIN', 'admin@ukma.edu.ua')
                             }}
-                            style={{padding: '10px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}
                         >
-                            <span>🔑</span>
-                            <span>Увійти як Адміністратор (Панель керування)</span>
+                            <span aria-hidden="true">🔑</span>
+                            <span>Увійти як Адміністратор</span>
                         </button>
                     </div>
 
-                    <div style={{marginTop: '1.5rem', textAlign: 'center', fontSize: '0.8rem', color: 'var(--color-muted, #94a3b8)'}}>
+                    <p className="login-footnote text-muted">
                         Авторизація через Microsoft Azure OAuth 2.0 / OpenID Connect НаУКМА
-                    </div>
+                    </p>
                 </div>
             </div>
         </main>

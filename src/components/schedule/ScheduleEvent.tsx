@@ -1,7 +1,11 @@
 import type {CalendarEvent, EventType} from '../../types/schedule'
-import {getEventHours} from '../../features/schedule/gridHours'
+import {getEventHours, type OverlapSlot} from '../../features/schedule/gridHours'
 import {CLASS_KIND_LABELS, getClassKind} from '../../features/schedule/classDetails'
-import {useSubjectColors} from '../../features/schedule/subjectColors'
+import {
+    FALLBACK_CLASS_COLOR,
+    FALLBACK_PERSONAL_COLOR,
+    useSubjectColors,
+} from '../../features/schedule/subjectColors'
 import {formatTime} from '../../utils/formatTime'
 import {getMeetingHref} from '../../features/events/personalEventValidation'
 import type {EventDragHandlers} from '../../features/schedule/useEventDrag'
@@ -14,6 +18,8 @@ type ScheduleEventProps = {
     onOpen?: () => void
     /** When set, a trash button opens the delete confirmation (own personal events). */
     onDelete?: () => void
+    /** Column among events that overlap this one; without it the card takes the full width. */
+    overlap?: OverlapSlot
     /** When set, the card can be dragged to another time or day (see `useEventDrag`). */
     dragHandlers?: EventDragHandlers
     /**
@@ -46,6 +52,7 @@ const eventColors: Record<EventType, string> = {
 export function ScheduleEvent({
     event,
     firstHour,
+    overlap,
     onOpen,
     onDelete,
     dragHandlers,
@@ -56,7 +63,7 @@ export function ScheduleEvent({
 
     const cardBackground =
         colors[event.name] ??
-        (event.eventType === 'PERSONAL' ? '#c7d8ff' : '#d9c7f0')
+        (event.eventType === 'PERSONAL' ? FALLBACK_PERSONAL_COLOR : FALLBACK_CLASS_COLOR)
 
     const isHidden = Boolean(event.occurrence?.isHidden)
     const className = [
@@ -73,10 +80,20 @@ export function ScheduleEvent({
     const meetingHref = getMeetingHref(event.location)
     // Row height comes from the --hour-height CSS custom property (layout.css), so the card
     // always lines up with the hour rows drawn by CSS.
+    // Overlapping events split the column width (4px inset on both sides, 2px between cards).
+    const laneCount = overlap?.laneCount ?? 1
+    const laneStyle = laneCount > 1 && overlap
+        ? {
+            left: `calc(4px + ${overlap.lane} * (100% - 8px) / ${laneCount})`,
+            right: 'auto',
+            width: `calc((100% - 8px) / ${laneCount} - 2px)`,
+        }
+        : {}
     const style = {
         top: `calc(${start - firstHour} * var(--hour-height) + 4px)`,
         height: `calc(${end - start} * var(--hour-height) - 8px)`,
         backgroundColor: cardBackground,
+        ...laneStyle,
     }
 
     // Class type: the kind of a university class (lecture, seminar, lab) when it is known,

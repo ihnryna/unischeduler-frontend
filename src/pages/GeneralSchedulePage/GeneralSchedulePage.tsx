@@ -110,16 +110,11 @@ export function GeneralSchedulePage() {
     }
 
     return (
-        <section className="schedule-page" style={{padding: '1.5rem', maxWidth: '1400px', margin: '0 auto'}}>
-            {/* Header */}
-            <div className="page-heading" style={{marginBottom: '1.5rem'}}>
+        <section className="schedule-page">
+            {/* Header — same heading style as the other pages */}
+            <div className="page-heading">
                 <div>
-                    <h1 style={{fontSize: '1.75rem', fontWeight: 700, margin: 0}}>
-                        Загальний розклад НаУКМА
-                    </h1>
-                    <p style={{margin: '6px 0 0 0', color: 'var(--color-muted, #64748b)'}}>
-                        Перегляд університетського розкладу навчальних груп, спеціальностей та дисциплін
-                    </p>
+                    <h1>Загальний розклад НаУКМА</h1>
                 </div>
             </div>
 
@@ -252,13 +247,11 @@ export function GeneralSchedulePage() {
             {/* Error state */}
             {error && (
                 <div
-                    className="card"
+                    className="card notice notice-error"
+                    role="alert"
                     style={{
                         padding: '1.25rem',
                         marginBottom: '1.5rem',
-                        backgroundColor: '#fee2e2',
-                        borderColor: '#f87171',
-                        color: '#991b1b',
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
@@ -281,11 +274,10 @@ export function GeneralSchedulePage() {
             {/* Empty state */}
             {!isLoading && !error && filteredClasses.length === 0 && (
                 <div
-                    className="card"
+                    className="card text-muted"
                     style={{
                         padding: '3rem',
                         textAlign: 'center',
-                        color: 'var(--color-muted, #64748b)',
                     }}
                 >
                     <p style={{fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem'}}>
@@ -324,10 +316,9 @@ export function GeneralSchedulePage() {
                                 }}
                             >
                                 <div
+                                    className="gs-day-header"
                                     style={{
                                         padding: '0.85rem 1.25rem',
-                                        backgroundColor: 'var(--color-surface-hover, rgba(0,0,0,0.03))',
-                                        borderBottom: '1px solid var(--color-border)',
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         alignItems: 'center',
@@ -342,10 +333,10 @@ export function GeneralSchedulePage() {
                                 <div style={{padding: '1rem', flex: 1}}>
                                     {dayClasses.length === 0 ? (
                                         <div
+                                            className="text-muted"
                                             style={{
                                                 padding: '1.5rem',
                                                 textAlign: 'center',
-                                                color: 'var(--color-muted, #94a3b8)',
                                                 fontSize: '0.9rem',
                                             }}
                                         >
@@ -358,12 +349,8 @@ export function GeneralSchedulePage() {
                                                 return (
                                                     <div
                                                         key={cls.id}
-                                                        style={{
-                                                            padding: '0.85rem',
-                                                            borderRadius: 'var(--radius-small, 6px)',
-                                                            border: '1px solid var(--color-border)',
-                                                            backgroundColor: 'var(--color-surface)',
-                                                        }}
+                                                        className="gs-class"
+                                                        style={{padding: '0.85rem'}}
                                                     >
                                                         <div
                                                             style={{
@@ -377,7 +364,6 @@ export function GeneralSchedulePage() {
                                                                 style={{
                                                                     fontSize: '0.85rem',
                                                                     fontWeight: 700,
-                                                                    color: 'var(--color-primary-text, #2563eb)',
                                                                 }}
                                                             >
                                                                 ⏱ {timeRange}
@@ -401,9 +387,9 @@ export function GeneralSchedulePage() {
                                                         </div>
 
                                                         <div
+                                                            className="text-muted"
                                                             style={{
                                                                 fontSize: '0.85rem',
-                                                                color: 'var(--color-muted, #64748b)',
                                                                 display: 'flex',
                                                                 flexDirection: 'column',
                                                                 gap: '3px',

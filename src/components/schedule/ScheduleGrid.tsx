@@ -2,7 +2,7 @@ import {useRef} from 'react'
 
 import type {CalendarEvent} from '../../types/schedule'
 import type {EventMove} from '../../features/schedule/eventMove'
-import {getHourRange, getHourRows} from '../../features/schedule/gridHours'
+import {getHourRange, getHourRows, getOverlapLayout} from '../../features/schedule/gridHours'
 import {useEventDrag} from '../../features/schedule/useEventDrag'
 import {getWeekDays} from '../../utils/dateUtils'
 import {ScheduleEvent} from './ScheduleEvent'
@@ -108,13 +108,18 @@ export function ScheduleGrid({
                             <div className="hour-slot" key={hour} />
                         ))}
 
-                        {visibleEvents
-                            .filter((event) => getDayIndex(event) === day.dayIndex)
-                            .map((event) => (
+                        {(() => {
+                            const dayEvents = visibleEvents.filter(
+                                (event) => getDayIndex(event) === day.dayIndex,
+                            )
+                            // Overlapping events sit side by side instead of covering each other.
+                            const overlap = getOverlapLayout(dayEvents, eventKey)
+                            return dayEvents.map((event) => (
                                 <ScheduleEvent
                                     key={eventKey(event)}
                                     event={event}
                                     firstHour={hourRange.first}
+                                    overlap={overlap.get(eventKey(event))}
                                     onOpen={onOpenEvent ? () => onOpenEvent(event) : undefined}
                                     onDelete={
                                         onDeleteEvent && canDeleteEvent?.(event)
@@ -126,7 +131,8 @@ export function ScheduleGrid({
                                         eventKey(event) === previewKey ? 'source' : undefined
                                     }
                                 />
-                            ))}
+                            ))
+                        })()}
 
                         {preview?.dayIndex === day.dayIndex && (
                             <ScheduleEvent

@@ -19,6 +19,11 @@ export const RETRO_COLOR_PALETTE: PaletteColor[] = [
     {id: 'coral', name: 'Кораловий', bg: '#fca5a5', border: '#29251f', text: '#29251f'},
 ]
 
+/** Card colour for a subject with no colour of its own (palette "lilac"). */
+export const FALLBACK_CLASS_COLOR = '#d9c7f0'
+/** Card colour for personal events with no colour of their own (palette "blue"). */
+export const FALLBACK_PERSONAL_COLOR = '#c7d8ff'
+
 export const DEFAULT_SUBJECT_COLORS: Record<string, string> = {
     'Проєктування програмних систем': '#f5c928',
     'Інженерія програмного забезпечення': '#f6c7d7',

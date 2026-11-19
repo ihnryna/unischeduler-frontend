@@ -48,3 +48,55 @@ export function getHourRange(events: CalendarEvent[]): HourRange {
 export function getHourRows({first, last}: HourRange): number[] {
     return Array.from({length: last - first}, (_, index) => first + index)
 }
+
+/** Side-by-side position of a card among events that overlap it in time. */
+export type OverlapSlot = {
+    /** 0-based column inside the group of overlapping events. */
+    lane: number
+    /** Number of columns the group needs. 1 = no overlap, the card takes the full width. */
+    laneCount: number
+}
+
+/**
+ * Splits one day's events into side-by-side columns so that overlapping events never cover
+ * each other. Events that overlap (directly or through a chain) form a group; each event
+ * takes the first column that is free at its start, and every event of the group gets the
+ * group's column count. Returns the slot for every event, keyed by `getKey(event)`.
+ */
+export function getOverlapLayout(
+    events: CalendarEvent[],
+    getKey: (event: CalendarEvent) => string,
+): Map<string, OverlapSlot> {
+    const layout = new Map<string, OverlapSlot>()
+    const sorted = events
+        .map((event) => ({event, ...getEventHours(event)}))
+        .sort((a, b) => a.start - b.start || b.end - a.end)
+
+    let group: {key: string; lane: number}[] = []
+    let laneEnds: number[] = []
+    let groupEnd = -Infinity
+
+    const closeGroup = () => {
+        for (const {key, lane} of group) layout.set(key, {lane, laneCount: laneEnds.length})
+        group = []
+        laneEnds = []
+    }
+
+    for (const {event, start, end} of sorted) {
+        if (start >= groupEnd) closeGroup()
+
+        let lane = laneEnds.findIndex((laneEnd) => laneEnd <= start)
+        if (lane === -1) {
+            lane = laneEnds.length
+            laneEnds.push(end)
+        } else {
+            laneEnds[lane] = end
+        }
+
+        group.push({key: getKey(event), lane})
+        groupEnd = Math.max(start >= groupEnd ? end : groupEnd, end)
+    }
+    closeGroup()
+
+    return layout
+}

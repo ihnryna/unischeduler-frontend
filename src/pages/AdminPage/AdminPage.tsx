@@ -105,12 +105,9 @@ export function AdminPage() {
     return (
         <section className="admin-page-container">
             {/* Top Heading */}
-            <div className="page-heading admin-page-heading" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+            <div className="page-heading admin-page-heading">
                 <div>
                     <h1>Адміністративна панель</h1>
-                    <p style={{margin: '4px 0 0 0', color: 'var(--color-muted, #64748b)', fontSize: '0.9rem'}}>
-                        Керування базою даних Spring Boot + PostgreSQL, дисциплінами та розкладом
-                    </p>
                 </div>
                 <div>
                     <button

@@ -90,6 +90,14 @@ export function SchedulePage() {
         () => (location.state as AccessDeniedState | null)?.accessNotice ?? null,
     )
 
+    // The success toast floats over the page (it no longer pushes the grid down) and
+    // hides itself after a few seconds; the close button hides it at once.
+    useEffect(() => {
+        if (!successMessage) return
+        const timer = window.setTimeout(() => setSuccessMessage(null), 6000)
+        return () => window.clearTimeout(timer)
+    }, [successMessage])
+
     // Drop the notice from history so a reload does not show it again.
     useEffect(() => {
         if (location.state) navigate(location.pathname, {replace: true, state: null})
@@ -363,11 +371,21 @@ export function SchedulePage() {
             )}
 
             {/* Live region stays mounted so the success message is announced. */}
-            <div role="status" aria-live="polite">
+            <div className="toast-region" role="status" aria-live="polite">
                 {successMessage && (
-                    <p className="form-success-notice">
-                        <span aria-hidden="true">✓ </span>
-                        {successMessage}
+                    <p className="form-success-notice toast">
+                        <span>
+                            <span aria-hidden="true">✓ </span>
+                            {successMessage}
+                        </span>
+                        <button
+                            type="button"
+                            className="toast-close"
+                            onClick={() => setSuccessMessage(null)}
+                            aria-label="Закрити повідомлення"
+                        >
+                            ×
+                        </button>
                     </p>
                 )}
             </div>

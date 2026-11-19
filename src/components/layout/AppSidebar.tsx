@@ -1,6 +1,8 @@
 import type {RefObject} from 'react'
 import {NavLink} from 'react-router'
 
+import {Icon} from '../ui/Icon'
+
 type AppSidebarProps = {
     lessonCount?: number
     sidebarRef?: RefObject<HTMLElement | null>
@@ -23,7 +25,7 @@ export function AppSidebar({lessonCount: _lessonCount, sidebarRef, onNavigate, i
                         `nav-link ${isActive ? 'active' : ''}`
                     }
                 >
-                    <span className="nav-icon">▦</span>
+                    <Icon name="calendar" className="nav-icon"/>
                     Мій розклад
                 </NavLink>
 
@@ -34,7 +36,7 @@ export function AppSidebar({lessonCount: _lessonCount, sidebarRef, onNavigate, i
                         `nav-link ${isActive ? 'active' : ''}`
                     }
                 >
-                    <span className="nav-icon">▤</span>
+                    <Icon name="table" className="nav-icon"/>
                     Загальний розклад
                 </NavLink>
             </nav>
@@ -51,7 +53,7 @@ export function AppSidebar({lessonCount: _lessonCount, sidebarRef, onNavigate, i
                         `nav-link ${isActive ? 'active' : ''}`
                     }
                 >
-                    <span className="nav-icon">◷</span>
+                    <Icon name="sync" className="nav-icon"/>
                     Google Calendar
                 </NavLink>
 
@@ -62,7 +64,7 @@ export function AppSidebar({lessonCount: _lessonCount, sidebarRef, onNavigate, i
                         `nav-link ${isActive ? 'active' : ''}`
                     }
                 >
-                    <span className="nav-icon">⚙</span>
+                    <Icon name="sliders" className="nav-icon"/>
                     Налаштування
                 </NavLink>
             </nav>
@@ -81,7 +83,7 @@ export function AppSidebar({lessonCount: _lessonCount, sidebarRef, onNavigate, i
                                 `nav-link ${isActive ? 'active' : ''}`
                             }
                         >
-                            <span className="nav-icon">🛡</span>
+                            <Icon name="shield" className="nav-icon"/>
                             Адмін-панель
                         </NavLink>
                     </nav>

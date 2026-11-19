@@ -1,5 +1,5 @@
 import type {RefObject} from 'react'
-import {useLocation} from 'react-router'
+import {Link, useLocation} from 'react-router'
 
 import {UserMenu, type UserMenuUser} from './UserMenu'
 
@@ -45,13 +45,13 @@ export function AppHeader({
                     </svg>
                 </button>
 
-                <a className="brand" href="#" aria-label="UNIScheduler — головна">
+                <Link className="brand" to="/" aria-label="UNIScheduler — головна">
                     <span className="brand-logo">UNI</span>
 
                     <span className="brand-text">
                         <strong>UNIScheduler</strong>
                     </span>
-                </a>
+                </Link>
             </div>
 
             <div className="topbar-right">

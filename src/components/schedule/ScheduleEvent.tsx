@@ -1,11 +1,7 @@
 import type {CalendarEvent, EventType} from '../../types/schedule'
 import {getEventHours, type OverlapSlot} from '../../features/schedule/gridHours'
 import {CLASS_KIND_LABELS, getClassKind} from '../../features/schedule/classDetails'
-import {
-    FALLBACK_CLASS_COLOR,
-    FALLBACK_PERSONAL_COLOR,
-    useSubjectColors,
-} from '../../features/schedule/subjectColors'
+import {getEventCardColor, useSubjectColors} from '../../features/schedule/subjectColors'
 import {formatTime} from '../../utils/formatTime'
 import {getMeetingHref} from '../../features/events/personalEventValidation'
 import type {EventDragHandlers} from '../../features/schedule/useEventDrag'
@@ -61,9 +57,7 @@ export function ScheduleEvent({
     const {start, end} = getEventHours(event)
     const {colors} = useSubjectColors()
 
-    const cardBackground =
-        colors[event.name] ??
-        (event.eventType === 'PERSONAL' ? FALLBACK_PERSONAL_COLOR : FALLBACK_CLASS_COLOR)
+    const cardBackground = getEventCardColor(colors, event)
 
     const isHidden = Boolean(event.occurrence?.isHidden)
     const className = [

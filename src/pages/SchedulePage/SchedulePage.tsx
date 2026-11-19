@@ -37,6 +37,7 @@ import {
     MONTH_SHORT_UA,
 } from '../../utils/dateUtils'
 import {formatTime} from '../../utils/formatTime'
+import {pluralUk} from '../../utils/plural'
 
 // TODO(FE-13): replace with useAuth().user.id
 const CURRENT_USER_ID = 1
@@ -548,12 +549,12 @@ export function SchedulePage() {
                     <div className="overview-stats">
                         <div>
                             <strong>{events.length}</strong>
-                            <span>подій</span>
+                            <span>{pluralUk(events.length, ['подія', 'події', 'подій'])}</span>
                         </div>
 
                         <div>
                             <strong>{uniqueDaysCount}</strong>
-                            <span>навчальних днів</span>
+                            <span>{pluralUk(uniqueDaysCount, ['навчальний день', 'навчальні дні', 'навчальних днів'])}</span>
                         </div>
 
                         <div>
@@ -562,7 +563,12 @@ export function SchedulePage() {
                                     maximumFractionDigits: 1,
                                 })}
                             </strong>
-                            <span>годин</span>
+                            <span>
+                                {/* A fractional count takes "години" (5,3 години). */}
+                                {Number.isInteger(Math.round(totalHours * 10) / 10)
+                                    ? pluralUk(totalHours, ['година', 'години', 'годин'])
+                                    : 'години'}
+                            </span>
                         </div>
                     </div>
                 </section>

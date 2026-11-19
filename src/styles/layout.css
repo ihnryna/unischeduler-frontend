@@ -1573,3 +1573,18 @@
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+/* Navigation icons (components/ui/Icon.tsx): fixed box so labels line up */
+.app[data-theme] .nav-link .nav-icon,
+.app[data-theme] .admin-tab-btn .admin-tab-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+}
+
+/* Settings: one card per colour group, spaced like the rest of the page */
+.app[data-theme] .settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}

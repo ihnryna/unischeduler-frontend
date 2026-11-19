@@ -1,4 +1,5 @@
 import type {CazSyncStatus, SystemIntegration} from '../../../features/admin/adminTypes'
+import {countUk, pluralUk} from '../../../utils/plural'
 
 type AdminOverviewTabProps = {
     coursesCount: number
@@ -31,7 +32,7 @@ export function AdminOverviewTab({
                     <div className="admin-metric-icon">📚</div>
                     <div className="admin-metric-info">
                         <strong className="admin-metric-value">{coursesCount}</strong>
-                        <span className="admin-metric-label">Активних дисциплін</span>
+                        <span className="admin-metric-label">{pluralUk(coursesCount, ['активна дисципліна', 'активні дисципліни', 'активних дисциплін'])}</span>
                     </div>
                 </div>
 
@@ -39,7 +40,7 @@ export function AdminOverviewTab({
                     <div className="admin-metric-icon">🗓️</div>
                     <div className="admin-metric-info">
                         <strong className="admin-metric-value">{classesCount}</strong>
-                        <span className="admin-metric-label">Розкладів занять</span>
+                        <span className="admin-metric-label">{pluralUk(classesCount, ['заняття в розкладі', 'заняття в розкладі', 'занять у розкладі'])}</span>
                     </div>
                 </div>
 
@@ -49,7 +50,7 @@ export function AdminOverviewTab({
                         <strong className="admin-metric-value">
                             {integrations.filter((i) => i.status === 'OPERATIONAL').length}/{integrations.length}
                         </strong>
-                        <span className="admin-metric-label">Інтеграцій активні</span>
+                        <span className="admin-metric-label">інтеграцій активні</span>
                     </div>
                 </div>
 
@@ -57,7 +58,7 @@ export function AdminOverviewTab({
                     <div className="admin-metric-icon">📋</div>
                     <div className="admin-metric-info">
                         <strong className="admin-metric-value">{logsCount}</strong>
-                        <span className="admin-metric-label">Записів в аудиті</span>
+                        <span className="admin-metric-label">{pluralUk(logsCount, ['запис в аудиті', 'записи в аудиті', 'записів в аудиті'])}</span>
                     </div>
                 </div>
             </div>
@@ -99,13 +100,15 @@ export function AdminOverviewTab({
                     </div>
 
                     <div className="admin-sync-meta-item">
+                        {/* Live counts, the same as the metric cards above (the last sync's
+                            record counts were shown here and read 0 next to "1 дисципліна"). */}
                         <span className="admin-sync-meta-label">Дисциплін у базі:</span>
-                        <strong className="admin-sync-meta-val">{syncStatus.recordsCourses} курсів</strong>
+                        <strong className="admin-sync-meta-val">{countUk(coursesCount, ['дисципліна', 'дисципліни', 'дисциплін'])}</strong>
                     </div>
 
                     <div className="admin-sync-meta-item">
                         <span className="admin-sync-meta-label">Розкладів пар:</span>
-                        <strong className="admin-sync-meta-val">{syncStatus.recordsClasses} занять</strong>
+                        <strong className="admin-sync-meta-val">{countUk(classesCount, ['заняття', 'заняття', 'занять'])}</strong>
                     </div>
 
                     <div className="admin-sync-meta-item">

@@ -1,5 +1,6 @@
 import {useState} from 'react'
 import {scheduleService} from '../../features/schedule/scheduleService'
+import {countUk} from '../../utils/plural'
 
 export function GoogleCalendarPage() {
     const [isConnected, setIsConnected] = useState(false)
@@ -70,7 +71,7 @@ export function GoogleCalendarPage() {
             setLastSyncedAt(`Сьогодні о ${timeStr}`)
             setNotification({
                 type: 'success',
-                message: `Синхронізацію успішно завершено! Передано ${events.length} занять до вашого Google-календаря без створення дублікатів.`,
+                message: `Синхронізацію успішно завершено! Передано ${countUk(events.length, ['заняття', 'заняття', 'занять'])} до вашого Google-календаря без створення дублікатів.`,
             })
         } catch {
             setNotification({
@@ -162,7 +163,7 @@ export function GoogleCalendarPage() {
                         </div>
                         <div className="stat-tile">
                             <span className="text-muted">Передано подій</span>
-                            <strong>{syncedEventsCount !== null ? `${syncedEventsCount} занять` : '—'}</strong>
+                            <strong>{syncedEventsCount !== null ? countUk(syncedEventsCount, ['заняття', 'заняття', 'занять']) : '—'}</strong>
                         </div>
                         <div className="stat-tile">
                             <span className="text-muted">Захист від дублікатів</span>

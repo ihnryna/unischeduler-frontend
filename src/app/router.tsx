@@ -11,7 +11,9 @@ import {SettingsPage} from '../pages/SettingsPage/SettingsPage'
 import { GeneralSchedulePage } from '../pages/GeneralSchedulePage/GeneralSchedulePage'
 import { GoogleCalendarPage } from '../pages/GoogleCalendarPage/GoogleCalendarPage'
 import { AdminPage } from '../pages/AdminPage/AdminPage'
+import {NotFoundPage} from '../pages/NotFoundPage/NotFoundPage'
 
+import {RequireAuth} from '../features/auth/RequireAuth'
 import {RequireRole} from '../features/auth/RequireRole'
 import {useAuthSession} from '../features/auth/useAuthSession'
 import {useSchedule} from '../features/schedule/useSchedule'
@@ -34,7 +36,12 @@ export const router = createBrowserRouter([
     },
     {
         path: '/',
-        element: <MainLayout />,
+        // Every route below needs a signed-in user (Q-06 default: only /login is public).
+        element: (
+            <RequireAuth>
+                <MainLayout />
+            </RequireAuth>
+        ),
         children: [
             {
                 index: true,
@@ -63,6 +70,10 @@ export const router = createBrowserRouter([
                         <AdminPage />
                     </RequireRole>
                 ),
+            },
+            {
+                path: '*',
+                element: <NotFoundPage />,
             },
         ],
     }

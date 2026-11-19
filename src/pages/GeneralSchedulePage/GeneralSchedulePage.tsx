@@ -4,6 +4,7 @@ import {courseService} from '../../services/api/courseService'
 import {courseClassService} from '../../services/api/courseClassService'
 import {specialityService} from '../../services/api/specialityService'
 import {Loader} from '../../components/ui/Loader'
+import {countUk} from '../../utils/plural'
 
 const DAYS = [
     {dayIndex: 1, name: 'Понеділок'},
@@ -326,7 +327,7 @@ export function GeneralSchedulePage() {
                                 >
                                     <strong style={{fontSize: '1rem'}}>{day.name}</strong>
                                     <span className="badge" style={{fontSize: '0.8rem', padding: '2px 8px'}}>
-                                        {dayClasses.length} {dayClasses.length === 1 ? 'пара' : 'пар'}
+                                        {countUk(dayClasses.length, ['пара', 'пари', 'пар'])}
                                     </span>
                                 </div>
 

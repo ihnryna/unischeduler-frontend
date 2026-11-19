@@ -1,10 +1,21 @@
 import {useState} from 'react'
-import {useNavigate} from 'react-router'
+import {useLocation, useNavigate} from 'react-router'
 
 import {authService} from '../../features/auth/authService'
+import type {LoginRedirectState} from '../../features/auth/RequireAuth'
+
+/** Only same-app paths are followed after sign-in, never `//host` or full URLs. */
+function readRedirectTarget(state: unknown): string | null {
+    const from = (state as Partial<LoginRedirectState> | null)?.from
+    if (typeof from !== 'string' || !from.startsWith('/') || from.startsWith('//')) return null
+    if (from === '/login') return null
+    return from
+}
 
 export function LoginPage() {
     const navigate = useNavigate()
+    const location = useLocation()
+    const redirectTarget = readRedirectTarget(location.state)
     const [isLoading, setIsLoading] = useState(false)
     const [email, setEmail] = useState('diana.tsisaruk@ukma.edu.ua')
     const [error, setError] = useState<string | null>(null)
@@ -27,7 +38,8 @@ export function LoginPage() {
                 role,
                 name: loginEmail.split('@')[0].replace('.', ' '),
             })
-            navigate(role === 'ADMIN' ? '/admin' : '/schedule')
+            // Back to the page that sent the user here; otherwise the role's home page.
+            navigate(redirectTarget ?? (role === 'ADMIN' ? '/admin' : '/schedule'), {replace: true})
         }, 600)
     }
 

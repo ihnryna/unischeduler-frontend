@@ -16,9 +16,11 @@ export function AdminPage() {
     const {
         courses,
         classes,
+        specialities,
         integrations,
         syncStatus,
         auditLogs,
+        isLoading,
         isSyncing,
         isCheckingIntegrations,
         notification,
@@ -31,6 +33,7 @@ export function AdminPage() {
         triggerCazSync,
         checkIntegrations,
         clearLogs,
+        resetDefaults,
     } = useAdmin()
 
     const [activeTab, setActiveTab] = useState<AdminTab>('OVERVIEW')
@@ -102,9 +105,23 @@ export function AdminPage() {
     return (
         <section className="admin-page-container">
             {/* Top Heading */}
-            <div className="page-heading admin-page-heading">
+            <div className="page-heading admin-page-heading" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                 <div>
                     <h1>Адміністративна панель</h1>
+                    <p style={{margin: '4px 0 0 0', color: 'var(--color-muted, #64748b)', fontSize: '0.9rem'}}>
+                        Керування базою даних Spring Boot + PostgreSQL, дисциплінами та розкладом
+                    </p>
+                </div>
+                <div>
+                    <button
+                        type="button"
+                        className="button primary-button"
+                        disabled={isLoading}
+                        onClick={resetDefaults}
+                        title="Наповнити базу PostgreSQL початковими дисциплінами та парами НаУКМА"
+                    >
+                        {isLoading ? '⏳ Завантаження…' : '📦 Ініціалізувати базу НаУКМА'}
+                    </button>
                 </div>
             </div>
 
@@ -208,6 +225,7 @@ export function AdminPage() {
             {activeTab === 'INSPECTOR' && (
                 <AdminScheduleInspectorTab
                     classes={classes}
+                    specialities={specialities}
                     onEditClass={handleOpenEditClass}
                 />
             )}
@@ -223,6 +241,7 @@ export function AdminPage() {
             <CourseModal
                 isOpen={isCourseModalOpen}
                 courseToEdit={courseToEdit}
+                specialities={specialities}
                 onSave={(data) => {
                     if (courseToEdit) {
                         updateCourse(courseToEdit.id, data)

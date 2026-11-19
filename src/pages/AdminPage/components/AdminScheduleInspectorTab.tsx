@@ -1,10 +1,11 @@
 import {useMemo, useState} from 'react'
-import type {CourseClass} from '../../../types/catalog'
+import type {CourseClass, Speciality} from '../../../types/catalog'
 import {mockSpecialities} from '../../../mocks/specialities'
 import {formatWeeksList} from '../../../utils/dateUtils'
 
 type AdminScheduleInspectorTabProps = {
     classes: CourseClass[]
+    specialities?: Speciality[]
     onEditClass: (cls: CourseClass) => void
 }
 
@@ -19,9 +20,11 @@ const DAYS = [
 
 export function AdminScheduleInspectorTab({
     classes,
+    specialities = [],
     onEditClass,
 }: Readonly<AdminScheduleInspectorTabProps>) {
-    const [selectedSpeciality, setSelectedSpeciality] = useState(mockSpecialities[0].name)
+    const activeSpecialities = specialities.length > 0 ? specialities : mockSpecialities
+    const [selectedSpeciality, setSelectedSpeciality] = useState(activeSpecialities[0]?.name ?? '')
 
     const inspectedClasses = useMemo(() => {
         return classes.filter((c) =>
@@ -55,7 +58,7 @@ export function AdminScheduleInspectorTab({
                             value={selectedSpeciality}
                             onChange={(e) => setSelectedSpeciality(e.target.value)}
                         >
-                            {mockSpecialities.map((spec) => (
+                            {activeSpecialities.map((spec) => (
                                 <option key={spec.id} value={spec.name}>
                                     {spec.name}
                                 </option>

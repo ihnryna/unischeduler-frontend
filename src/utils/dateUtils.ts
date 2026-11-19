@@ -111,23 +111,166 @@ export function formatWeekRange(monday: Date, sunday: Date): string {
     return `${startDay} — ${endDay} ${MONTH_NAMES_GENITIVE[endMonth]}`
 }
 
-export function getAcademicWeekInfo(monday: Date) {
-    const year = monday.getFullYear()
-    // Academic year starts Sep 1. If date is before July, semester started Sep previous year
-    const semStartYear = monday.getMonth() < 6 ? year - 1 : year
-    const semStart = new Date(semStartYear, 8, 1)
-    const semStartMonday = getMondayOfWeek(semStart)
+export type AcademicWeekInfo = {
+    semesterWeek: number | null
+    isNumerator: boolean
+    parityName: string
+    fullLabel: string
+    isVacation: boolean
+    semesterName: 'AUTUMN' | 'SPRING' | 'VACATION'
+    semesterYear: number
+}
 
-    const diffMs = monday.getTime() - semStartMonday.getTime()
-    const diffWeeks = Math.round(diffMs / (7 * 24 * 60 * 60 * 1000))
-    const semesterWeek = Math.max(1, diffWeeks + 1)
-    const isNumerator = semesterWeek % 2 !== 0
+export function getAcademicWeekInfo(monday: Date): AcademicWeekInfo {
+    const d = new Date(monday)
+    const month = d.getMonth() // 0 = Jan, ..., 11 = Dec
+    const year = d.getFullYear()
+
+    // Розраховуємо понеділок 1-го тижня осіннього семестру поточного року
+    const autumnStartMonday = getMondayOfWeek(new Date(year, 8, 1))
+
+    // Якщо дата в серпні, але вже на тижні 1 вересня (наприклад, 31 серпня 2026),
+    // або у вересні-грудні:
+    if (d.getTime() >= autumnStartMonday.getTime() && month >= 7) {
+        const diffMs = d.getTime() - autumnStartMonday.getTime()
+        const diffWeeks = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000))
+        const weekNum = diffWeeks + 1
+
+        if (weekNum >= 1 && weekNum <= 15) {
+            const isNumerator = weekNum % 2 !== 0
+            return {
+                semesterWeek: weekNum,
+                isNumerator,
+                parityName: isNumerator ? 'Чисельник' : 'Знаменник',
+                fullLabel: `${weekNum}-й тиждень · ${isNumerator ? 'Чисельник' : 'Знаменник'}`,
+                isVacation: false,
+                semesterName: 'AUTUMN',
+                semesterYear: year,
+            }
+        }
+
+        if (weekNum > 15 && weekNum <= 17) {
+            return {
+                semesterWeek: weekNum,
+                isNumerator: weekNum % 2 !== 0,
+                parityName: 'Сесія',
+                fullLabel: `${weekNum}-й тиждень · Зимова сесія`,
+                isVacation: false,
+                semesterName: 'AUTUMN',
+                semesterYear: year,
+            }
+        }
+
+        return {
+            semesterWeek: null,
+            isNumerator: false,
+            parityName: 'Канікули',
+            fullLabel: 'Зимові канікули',
+            isVacation: true,
+            semesterName: 'VACATION',
+            semesterYear: year,
+        }
+    }
+
+    // 1. Липень та серпень до початку навчального року (d < autumnStartMonday) — літні канікули
+    if (month === 6 || month === 7) {
+        return {
+            semesterWeek: null,
+            isNumerator: false,
+            parityName: 'Канікули',
+            fullLabel: 'Літні канікули',
+            isVacation: true,
+            semesterName: 'VACATION',
+            semesterYear: year,
+        }
+    }
+
+    // 3. Січень (month 0) — зимові канікули / завершення сесії осіннього семестру
+    if (month === 0) {
+        const prevYear = year - 1
+        const semStartMonday = getMondayOfWeek(new Date(prevYear, 8, 1))
+        const diffMs = d.getTime() - semStartMonday.getTime()
+        const diffWeeks = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000))
+        const weekNum = diffWeeks + 1
+
+        if (weekNum <= 17) {
+            return {
+                semesterWeek: weekNum,
+                isNumerator: weekNum % 2 !== 0,
+                parityName: 'Сесія',
+                fullLabel: `${weekNum}-й тиждень · Зимова сесія`,
+                isVacation: false,
+                semesterName: 'AUTUMN',
+                semesterYear: prevYear,
+            }
+        }
+
+        return {
+            semesterWeek: null,
+            isNumerator: false,
+            parityName: 'Канікули',
+            fullLabel: 'Зимові канікули',
+            isVacation: true,
+            semesterName: 'VACATION',
+            semesterYear: prevYear,
+        }
+    }
+
+    // 4. Весняний семестр (лютий — червень, months 1, 2, 3, 4, 5)
+    const springStartMonday = getMondayOfWeek(new Date(year, 1, 1))
+    if (springStartMonday.getMonth() === 0 && springStartMonday.getDate() < 28) {
+        springStartMonday.setDate(springStartMonday.getDate() + 7)
+    }
+
+    const diffMs = d.getTime() - springStartMonday.getTime()
+    const diffWeeks = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000))
+    const weekNum = diffWeeks + 1
+
+    if (weekNum < 1) {
+        return {
+            semesterWeek: null,
+            isNumerator: false,
+            parityName: 'Канікули',
+            fullLabel: 'Зимові канікули',
+            isVacation: true,
+            semesterName: 'VACATION',
+            semesterYear: year,
+        }
+    }
+
+    if (weekNum >= 1 && weekNum <= 15) {
+        const isNumerator = weekNum % 2 !== 0
+        return {
+            semesterWeek: weekNum,
+            isNumerator,
+            parityName: isNumerator ? 'Чисельник' : 'Знаменник',
+            fullLabel: `${weekNum}-й тиждень · ${isNumerator ? 'Чисельник' : 'Знаменник'}`,
+            isVacation: false,
+            semesterName: 'SPRING',
+            semesterYear: year,
+        }
+    }
+
+    if (weekNum > 15 && weekNum <= 18) {
+        return {
+            semesterWeek: weekNum,
+            isNumerator: weekNum % 2 !== 0,
+            parityName: 'Сесія',
+            fullLabel: `${weekNum}-й тиждень · Літня сесія`,
+            isVacation: false,
+            semesterName: 'SPRING',
+            semesterYear: year,
+        }
+    }
 
     return {
-        semesterWeek,
-        isNumerator,
-        parityName: isNumerator ? 'Чисельник' : 'Знаменник',
-        fullLabel: `${semesterWeek}-й тиждень · ${isNumerator ? 'Чисельник' : 'Знаменник'}`,
+        semesterWeek: null,
+        isNumerator: false,
+        parityName: 'Канікули',
+        fullLabel: 'Літні канікули',
+        isVacation: true,
+        semesterName: 'VACATION',
+        semesterYear: year,
     }
 }
 

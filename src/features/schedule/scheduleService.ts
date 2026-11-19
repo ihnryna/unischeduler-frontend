@@ -1,191 +1,148 @@
-import {
-    mockSpecialities,
-    mockUsers,
-} from '../../mocks'
-import {adminService} from '../admin/adminService'
-import {personalEventService} from '../events/personalEventService'
-import type {Course, Speciality} from '../../types/catalog'
+import {apiClient} from '../../services/api/apiClient'
+import {courseService} from '../../services/api/courseService'
+import {courseClassService} from '../../services/api/courseClassService'
+import {specialityService} from '../../services/api/specialityService'
+import type {Course, CourseClass, Speciality} from '../../types/catalog'
 import type {CalendarEvent, CalendarEventFilter} from '../../types/schedule'
 import {getAcademicWeekInfo, getMondayOfWeek} from '../../utils/dateUtils'
 
-const DEFAULT_MOCK_USER_ID = 1
-
-function generateWeekCalendarEvents(weekOffset = 0, userId?: number): CalendarEvent[] {
-    const monday = getMondayOfWeek()
-    monday.setDate(monday.getDate() + weekOffset * 7)
-
-    const {semesterWeek, isNumerator} = getAcademicWeekInfo(monday)
-
-    const makeDateTime = (dayOffset: number, timeStr: string) => {
-        const d = new Date(monday)
-        d.setDate(monday.getDate() + dayOffset)
-        const yyyy = d.getFullYear()
-        const mm = String(d.getMonth() + 1).padStart(2, '0')
-        const dd = String(d.getDate()).padStart(2, '0')
-        return `${yyyy}-${mm}-${dd}T${timeStr}`
-    }
-
-    const cleanTime = (isoOrTime: string, defaultTime: string) => {
-        if (!isoOrTime) return defaultTime
-        const part = isoOrTime.includes('T') ? isoOrTime.split('T')[1] : isoOrTime
-        const trimmed = part.trim()
-        if (trimmed.length === 5) return `${trimmed}:00`
-        if (trimmed.length >= 8) return trimmed.slice(0, 8)
-        return defaultTime
-    }
-
-    // 1. Навчальні заняття, керовані адміністратором (через adminService)
-    const adminClasses = adminService.getCourseClasses()
-    const activeClasses = adminClasses.filter((cls) => {
-        if (cls.weeks && cls.weeks.length > 0 && semesterWeek >= 1 && semesterWeek <= 20) {
-            return cls.weeks.includes(semesterWeek)
-        }
-        return true
-    })
-
-    const courseEvents: CalendarEvent[] = activeClasses.map((cls) => {
-        const startDate = new Date(cls.startsAt)
-        const dayOffset = !isNaN(startDate.getTime())
-            ? (startDate.getDay() + 6) % 7
-            : 0
-
-        const startTime = cleanTime(cls.startsAt, '08:30:00')
-        const endTime = cleanTime(cls.endsAt, '09:50:00')
-
-        return {
-            eventId: cls.id,
-            eventType: 'COURSE_CLASS' as const,
-            name: cls.course?.name || 'Навчальне заняття',
-            teacher: cls.teacher || null,
-            group: cls.group || null,
-            location: cls.location || null,
-            description: cls.course?.department || cls.course?.faculty || null,
-            startsAt: makeDateTime(dayOffset, startTime),
-            endsAt: makeDateTime(dayOffset, endTime),
-            weeks: cls.weeks,
-        }
-    })
-
-    // 2. Персональні події залежно від тижня
-    let eventIdCounter = 10000
-    const personalEvents: CalendarEvent[] = []
-    if (userId === undefined || userId === 1) {
-        if (weekOffset === 0) {
-            personalEvents.push({
-                eventId: eventIdCounter++,
-                eventType: 'PERSONAL',
-                name: 'Зустріч команди UNIScheduler',
-                teacher: null,
-                group: null,
-                location: 'Онлайн',
-                description: 'Обговорення прогресу frontend і наступної ітерації.',
-                startsAt: makeDateTime(2, '16:00:00'),
-                endsAt: makeDateTime(2, '17:00:00'),
-            })
-        } else if (weekOffset === 1) {
-            personalEvents.push({
-                eventId: eventIdCounter++,
-                eventType: 'PERSONAL',
-                name: 'Консультація перед модульним контролем',
-                teacher: null,
-                group: null,
-                location: 'Кафедра',
-                description: 'Питання до викладача перед іспитом.',
-                startsAt: makeDateTime(3, '16:00:00'),
-                endsAt: makeDateTime(3, '17:30:00'),
-            })
-        } else if (weekOffset === -1) {
-            personalEvents.push({
-                eventId: eventIdCounter++,
-                eventType: 'PERSONAL',
-                name: 'Здача звіту з практики',
-                teacher: null,
-                group: null,
-                location: 'Деканат',
-                description: 'Підписання індивідуального плану.',
-                startsAt: makeDateTime(4, '16:00:00'),
-                endsAt: makeDateTime(4, '17:00:00'),
-            })
-        } else if (isNumerator) {
-            personalEvents.push({
-                eventId: eventIdCounter++,
-                eventType: 'PERSONAL',
-                name: 'Зустріч з ментором зі стажування',
-                teacher: null,
-                group: null,
-                location: 'Онлайн',
-                description: 'Регулярний синхрон по pet-проєкту.',
-                startsAt: makeDateTime(1, '17:00:00'),
-                endsAt: makeDateTime(1, '18:00:00'),
-            })
-        } else {
-            personalEvents.push({
-                eventId: eventIdCounter++,
-                eventType: 'PERSONAL',
-                name: 'Студентський клуб дебатів НаУКМА',
-                teacher: null,
-                group: null,
-                location: 'Студентський хаб',
-                description: 'Щотижнева зустріч клубу.',
-                startsAt: makeDateTime(3, '18:00:00'),
-                endsAt: makeDateTime(3, '19:30:00'),
-            })
-        }
-    }
-
-    // 3. Personal events created by the user in this session (mock store)
-    const createdEvents: CalendarEvent[] = personalEventService
-        .listCreatedInRange(
-            userId ?? DEFAULT_MOCK_USER_ID,
-            makeDateTime(0, '00:00:00'),
-            makeDateTime(7, '00:00:00'),
-        )
-        .map((event) => ({
-            eventId: event.id,
-            eventType: 'PERSONAL' as const,
-            name: event.name,
-            teacher: null,
-            group: null,
-            location: event.location,
-            description: event.description,
-            startsAt: event.startsAt,
-            endsAt: event.endsAt,
-        }))
-
-    return [...courseEvents, ...personalEvents, ...createdEvents].sort((left, right) =>
-        left.startsAt.localeCompare(right.startsAt),
-    )
-}
-
-function overlapsRequestedRange(
-    event: CalendarEvent,
-    {startsAt, endsAt}: CalendarEventFilter,
-) {
-    return (
-        (!startsAt || event.endsAt >= startsAt) &&
-        (!endsAt || event.startsAt <= endsAt)
-    )
+function formatLocalDateTime(d: Date): string {
+    const yyyy = d.getFullYear()
+    const mm = String(d.getMonth() + 1).padStart(2, '0')
+    const dd = String(d.getDate()).padStart(2, '0')
+    const hh = String(d.getHours()).padStart(2, '0')
+    const min = String(d.getMinutes()).padStart(2, '0')
+    const ss = String(d.getSeconds()).padStart(2, '0')
+    return `${yyyy}-${mm}-${dd}T${hh}:${min}:${ss}`
 }
 
 export const scheduleService = {
-    getCalendar(filters: CalendarEventFilter = {}): Promise<CalendarEvent[]> {
-        const {userId, weekOffset = 0} = filters
+    /**
+     * Fetches user's schedule (university classes, overrides, and personal events)
+     * for the selected week. Combines backend calendar API events with recurring
+     * weekly course classes so that timetable lessons repeat across semester weeks.
+     */
+    async getCalendar(filters: CalendarEventFilter = {}): Promise<CalendarEvent[]> {
+        const {userId = 1, weekOffset = 0} = filters
 
-        if (userId !== undefined && !mockUsers.some((user) => user.id === userId)) {
-            return Promise.reject(new Error('Тестового користувача не знайдено.'))
+        const monday = getMondayOfWeek()
+        monday.setDate(monday.getDate() + weekOffset * 7)
+        monday.setHours(0, 0, 0, 0)
+
+        const sunday = new Date(monday)
+        sunday.setDate(monday.getDate() + 6)
+        sunday.setHours(23, 59, 59, 999)
+
+        const startsAt = filters.startsAt || formatLocalDateTime(monday)
+        const endsAt = filters.endsAt || formatLocalDateTime(sunday)
+
+        // 1. Fetch specific week events from backend (personal events, overrides)
+        // and all classes from /api/class (the university timetable)
+        const [backendCalendarEvents, allClasses] = await Promise.all([
+            apiClient.get<CalendarEvent[]>('/calendar', {
+                userId,
+                startsAt,
+                endsAt,
+            }).catch(() => [] as CalendarEvent[]),
+            courseClassService.getAll().catch(() => [] as CourseClass[]),
+        ])
+
+        const {semesterWeek, isVacation, semesterName, semesterYear} = getAcademicWeekInfo(monday)
+
+        // During vacation or outside teaching weeks (1-15), regular university classes do not take place
+        if (isVacation || semesterWeek === null || semesterWeek < 1 || semesterWeek > 15) {
+            return backendCalendarEvents || []
         }
 
-        const events = generateWeekCalendarEvents(weekOffset, userId)
-            .filter((event) => overlapsRequestedRange(event, filters))
+        // Stored weeks map from admin settings if any
+        const storedWeeksMap: Record<number, number[]> = (() => {
+            try {
+                return JSON.parse(localStorage.getItem('unischeduler_class_weeks_map') || '{}')
+            } catch {
+                return {}
+            }
+        })()
 
-        return Promise.resolve(structuredClone(events))
+        const recurringCourseEvents: CalendarEvent[] = []
+
+        for (const cls of allClasses) {
+            // Check semester match: e.g. 'AUTUMN' course must only appear in 'AUTUMN' semester
+            if (cls.course?.semester && cls.course.semester !== semesterName) {
+                continue
+            }
+
+            // Check academic year match: e.g. 2026 course must only appear in 2026 academic year
+            if (cls.course?.year && cls.course.year >= 2000 && cls.course.year !== semesterYear) {
+                continue
+            }
+
+            const classWeeks = cls.weeks || storedWeeksMap[cls.id] || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+
+            // Check if this class is scheduled for this specific semester week
+            if (!classWeeks.includes(semesterWeek)) {
+                continue
+            }
+
+            // Determine day of week from cls.startsAt (0 = Monday, ..., 6 = Sunday)
+            const startDate = new Date(cls.startsAt)
+            const dayOffset = !isNaN(startDate.getTime())
+                ? (startDate.getDay() + 6) % 7
+                : 0
+
+            const startTimeStr = cls.startsAt && cls.startsAt.length >= 16 ? cls.startsAt.slice(11, 19) : '08:30:00'
+            const endTimeStr = cls.endsAt && cls.endsAt.length >= 16 ? cls.endsAt.slice(11, 19) : '09:50:00'
+
+            const targetDate = new Date(monday)
+            targetDate.setDate(targetDate.getDate() + dayOffset)
+            const yyyy = targetDate.getFullYear()
+            const mm = String(targetDate.getMonth() + 1).padStart(2, '0')
+            const dd = String(targetDate.getDate()).padStart(2, '0')
+
+            const cleanStartTime = startTimeStr.length === 5 ? `${startTimeStr}:00` : startTimeStr.slice(0, 8)
+            const cleanEndTime = endTimeStr.length === 5 ? `${endTimeStr}:00` : endTimeStr.slice(0, 8)
+
+            const projectedStartsAt = `${yyyy}-${mm}-${dd}T${cleanStartTime}`
+            const projectedEndsAt = `${yyyy}-${mm}-${dd}T${cleanEndTime}`
+
+            // Check if backend already has this class in calendar for this week
+            const alreadyInCalendar = (backendCalendarEvents || []).some(
+                (e) => (e.eventType === 'COURSE_CLASS' || e.eventType === 'CLASS_OVERRIDE') && e.eventId === cls.id
+            )
+
+            if (!alreadyInCalendar) {
+                recurringCourseEvents.push({
+                    eventId: cls.id,
+                    eventType: 'COURSE_CLASS',
+                    name: cls.course?.name || 'Навчальне заняття',
+                    teacher: cls.teacher || null,
+                    group: cls.group || null,
+                    location: cls.location || null,
+                    description: cls.course?.faculty || cls.course?.department || null,
+                    startsAt: projectedStartsAt,
+                    endsAt: projectedEndsAt,
+                    weeks: classWeeks,
+                })
+            }
+        }
+
+        const combinedEvents = [...(backendCalendarEvents || []), ...recurringCourseEvents].sort((a, b) =>
+            a.startsAt.localeCompare(b.startsAt)
+        )
+
+        return combinedEvents
     },
 
+    /**
+     * Fetches all courses from backend `GET /api/course`.
+     */
     getCourses(): Promise<Course[]> {
-        return Promise.resolve(structuredClone(adminService.getCourses()))
+        return courseService.getAll()
     },
 
+    /**
+     * Fetches all specialities from backend `GET /api/speciality`.
+     */
     getSpecialities(): Promise<Speciality[]> {
-        return Promise.resolve(structuredClone(mockSpecialities))
+        return specialityService.getAll()
     },
 }

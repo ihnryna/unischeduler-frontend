@@ -3,12 +3,13 @@ import {HOUR_HEIGHT} from '../../features/schedule/scheduleConfig'
 import {useSubjectColors} from '../../features/schedule/subjectColors'
 import {formatTime} from '../../utils/formatTime'
 import {formatWeeksList} from '../../utils/dateUtils'
+import {isLinkLike, isValidLink} from '../../features/events/personalEventValidation'
 
 type ScheduleEventProps = {
     event: CalendarEvent
     /**
-     * When set, the card is a button that opens the event's edit form (own personal
-     * events only; university classes are always read-only).
+     * When set, the card is a button that opens the event's edit form: the personal-event
+     * form, or for a university class the form for the student's own change of it.
      */
     onEdit?: () => void
     onDelete?: () => void
@@ -26,6 +27,13 @@ const eventColors: Record<EventType, string> = {
     PERSONAL: 'blue',
 }
 
+/** Meeting link to open, or `null` when the location is a room / not a valid link. */
+function getMeetingHref(location: string | null): string | null {
+    if (!location || !isLinkLike(location) || !isValidLink(location)) return null
+    const trimmed = location.trim()
+    return /^www\./i.test(trimmed) ? `https://${trimmed}` : trimmed
+}
+
 function hoursFromStartOfDay(value: string) {
     const date = new Date(value)
     return date.getHours() + date.getMinutes() / 60
@@ -33,7 +41,8 @@ function hoursFromStartOfDay(value: string) {
 
 /**
  * One event card in the week grid, positioned by its start/end time. Read-only by default;
- * with `onEdit` it becomes a button that opens the edit form (FE-23).
+ * with `onEdit` it becomes a button that opens the edit form (FE-23). A meeting-link
+ * location is rendered as a separate "Онлайн-зустріч" link.
  */
 export function ScheduleEvent({event, onEdit, onDelete}: Readonly<ScheduleEventProps>) {
     const startsAt = hoursFromStartOfDay(event.startsAt)
@@ -45,6 +54,9 @@ export function ScheduleEvent({event, onEdit, onDelete}: Readonly<ScheduleEventP
         (event.eventType === 'PERSONAL' ? '#c7d8ff' : '#d9c7f0')
 
     const className = `lesson-card lesson-${eventColors[event.eventType]}`
+    const isPersonal = event.eventType === 'PERSONAL'
+    const editLabel = isPersonal ? 'Редагувати подію' : 'Змінити заняття'
+    const meetingHref = getMeetingHref(event.location)
     const style = {
         top: (startsAt - 8) * HOUR_HEIGHT + 4,
         height: (endsAt - startsAt) * HOUR_HEIGHT - 8,
@@ -58,7 +70,19 @@ export function ScheduleEvent({event, onEdit, onDelete}: Readonly<ScheduleEventP
             </span>
             <strong className="lesson-title">{event.name}</strong>
             <span className="lesson-type">{eventLabels[event.eventType]}</span>
-            {event.location && (
+            {meetingHref ? (
+                <a
+                    className="lesson-detail lesson-link"
+                    href={meetingHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={meetingHref}
+                >
+                    <span aria-hidden="true">↗ </span>
+                    Онлайн-зустріч
+                    <span className="visually-hidden"> (відкриється в новій вкладці)</span>
+                </a>
+            ) : event.location && (
                 <span className="lesson-detail">
                     <span aria-hidden="true">-</span>
                     {event.location}
@@ -84,9 +108,9 @@ export function ScheduleEvent({event, onEdit, onDelete}: Readonly<ScheduleEventP
                         className="lesson-card-hit"
                         onClick={onEdit}
                         aria-haspopup="dialog"
-                        title="Редагувати подію"
+                        title={editLabel}
                     >
-                        <span className="visually-hidden">Редагувати подію: {event.name}</span>
+                        <span className="visually-hidden">{editLabel}: {event.name}</span>
                     </button>
                 )}
                 <span className="lesson-card-actions">

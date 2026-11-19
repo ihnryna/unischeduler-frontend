@@ -6,14 +6,22 @@ import {scheduleService} from './scheduleService'
 const DEFAULT_USER_ID = 1
 
 type UseScheduleResult = {
+    /** Events to show in the grid (hidden classes excluded). */
     events: CalendarEvent[]
+    /** University classes of the week the student hid from the personal schedule. */
+    hiddenEvents: CalendarEvent[]
     isLoading: boolean
     error: string | null
     refetch: () => void
 }
 
+/**
+ * Loads the personal schedule for the week `weekOffset` weeks from now: university classes
+ * (with the student's overrides applied) and personal events. Refetches when classes or
+ * courses change in the admin panel, or on `refetch()`.
+ */
 export function useSchedule(userId = DEFAULT_USER_ID, weekOffset = 0): UseScheduleResult {
-    const [events, setEvents] = useState<CalendarEvent[]>([])
+    const [allEvents, setAllEvents] = useState<CalendarEvent[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [requestVersion, setRequestVersion] = useState(0)
@@ -40,7 +48,7 @@ export function useSchedule(userId = DEFAULT_USER_ID, weekOffset = 0): UseSchedu
             .getCalendar({userId, weekOffset})
             .then((nextEvents) => {
                 if (isActive) {
-                    setEvents(nextEvents)
+                    setAllEvents(nextEvents)
                 }
             })
             .catch((reason: unknown) => {
@@ -64,7 +72,8 @@ export function useSchedule(userId = DEFAULT_USER_ID, weekOffset = 0): UseSchedu
     }, [requestVersion, userId, weekOffset])
 
     return {
-        events,
+        events: allEvents.filter((event) => !event.occurrence?.isHidden),
+        hiddenEvents: allEvents.filter((event) => event.occurrence?.isHidden),
         isLoading,
         error,
         refetch: () => setRequestVersion((version) => version + 1),

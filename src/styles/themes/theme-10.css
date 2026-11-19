@@ -2550,3 +2550,59 @@
         transition: none;
     }
 }
+
+/* Class change form + hidden classes (personal class override) */
+.app[data-theme="theme-10"] .class-override-summary {
+    padding: 10px 14px;
+    background-color: var(--retro-lilac);
+    border: 1.5px solid var(--retro-ink);
+    border-radius: 12px;
+    font-size: 0.85rem;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .choice-option {
+    font-size: 0.88rem;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .choice-option input {
+    accent-color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .choice-option input:focus-visible {
+    outline: 3px solid var(--retro-yellow);
+    outline-offset: 2px;
+}
+
+.app[data-theme="theme-10"] .lesson-card .lesson-link {
+    color: var(--retro-ink);
+    font-weight: 750;
+    text-decoration: underline;
+}
+
+.app[data-theme="theme-10"] .lesson-card .lesson-link:focus-visible {
+    outline: 2px solid var(--retro-ink);
+    outline-offset: 1px;
+}
+
+.app[data-theme="theme-10"] .hidden-classes {
+    background-color: var(--retro-paper);
+    border: 2px solid var(--retro-ink);
+    border-radius: 16px;
+    box-shadow: 3px 3px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .hidden-classes-title {
+    font-size: 1rem;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .hidden-classes-text {
+    font-size: 0.85rem;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .hidden-classes-text span {
+    color: var(--retro-muted);
+}

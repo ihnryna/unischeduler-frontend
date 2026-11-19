@@ -35,7 +35,8 @@ export function isLinkLike(value: string): boolean {
     return LINK_PATTERN.test(value.trim())
 }
 
-function isValidLink(value: string): boolean {
+/** True for a well-formed http(s) link (a bare `www.` prefix is accepted). */
+export function isValidLink(value: string): boolean {
     const candidate = /^www\./i.test(value) ? `https://${value}` : value
     try {
         const url = new URL(candidate)
@@ -45,7 +46,8 @@ function isValidLink(value: string): boolean {
     }
 }
 
-function isRealDate(value: string): boolean {
+/** True for an existing calendar date in `YYYY-MM-DD` format. */
+export function isRealDate(value: string): boolean {
     if (!DATE_PATTERN.test(value)) return false
     const [year, month, day] = value.split('-').map(Number)
     const date = new Date(year, month - 1, day)

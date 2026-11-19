@@ -1,6 +1,11 @@
 import {useState} from 'react'
 
 import {
+    ClassOverrideModal,
+    type ClassOverrideResult,
+    type EditableClass,
+} from '../../components/events/ClassOverrideModal'
+import {
     ConfirmDeleteDialog,
     type DeletablePersonalEvent,
 } from '../../components/events/ConfirmDeleteDialog'
@@ -8,9 +13,11 @@ import {
     PersonalEventModal,
     type EditablePersonalEvent,
 } from '../../components/events/PersonalEventModal'
+import {HiddenClassesList} from '../../components/events/HiddenClassesList'
 import {ScheduleGrid} from '../../components/schedule/ScheduleGrid'
 import {isEditablePersonalEvent} from '../../features/events/usePersonalEventMutations'
 import {useSchedule} from '../../features/schedule/useSchedule'
+import {useClassOverrideMutations} from '../../features/schedule/useClassOverrideMutations'
 import type {CalendarEvent, PersonalEvent} from '../../types/schedule'
 import {
     formatWeekRange,
@@ -26,14 +33,32 @@ import {formatTime} from '../../utils/formatTime'
 // TODO(FE-13): replace with useAuth().user.id
 const CURRENT_USER_ID = 1
 
+/** Personal events are edited; university classes get the student's own change form. */
+function canEditScheduleEvent(event: CalendarEvent): boolean {
+    return isEditablePersonalEvent(event) || Boolean(event.occurrence)
+}
+
+const CLASS_CHANGE_MESSAGES: Record<ClassOverrideResult, (name: string) => string> = {
+    changed: (name) => `Зміни заняття «${name}» збережено. Їх бачите лише ви.`,
+    hidden: (name) => `Заняття «${name}» приховано з вашого розкладу.`,
+    restored: (name) => `Зміни заняття «${name}» скинуто.`,
+}
+
 export function SchedulePage() {
     const [weekOffset, setWeekOffset] = useState(0)
     const [selectedDay, setSelectedDay] = useState<number | null>(null)
     const [isCreateOpen, setIsCreateOpen] = useState(false)
     const [editingEvent, setEditingEvent] = useState<EditablePersonalEvent | null>(null)
     const [deletingEvent, setDeletingEvent] = useState<DeletablePersonalEvent | null>(null)
+    const [editingClass, setEditingClass] = useState<EditableClass | null>(null)
     const [successMessage, setSuccessMessage] = useState<string | null>(null)
-    const {events, isLoading, error, refetch} = useSchedule(CURRENT_USER_ID, weekOffset)
+    const {events, hiddenEvents, isLoading, error, refetch} = useSchedule(CURRENT_USER_ID, weekOffset)
+    const {
+        unhide,
+        isSaving: isRestoringClass,
+        error: restoreError,
+        resetError: resetRestoreError,
+    } = useClassOverrideMutations()
 
     // New events default to the selected day, else today (if visible), else Monday.
     const weekDays = getWeekDays(weekOffset)
@@ -79,8 +104,33 @@ export function SchedulePage() {
         })
     }
 
+    const handleClassSaved = (name: string, result: ClassOverrideResult) => {
+        setEditingClass(null)
+        refetch()
+        setSuccessMessage(CLASS_CHANGE_MESSAGES[result](name))
+    }
+
+    const handleRestoreClass = async (event: CalendarEvent) => {
+        const occurrence = event.occurrence
+        const override = occurrence?.occurrenceOverride ?? occurrence?.seriesOverride
+        if (!occurrence || !override) return
+        setSuccessMessage(null)
+        const ok = await unhide(override, occurrence)
+        if (ok) {
+            refetch()
+            setSuccessMessage(`Заняття «${event.name}» знову у вашому розкладі.`)
+        }
+    }
+
     const handleEditEvent = (event: CalendarEvent) => {
         setSuccessMessage(null)
+        resetRestoreError()
+        if (event.eventType !== 'PERSONAL') {
+            if (event.occurrence) {
+                setEditingClass({name: event.name, occurrence: event.occurrence})
+            }
+            return
+        }
         setEditingEvent({
             id: event.eventId,
             name: event.name,
@@ -156,6 +206,15 @@ export function SchedulePage() {
                     onClose={() => setEditingEvent(null)}
                     onSaved={(event) => handleEventSaved(event, 'оновлено')}
                     onDeleted={handleEventDeleted}
+                />
+            )}
+
+            {editingClass && (
+                <ClassOverrideModal
+                    classItem={editingClass}
+                    userId={CURRENT_USER_ID}
+                    onClose={() => setEditingClass(null)}
+                    onSaved={(result) => handleClassSaved(editingClass.name, result)}
                 />
             )}
 
@@ -245,7 +304,22 @@ export function SchedulePage() {
                 weekOffset={weekOffset}
                 onEditEvent={handleEditEvent}
                 onDeleteEvent={handleDeleteEvent}
-                canEditEvent={isEditablePersonalEvent}
+                canEditEvent={canEditScheduleEvent}
+                canDeleteEvent={isEditablePersonalEvent}
+            />
+
+            {restoreError && (
+                <p className="form-error-alert" role="alert">
+                    <span aria-hidden="true">!! </span>
+                    {restoreError}
+                </p>
+            )}
+
+            <HiddenClassesList
+                events={hiddenEvents}
+                onRestore={handleRestoreClass}
+                onEdit={handleEditEvent}
+                isBusy={isRestoringClass}
             />
 
             <div className="bottom-widgets">

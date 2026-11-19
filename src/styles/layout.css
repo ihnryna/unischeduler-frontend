@@ -830,3 +830,88 @@
 .app[data-theme] .lesson-card-editable .lesson-time {
     padding-right: 52px;
 }
+
+/* Class change form (personal class override) */
+.app[data-theme] .class-override-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.app[data-theme] .choice-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.app[data-theme] .choice-group legend {
+    margin-bottom: 6px;
+    padding: 0;
+}
+
+.app[data-theme] .choice-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.app[data-theme] .choice-option input {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin: 2px 0 0;
+    padding: 0;
+}
+
+/* Meeting link on an event card sits above the card's edit hit-area */
+.app[data-theme] .lesson-card .lesson-link {
+    position: relative;
+    z-index: 2;
+    display: inline-block;
+}
+
+/* Hidden (cancelled) classes of the week */
+.app[data-theme] .hidden-classes {
+    margin-top: 16px;
+    padding: 14px 18px;
+}
+
+.app[data-theme] .hidden-classes-title {
+    margin: 0 0 10px;
+}
+
+.app[data-theme] .hidden-classes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.app[data-theme] .hidden-classes-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+}
+
+.app[data-theme] .hidden-classes-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.app[data-theme] .hidden-classes-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}

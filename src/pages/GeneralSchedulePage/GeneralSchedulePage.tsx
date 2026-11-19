@@ -136,7 +136,7 @@ export function GeneralSchedulePage() {
                 }}
             >
                 {/* Speciality selector */}
-                <div style={{flex: '1 1 220px', minWidth: '200px'}}>
+                <div style={{flex: '1 1 220px', minWidth: 'min(200px, 100%)'}}>
                     <label
                         htmlFor="filter-spec"
                         style={{display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px'}}
@@ -164,7 +164,7 @@ export function GeneralSchedulePage() {
                 </div>
 
                 {/* Course selector */}
-                <div style={{flex: '1 1 240px', minWidth: '200px'}}>
+                <div style={{flex: '1 1 240px', minWidth: 'min(200px, 100%)'}}>
                     <label
                         htmlFor="filter-course"
                         style={{display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px'}}
@@ -190,7 +190,7 @@ export function GeneralSchedulePage() {
                 </div>
 
                 {/* Group selector */}
-                <div style={{flex: '0 1 160px', minWidth: '130px'}}>
+                <div style={{flex: '0 1 160px', minWidth: 'min(130px, 100%)'}}>
                     <label
                         htmlFor="filter-group"
                         style={{display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px'}}
@@ -214,7 +214,7 @@ export function GeneralSchedulePage() {
                 </div>
 
                 {/* Search query */}
-                <div style={{flex: '2 1 260px', minWidth: '220px'}}>
+                <div style={{flex: '2 1 260px', minWidth: 'min(220px, 100%)'}}>
                     <label
                         htmlFor="filter-search"
                         style={{display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px'}}
@@ -302,7 +302,9 @@ export function GeneralSchedulePage() {
                 <div
                     style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
+                        // min(…, 100%) lets a day card shrink below 360px on phones
+                        // instead of widening the whole page.
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(min(360px, 100%), 1fr))',
                         gap: '1.25rem',
                     }}
                 >

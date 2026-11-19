@@ -1,5 +1,5 @@
 import type {CalendarEvent} from '../../types/schedule'
-import {HOURS} from '../../features/schedule/scheduleConfig'
+import {getHourRange, getHourRows} from '../../features/schedule/gridHours'
 import {getWeekDays} from '../../utils/dateUtils'
 import {ScheduleEvent} from './ScheduleEvent'
 
@@ -35,6 +35,11 @@ export function ScheduleGrid({
         (event) => selectedDay === null || getDayIndex(event) === selectedDay,
     )
 
+    // Range from all events, not only the selected day, so the grid does not jump
+    // when a day is selected.
+    const hourRange = getHourRange(events)
+    const hours = getHourRows(hourRange)
+
     return (
         <section className="calendar" id="calendar">
             <div className="calendar-header">
@@ -58,7 +63,7 @@ export function ScheduleGrid({
 
             <div className="calendar-body">
                 <div className="time-column">
-                    {HOURS.map((hour) => (
+                    {hours.map((hour) => (
                         <div className="time-label" key={hour}>
                             {String(hour).padStart(2, '0')}:00
                         </div>
@@ -72,7 +77,7 @@ export function ScheduleGrid({
                         } ${day.isToday ? 'day-column-today' : ''}`}
                         key={day.isoDate}
                     >
-                        {HOURS.map((hour) => (
+                        {hours.map((hour) => (
                             <div className="hour-slot" key={hour} />
                         ))}
 
@@ -82,6 +87,7 @@ export function ScheduleGrid({
                                 <ScheduleEvent
                                     key={`${event.eventType}-${event.eventId}`}
                                     event={event}
+                                    firstHour={hourRange.first}
                                     onOpen={onOpenEvent ? () => onOpenEvent(event) : undefined}
                                     onDelete={
                                         onDeleteEvent && canDeleteEvent?.(event)

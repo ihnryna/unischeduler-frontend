@@ -858,13 +858,18 @@
     border-left: 1px solid #e9e1d6;
 }
 
-/* Lesson cards */
+/* Lesson cards: content centred vertically, text aligned to the start (leading) edge;
+   `safe` keeps the name visible (top-aligned) when a short card cannot fit all lines. */
 .app[data-theme="theme-10"] .lesson-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: safe center;
     padding: 8px;
     border: 1px solid var(--retro-ink);
     border-radius: 9px;
     box-shadow: 1px 1px 0 var(--retro-ink);
     line-height: 1.35;
+    text-align: start;
 }
 
 .app[data-theme="theme-10"] .lesson-time {
@@ -1264,7 +1269,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 11px 18px 10px !important;
+    padding: 11px 18px 10px;
     border: 2px solid var(--retro-ink) !important;
     border-bottom: 2px solid var(--retro-ink) !important;
     border-top-left-radius: 12px !important;
@@ -1336,7 +1341,7 @@
 /* Overview Metrics */
 .app[data-theme="theme-10"] .admin-metrics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
     gap: 16px;
 }
 
@@ -1456,7 +1461,7 @@
 
 .app[data-theme="theme-10"] .admin-sync-meta-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
     gap: 14px;
     padding-top: 16px;
     border-top: 1.5px dashed var(--retro-ink);
@@ -1489,7 +1494,7 @@
 /* Integrations Grid */
 .app[data-theme="theme-10"] .admin-integrations-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: 16px;
 }
 
@@ -1897,7 +1902,7 @@
 
 .app[data-theme="theme-10"] .admin-inspector-days-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
     gap: 16px;
 }
 
@@ -2669,4 +2674,46 @@
 
 .app[data-theme="theme-10"] .hidden-toggle[aria-pressed="true"] {
     background-color: var(--retro-lilac);
+}
+
+/* Mobile menu button and backdrop (layout: layout.css "MOBILE MENU") */
+.app[data-theme="theme-10"] .menu-toggle {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: var(--retro-paper);
+    border: 2px solid var(--retro-ink);
+    border-radius: 12px;
+    color: var(--retro-ink);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+    cursor: pointer;
+    transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.app[data-theme="theme-10"] .menu-toggle:hover,
+.app[data-theme="theme-10"] .menu-toggle[aria-expanded="true"] {
+    background: var(--retro-yellow);
+}
+
+.app[data-theme="theme-10"] .menu-toggle:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .sidebar-backdrop {
+    background-color: rgba(41, 37, 31, 0.45);
+}
+
+/* Sticky actions column in admin tables (layout: layout.css "ADMIN PANEL") */
+.app[data-theme="theme-10"] .admin-table td.admin-cell-actions {
+    background-color: var(--retro-paper);
+    box-shadow: -8px 0 8px -8px rgba(41, 37, 31, 0.35);
+}
+
+.app[data-theme="theme-10"] .admin-table tr:hover td.admin-cell-actions {
+    background-color: #fff9ed;
+}
+
+.app[data-theme="theme-10"] .admin-table:has(.admin-cell-actions) th:last-child {
+    box-shadow: -8px 0 8px -8px rgba(41, 37, 31, 0.35);
 }

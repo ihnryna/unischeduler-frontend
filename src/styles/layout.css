@@ -85,6 +85,9 @@
 }
 
 .app[data-theme] .calendar {
+    /* Height of one hour row. ScheduleEvent positions cards with the same value. */
+    --hour-height: 90px;
+
     width: 100%;
     min-width: 0;
     overflow: hidden;
@@ -118,14 +121,13 @@
 .app[data-theme] .day-column {
     position: relative;
     min-width: 0;
-    height: 704px;
     overflow: hidden;
 }
 
 .app[data-theme] .time-label,
 .app[data-theme] .hour-slot {
-    height: 64px;
-    min-height: 64px;
+    height: var(--hour-height);
+    min-height: var(--hour-height);
 }
 
 .app[data-theme] .hour-slot {
@@ -187,7 +189,7 @@
     }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
     .app[data-theme] .topbar {
         padding: 14px 16px;
     }
@@ -398,14 +400,13 @@
 .app[data-theme] .day-column {
     position: relative;
     min-width: 0;
-    height: 704px;
     overflow: hidden;
 }
 
 .app[data-theme] .time-label,
 .app[data-theme] .hour-slot {
-    height: 64px;
-    min-height: 64px;
+    height: var(--hour-height);
+    min-height: var(--hour-height);
 }
 
 .app[data-theme] .hour-slot {
@@ -475,7 +476,7 @@
     }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
     .app[data-theme] .topbar {
         padding: 8px 16px;
     }
@@ -561,10 +562,13 @@
     padding: 8px 16px;
 }
 
-/* 8-column grid */
+/* Two columns: a fixed-width sidebar and the content. The sidebar used to be 1/8 of the
+   width, which cut its labels on every screen narrower than ~1600px. */
 .app[data-theme] .app-layout {
+    --sidebar-width: 232px;
+
     display: grid;
-    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
     align-items: start;
 
     gap: 8px;
@@ -594,9 +598,9 @@
     z-index: 900;
 }
 
-/* Schedule — remaining seven columns */
+/* Content — second column */
 .app[data-theme] .main-content {
-    grid-column: 2 / 9;
+    grid-column: 2 / -1;
     grid-row: 1;
 
     display: flex;
@@ -609,9 +613,15 @@
     padding: 0;
 }
 
-/* Sidebar collapsed — schedule uses all columns */
+/* Sidebar collapsed — content uses all columns */
 .app[data-theme] .app-layout.sidebar-collapsed .main-content {
-    grid-column: 1 / 9;
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 1100px) {
+    .app[data-theme] .app-layout {
+        --sidebar-width: 200px;
+    }
 }
 
 /* Keep calendar within its grid area */
@@ -625,7 +635,7 @@
    RESPONSIVE
    ========================================= */
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
     .app[data-theme] .app-layout {
         grid-template-columns: minmax(0, 1fr);
         padding: 84px 16px 16px;
@@ -826,8 +836,17 @@
     pointer-events: auto;
 }
 
-.app[data-theme] .lesson-card-editable:has(.lesson-card-actions) .lesson-time {
-    padding-right: 28px;
+/* Keep the centred content clear of the delete button in the top-right corner;
+   the same space at the bottom keeps it visually centred. On narrow columns the text wraps
+   to more lines, so the bottom space is dropped to keep everything inside the card. */
+.app[data-theme] .lesson-card-editable:has(.lesson-card-actions) {
+    padding-block: 26px;
+}
+
+@media (max-width: 1100px) {
+    .app[data-theme] .lesson-card-editable:has(.lesson-card-actions) {
+        padding-bottom: 6px;
+    }
 }
 
 /* Event details modal (FE-18) */
@@ -933,6 +952,7 @@
     position: relative;
     z-index: 2;
     display: inline-block;
+    align-self: flex-start;
 }
 
 /* Hidden (cancelled) classes of the week */
@@ -986,4 +1006,206 @@
 /* A hidden class drawn in the grid on request (faded, not clickable through) */
 .app[data-theme] .lesson-card-hidden .lesson-title {
     text-decoration: line-through;
+}
+
+/* =========================================
+   MOBILE MENU (≤ 900px)
+   The sidebar becomes an off-canvas menu opened by .menu-toggle in the
+   header; AppLayout adds .sidebar-open while it is shown.
+   ========================================= */
+
+.app[data-theme] .topbar-left {
+    min-width: 0;
+}
+
+.app[data-theme] .brand {
+    min-width: 0;
+}
+
+.app[data-theme] .brand-text {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.app[data-theme] .menu-toggle,
+.app[data-theme] .sidebar-backdrop {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    .app[data-theme] .menu-toggle {
+        display: inline-grid;
+        place-items: center;
+        flex-shrink: 0;
+    }
+
+    .app[data-theme] .sidebar {
+        z-index: 1100;
+        visibility: hidden;
+        transform: translateX(calc(-100% - 32px));
+        transition: transform 200ms ease, visibility 0s linear 200ms;
+    }
+
+    .app[data-theme] .app-layout.sidebar-open .sidebar {
+        visibility: visible;
+        transform: none;
+        transition: transform 200ms ease;
+    }
+
+    .app[data-theme] .sidebar-backdrop {
+        display: block;
+        position: fixed;
+        inset: 76px 0 0 0;
+        z-index: 1050;
+    }
+
+    /* Header: keep only what fits next to the menu button and the brand. */
+    .app[data-theme] .topbar {
+        gap: 8px;
+    }
+
+    .app[data-theme] .topbar .admin-badge-admin-role {
+        display: none;
+    }
+
+    /* Page title + subtitle: let the subtitle drop below instead of widening the page. */
+    .app[data-theme] .page-heading > div {
+        flex-wrap: wrap;
+    }
+
+    .app[data-theme] .page-heading > div > * {
+        min-width: 0;
+    }
+}
+
+@media (max-width: 560px) {
+    .app[data-theme] .topbar .semester-label {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app[data-theme] .sidebar,
+    .app[data-theme] .app-layout.sidebar-open .sidebar {
+        transition: none;
+    }
+}
+
+/* =========================================
+   EVENT CARD TEXT
+   A long name must not push the type, place and teacher out of the card:
+   the name is cut to two lines, every other line to one, all with "…".
+   The full text is in the card's tooltip and in the details modal.
+   ========================================= */
+
+.app[data-theme] .lesson-card > * {
+    flex-shrink: 0;
+    max-width: 100%;
+}
+
+.app[data-theme] .lesson-card .lesson-title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    overflow-wrap: break-word;
+}
+
+.app[data-theme] .lesson-card .lesson-type,
+.app[data-theme] .lesson-card .lesson-detail,
+.app[data-theme] .lesson-card .lesson-teacher {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* =========================================
+   HEADER — keep pills on one line
+   ========================================= */
+
+.app[data-theme] .topbar .semester-label,
+.app[data-theme] .topbar .admin-badge-admin-role {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* =========================================
+   ADMIN PANEL — nothing cut off or hidden
+   ========================================= */
+
+/* Tabs wrap onto a second row instead of scrolling out of view. */
+.app[data-theme] nav.admin-tabs-nav {
+    flex-wrap: wrap;
+    row-gap: 4px;
+    overflow: visible;
+}
+
+/* Slightly tighter tabs so all five fit on one row on common laptop widths. */
+.app[data-theme] .admin-tabs-nav .admin-tab-btn {
+    padding-inline: 13px;
+    gap: 6px;
+}
+
+@media (max-width: 900px) {
+    .app[data-theme] .admin-tabs-nav .admin-tab-btn {
+        padding-inline: 10px;
+    }
+}
+
+/* Phones: drop the decorative icons so two tabs fit per row. */
+@media (max-width: 560px) {
+    .app[data-theme] .admin-tabs-nav .admin-tab-icon {
+        display: none;
+    }
+
+    .app[data-theme] .admin-tabs-nav .admin-tab-btn {
+        padding-inline: 8px;
+        font-size: 0.78rem;
+    }
+}
+
+/* Filters: the search field grows, the select keeps its own width. */
+.app[data-theme] .admin-filter-group .admin-search-input {
+    flex: 1 1 320px;
+    width: auto;
+    max-width: 480px;
+    min-width: min(240px, 100%);
+}
+
+.app[data-theme] .admin-filter-group .admin-filter-select {
+    flex: 0 1 220px;
+    width: auto;
+    min-width: min(170px, 100%);
+}
+
+/* Tables: the actions column stays visible while the table scrolls sideways. */
+.app[data-theme] .admin-table td.admin-cell-actions,
+.app[data-theme] .admin-table:has(.admin-cell-actions) th:last-child {
+    position: sticky;
+    right: 0;
+    z-index: 1;
+}
+
+/* Buttons and pills that must not break onto two lines. */
+.app[data-theme] .admin-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.app[data-theme] .admin-integration-footer {
+    min-width: 0;
+}
+
+.app[data-theme] .admin-integration-detail {
+    min-width: 0;
+}
+
+.app[data-theme] .admin-integration-latency {
+    flex-shrink: 0;
+    white-space: nowrap;
 }

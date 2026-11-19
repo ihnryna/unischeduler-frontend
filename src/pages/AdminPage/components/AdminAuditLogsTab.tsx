@@ -59,7 +59,8 @@ export function AdminAuditLogsTab({
                     <input
                         type="text"
                         className="input admin-search-input"
-                        placeholder="🔍 Пошук у журналі дій, системних подіях та помилках…"
+                        placeholder="🔍 Пошук у журналі"
+                        aria-label="Пошук у журналі дій, системних подіях та помилках"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />

@@ -1,12 +1,14 @@
 import type {CalendarEvent, EventType} from '../../types/schedule'
-import {HOUR_HEIGHT} from '../../features/schedule/scheduleConfig'
+import {getEventHours} from '../../features/schedule/gridHours'
+import {CLASS_KIND_LABELS, getClassKind} from '../../features/schedule/classDetails'
 import {useSubjectColors} from '../../features/schedule/subjectColors'
 import {formatTime} from '../../utils/formatTime'
-import {formatWeeksList} from '../../utils/dateUtils'
 import {getMeetingHref} from '../../features/events/personalEventValidation'
 
 type ScheduleEventProps = {
     event: CalendarEvent
+    /** First hour row of the grid (e.g. 8 for 08:00); the card is positioned relative to it. */
+    firstHour: number
     /** When set, the card is a button that opens the event's details (FE-18). */
     onOpen?: () => void
     /** When set, a trash button opens the delete confirmation (own personal events). */
@@ -25,20 +27,16 @@ const eventColors: Record<EventType, string> = {
     PERSONAL: 'blue',
 }
 
-function hoursFromStartOfDay(value: string) {
-    const date = new Date(value)
-    return date.getHours() + date.getMinutes() / 60
-}
-
 /**
- * One event card in the week grid, positioned by its start/end time. Read-only by default;
- * with `onOpen` the whole card is a button that opens the event's details (FE-18). A
- * meeting-link location is rendered as a separate "Онлайн-зустріч" link. A class the student
- * hid (shown only when the page asks for hidden classes) is drawn faded and labelled.
+ * One event card in the week grid, positioned by its start/end time. It shows the name, the
+ * class type, the place and the teacher, centred vertically and aligned to the start; everything
+ * else is in the details modal. Read-only by default; with
+ * `onOpen` the whole card is a button that opens the event's details (FE-18). A meeting-link
+ * location is rendered as a separate "Онлайн-зустріч" link. A class the student hid (shown
+ * only when the page asks for hidden classes) is drawn faded with a struck-through name.
  */
-export function ScheduleEvent({event, onOpen, onDelete}: Readonly<ScheduleEventProps>) {
-    const startsAt = hoursFromStartOfDay(event.startsAt)
-    const endsAt = hoursFromStartOfDay(event.endsAt)
+export function ScheduleEvent({event, firstHour, onOpen, onDelete}: Readonly<ScheduleEventProps>) {
+    const {start, end} = getEventHours(event)
     const {colors} = useSubjectColors()
 
     const cardBackground =
@@ -51,21 +49,32 @@ export function ScheduleEvent({event, onOpen, onDelete}: Readonly<ScheduleEventP
     }`
     const openLabel = event.eventType === 'PERSONAL' ? 'Деталі події' : 'Деталі заняття'
     const meetingHref = getMeetingHref(event.location)
+    // Row height comes from the --hour-height CSS custom property (layout.css), so the card
+    // always lines up with the hour rows drawn by CSS.
     const style = {
-        top: (startsAt - 8) * HOUR_HEIGHT + 4,
-        height: (endsAt - startsAt) * HOUR_HEIGHT - 8,
+        top: `calc(${start - firstHour} * var(--hour-height) + 4px)`,
+        height: `calc(${end - start} * var(--hour-height) - 8px)`,
         backgroundColor: cardBackground,
     }
 
+    // Class type: the kind of a university class (lecture, seminar, lab) when it is known,
+    // otherwise the event type ("Заняття", "Змінене заняття", "Особиста подія").
+    const classKind = event.eventType === 'PERSONAL' ? null : getClassKind(event)
+    const typeLabel = classKind ? CLASS_KIND_LABELS[classKind] : eventLabels[event.eventType]
+
+    // The card shows the name, type, place and teacher; time and the hidden state are in the
+    // accessible label (and the tooltip), the rest is in the details modal.
+    const timeRange = `${formatTime(event.startsAt)} – ${formatTime(event.endsAt)}`
+    const accessibleSummary = [
+        event.name,
+        isHidden ? 'приховано вами' : typeLabel.toLowerCase(),
+        timeRange,
+    ].join(', ')
+
     const content = (
         <>
-            <span className="lesson-time">
-                {formatTime(event.startsAt)} – {formatTime(event.endsAt)}
-            </span>
             <strong className="lesson-title">{event.name}</strong>
-            <span className="lesson-type">
-                {isHidden ? 'Приховано вами' : eventLabels[event.eventType]}
-            </span>
+            <span className="lesson-type">{typeLabel}</span>
             {meetingHref ? (
                 <a
                     className="lesson-detail lesson-link"
@@ -79,18 +88,10 @@ export function ScheduleEvent({event, onOpen, onDelete}: Readonly<ScheduleEventP
                     <span className="visually-hidden"> (відкриється в новій вкладці)</span>
                 </a>
             ) : event.location && (
-                <span className="lesson-detail">
-                    <span aria-hidden="true">-</span>
-                    {event.location}
-                </span>
+                <span className="lesson-detail">{event.location}</span>
             )}
             {event.teacher && (
                 <span className="lesson-teacher">{event.teacher}</span>
-            )}
-            {event.weeks && event.weeks.length > 0 && (
-                <span className="lesson-weeks" title={`Тижні: ${event.weeks.join(', ')}`}>
-                    🗓️ {formatWeeksList(event.weeks)} тиж.
-                </span>
             )}
         </>
     )
@@ -104,9 +105,9 @@ export function ScheduleEvent({event, onOpen, onDelete}: Readonly<ScheduleEventP
                         className="lesson-card-hit"
                         onClick={onOpen}
                         aria-haspopup="dialog"
-                        title={openLabel}
+                        title={`${event.name} · ${timeRange}`}
                     >
-                        <span className="visually-hidden">{openLabel}: {event.name}</span>
+                        <span className="visually-hidden">{openLabel}: {accessibleSummary}</span>
                     </button>
                 )}
                 {onDelete && (
@@ -134,7 +135,7 @@ export function ScheduleEvent({event, onOpen, onDelete}: Readonly<ScheduleEventP
     }
 
     return (
-        <article className={className} style={style}>
+        <article className={className} style={style} title={`${event.name} · ${timeRange}`} aria-label={accessibleSummary}>
             {content}
         </article>
     )

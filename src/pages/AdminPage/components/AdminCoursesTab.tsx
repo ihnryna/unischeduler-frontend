@@ -51,7 +51,8 @@ export function AdminCoursesTab({
                     <input
                         type="text"
                         className="input admin-search-input"
-                        placeholder="🔍 Пошук за назвою дисципліни, факультетом…"
+                        placeholder="🔍 Назва або факультет"
+                        aria-label="Пошук дисциплін за назвою або факультетом"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />

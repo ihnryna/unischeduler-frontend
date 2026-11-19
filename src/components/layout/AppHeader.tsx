@@ -1,18 +1,50 @@
+import type {RefObject} from 'react'
 import {useLocation} from 'react-router'
 
-export function AppHeader() {
+type AppHeaderProps = {
+    isSidebarOpen: boolean
+    onToggleSidebar: () => void
+    menuButtonRef: RefObject<HTMLButtonElement | null>
+}
+
+export function AppHeader({
+    isSidebarOpen,
+    onToggleSidebar,
+    menuButtonRef,
+}: Readonly<AppHeaderProps>) {
     const location = useLocation()
     const isAdminPage = location.pathname.startsWith('/admin')
 
     return (
         <header className="topbar">
-            <a className="brand" href="#" aria-label="UNIScheduler — головна">
-                <span className="brand-logo">UNI</span>
+            <div className="topbar-left">
+                {/* Shown only on narrow screens, where the sidebar is hidden (layout.css). */}
+                <button
+                    ref={menuButtonRef}
+                    type="button"
+                    className="menu-toggle"
+                    aria-controls="app-sidebar"
+                    aria-expanded={isSidebarOpen}
+                    aria-label={isSidebarOpen ? 'Закрити меню' : 'Відкрити меню'}
+                    onClick={onToggleSidebar}
+                >
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                        {isSidebarOpen ? (
+                            <path d="M5 5l10 10M15 5L5 15"/>
+                        ) : (
+                            <path d="M3 5h14M3 10h14M3 15h14"/>
+                        )}
+                    </svg>
+                </button>
 
-                <span className="brand-text">
-                    <strong>UNIScheduler</strong>
-                </span>
-            </a>
+                <a className="brand" href="#" aria-label="UNIScheduler — головна">
+                    <span className="brand-logo">UNI</span>
+
+                    <span className="brand-text">
+                        <strong>UNIScheduler</strong>
+                    </span>
+                </a>
+            </div>
 
             <div className="topbar-right">
                 {isAdminPage && (

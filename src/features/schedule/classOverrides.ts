@@ -323,6 +323,32 @@ export function buildOverridePatch(
     }
 }
 
+/**
+ * Override fields for moving one occurrence to `startsAt`–`endsAt` (drag-and-drop in the
+ * week grid), built and validated exactly like the "this occurrence" form: the room, note
+ * and other changes already recorded for the occurrence are kept. Returns the first
+ * validation message instead when the move is not allowed (e.g. outside the occurrence's
+ * week). `patch === null` means the class is back at its university time with no other
+ * change, so the occurrence override should be removed.
+ */
+export function buildMovePatch(
+    occurrence: ClassOccurrence,
+    startsAt: LocalDateTime,
+    endsAt: LocalDateTime,
+): {patch: ClassOverridePatch | null; error: null} | {patch: null; error: string} {
+    const values: ClassOverrideFormValues = {
+        ...getInitialFormValues(occurrence, 'occurrence'),
+        action: 'change',
+        date: startsAt.slice(0, 10),
+        startTime: startsAt.slice(11, 16),
+        endTime: endsAt.slice(11, 16),
+    }
+    const errors = validateClassOverride(values, occurrence)
+    const firstError = CLASS_OVERRIDE_FIELD_ORDER.map((field) => errors[field]).find(Boolean)
+    if (firstError) return {patch: null, error: firstError}
+    return {patch: buildOverridePatch(values, occurrence), error: null}
+}
+
 function normalizeSeconds(value: LocalDateTime): LocalDateTime {
     return value.length === 16 ? `${value}:00` : value.slice(0, 19)
 }

@@ -1,16 +1,24 @@
 import type {RefObject} from 'react'
 import {useLocation} from 'react-router'
 
+import {UserMenu, type UserMenuUser} from './UserMenu'
+
 type AppHeaderProps = {
     isSidebarOpen: boolean
     onToggleSidebar: () => void
     menuButtonRef: RefObject<HTMLButtonElement | null>
+    user: UserMenuUser | null
+    onLogout: () => void
+    onUserMenuOpen?: () => void
 }
 
 export function AppHeader({
     isSidebarOpen,
     onToggleSidebar,
     menuButtonRef,
+    user,
+    onLogout,
+    onUserMenuOpen,
 }: Readonly<AppHeaderProps>) {
     const location = useLocation()
     const isAdminPage = location.pathname.startsWith('/admin')
@@ -57,12 +65,7 @@ export function AppHeader({
                     Осінній семестр · 2026
                 </span>
 
-                <button
-                    className="profile-button"
-                    aria-label="Профіль користувача"
-                >
-                    ІГ
-                </button>
+                <UserMenu user={user} onLogout={onLogout} onOpen={onUserMenuOpen}/>
             </div>
         </header>
     )

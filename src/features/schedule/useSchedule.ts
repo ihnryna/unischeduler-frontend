@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useCallback, useEffect, useRef, useState} from 'react'
 
 import type {CalendarEvent} from '../../types/schedule'
 import {scheduleService} from './scheduleService'
@@ -12,7 +12,8 @@ type UseScheduleResult = {
     hiddenEvents: CalendarEvent[]
     isLoading: boolean
     error: string | null
-    refetch: () => void
+    /** Reloads the week; resolves when the new data is in (or the reload failed). */
+    refetch: () => Promise<void>
 }
 
 /**
@@ -25,6 +26,8 @@ export function useSchedule(userId = DEFAULT_USER_ID, weekOffset = 0): UseSchedu
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [requestVersion, setRequestVersion] = useState(0)
+    // `refetch()` callers waiting for the next reload to finish.
+    const waitersRef = useRef<Array<() => void>>([])
 
     useEffect(() => {
         const handleUpdate = () => {
@@ -63,6 +66,9 @@ export function useSchedule(userId = DEFAULT_USER_ID, weekOffset = 0): UseSchedu
             .finally(() => {
                 if (isActive) {
                     setIsLoading(false)
+                    const waiters = waitersRef.current
+                    waitersRef.current = []
+                    waiters.forEach((resolve) => resolve())
                 }
             })
 
@@ -71,11 +77,20 @@ export function useSchedule(userId = DEFAULT_USER_ID, weekOffset = 0): UseSchedu
         }
     }, [requestVersion, userId, weekOffset])
 
+    const refetch = useCallback(
+        () =>
+            new Promise<void>((resolve) => {
+                waitersRef.current.push(resolve)
+                setRequestVersion((version) => version + 1)
+            }),
+        [],
+    )
+
     return {
         events: allEvents.filter((event) => !event.occurrence?.isHidden),
         hiddenEvents: allEvents.filter((event) => event.occurrence?.isHidden),
         isLoading,
         error,
-        refetch: () => setRequestVersion((version) => version + 1),
+        refetch,
     }
 }

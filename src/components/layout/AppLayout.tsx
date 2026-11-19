@@ -2,10 +2,13 @@ import {useEffect, useRef, useState, type ReactNode} from 'react'
 
 import { AppHeader } from './AppHeader'
 import { AppSidebar } from './AppSidebar'
+import type {UserMenuUser} from './UserMenu'
 
 type AppLayoutProps = {
     children: ReactNode
     lessonCount: number
+    user: UserMenuUser | null
+    onLogout: () => void
 }
 
 /**
@@ -13,7 +16,7 @@ type AppLayoutProps = {
  * the sidebar is an off-canvas menu opened by the header's menu button; it closes on
  * Escape, on a click outside it, and after choosing a page.
  */
-export function AppLayout({ children, lessonCount }: Readonly<AppLayoutProps>) {
+export function AppLayout({ children, lessonCount, user, onLogout }: Readonly<AppLayoutProps>) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
     const menuButtonRef = useRef<HTMLButtonElement>(null)
     const sidebarRef = useRef<HTMLElement>(null)
@@ -41,6 +44,9 @@ export function AppLayout({ children, lessonCount }: Readonly<AppLayoutProps>) {
                 isSidebarOpen={isSidebarOpen}
                 onToggleSidebar={() => setIsSidebarOpen((open) => !open)}
                 menuButtonRef={menuButtonRef}
+                user={user}
+                onLogout={onLogout}
+                onUserMenuOpen={closeSidebar}
             />
 
             <div className={`app-layout${isSidebarOpen ? ' sidebar-open' : ''}`}>
@@ -48,6 +54,7 @@ export function AppLayout({ children, lessonCount }: Readonly<AppLayoutProps>) {
                     lessonCount={lessonCount}
                     sidebarRef={sidebarRef}
                     onNavigate={closeSidebar}
+                    isAdmin={user?.role === 'ADMIN'}
                 />
 
                 {isSidebarOpen && (

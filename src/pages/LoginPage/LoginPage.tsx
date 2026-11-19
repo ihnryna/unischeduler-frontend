@@ -1,17 +1,20 @@
 import {useState} from 'react'
 import {useNavigate} from 'react-router'
 
+import {authService} from '../../features/auth/authService'
+
 export function LoginPage() {
     const navigate = useNavigate()
     const [isLoading, setIsLoading] = useState(false)
     const [email, setEmail] = useState('diana.tsisaruk@ukma.edu.ua')
     const [error, setError] = useState<string | null>(null)
 
-    const handleLogin = (role: 'STUDENT' | 'ADMIN') => {
+    // The admin button passes its own email: setEmail() would not be applied yet here.
+    const handleLogin = (role: 'STUDENT' | 'ADMIN', loginEmail = email) => {
         setIsLoading(true)
         setError(null)
 
-        if (!email.endsWith('@ukma.edu.ua')) {
+        if (!loginEmail.endsWith('@ukma.edu.ua')) {
             setError('Авторизація дозволена лише для корпоративних поштових скриньок НаУКМА (*@ukma.edu.ua).')
             setIsLoading(false)
             return
@@ -19,12 +22,11 @@ export function LoginPage() {
 
         setTimeout(() => {
             setIsLoading(false)
-            // Store session
-            localStorage.setItem('unischeduler_auth_user', JSON.stringify({
-                email,
+            authService.saveSession({
+                email: loginEmail,
                 role,
-                name: email.split('@')[0].replace('.', ' '),
-            }))
+                name: loginEmail.split('@')[0].replace('.', ' '),
+            })
             navigate(role === 'ADMIN' ? '/admin' : '/schedule')
         }, 600)
     }
@@ -113,7 +115,7 @@ export function LoginPage() {
                             disabled={isLoading}
                             onClick={() => {
                                 setEmail('admin@ukma.edu.ua')
-                                handleLogin('ADMIN')
+                                handleLogin('ADMIN', 'admin@ukma.edu.ua')
                             }}
                             style={{padding: '10px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}
                         >

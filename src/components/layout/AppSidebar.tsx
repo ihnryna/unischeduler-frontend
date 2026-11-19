@@ -6,9 +6,11 @@ type AppSidebarProps = {
     sidebarRef?: RefObject<HTMLElement | null>
     /** Called after a link is chosen (closes the off-canvas menu on narrow screens). */
     onNavigate?: () => void
+    /** Shows the "Адміністрування" group; only users with the ADMIN role get it. */
+    isAdmin?: boolean
 }
 
-export function AppSidebar({lessonCount: _lessonCount, sidebarRef, onNavigate}: AppSidebarProps) {
+export function AppSidebar({lessonCount: _lessonCount, sidebarRef, onNavigate, isAdmin = false}: AppSidebarProps) {
     return (
         <aside className="sidebar" id="app-sidebar" ref={sidebarRef}>
             <p className="sidebar-label">РОЗКЛАД</p>
@@ -65,22 +67,26 @@ export function AppSidebar({lessonCount: _lessonCount, sidebarRef, onNavigate}: 
                 </NavLink>
             </nav>
 
-            <div className="sidebar-divider"/>
+            {isAdmin && (
+                <>
+                    <div className="sidebar-divider"/>
 
-            <p className="sidebar-label">АДМІНІСТРУВАННЯ</p>
+                    <p className="sidebar-label">АДМІНІСТРУВАННЯ</p>
 
-            <nav className="navigation" aria-label="Адміністрування системи">
-                <NavLink
-                    onClick={onNavigate}
-                    to="/admin"
-                    className={({isActive}) =>
-                        `nav-link ${isActive ? 'active' : ''}`
-                    }
-                >
-                    <span className="nav-icon">🛡</span>
-                    Адмін-панель
-                </NavLink>
-            </nav>
+                    <nav className="navigation" aria-label="Адміністрування системи">
+                        <NavLink
+                            onClick={onNavigate}
+                            to="/admin"
+                            className={({isActive}) =>
+                                `nav-link ${isActive ? 'active' : ''}`
+                            }
+                        >
+                            <span className="nav-icon">🛡</span>
+                            Адмін-панель
+                        </NavLink>
+                    </nav>
+                </>
+            )}
         </aside>
     )
 }

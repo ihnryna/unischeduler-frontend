@@ -4,6 +4,7 @@ import {CLASS_KIND_LABELS, getClassKind} from '../../features/schedule/classDeta
 import {useSubjectColors} from '../../features/schedule/subjectColors'
 import {formatTime} from '../../utils/formatTime'
 import {getMeetingHref} from '../../features/events/personalEventValidation'
+import type {EventDragHandlers} from '../../features/schedule/useEventDrag'
 
 type ScheduleEventProps = {
     event: CalendarEvent
@@ -13,6 +14,13 @@ type ScheduleEventProps = {
     onOpen?: () => void
     /** When set, a trash button opens the delete confirmation (own personal events). */
     onDelete?: () => void
+    /** When set, the card can be dragged to another time or day (see `useEventDrag`). */
+    dragHandlers?: EventDragHandlers
+    /**
+     * Drag-and-drop look: `source` fades the card being moved; `preview` is the outline of
+     * where it would land, `saving` the same outline while the move is being saved.
+     */
+    dragState?: 'source' | 'preview' | 'saving'
 }
 
 const eventLabels: Record<EventType, string> = {
@@ -35,7 +43,14 @@ const eventColors: Record<EventType, string> = {
  * location is rendered as a separate "Онлайн-зустріч" link. A class the student hid (shown
  * only when the page asks for hidden classes) is drawn faded with a struck-through name.
  */
-export function ScheduleEvent({event, firstHour, onOpen, onDelete}: Readonly<ScheduleEventProps>) {
+export function ScheduleEvent({
+    event,
+    firstHour,
+    onOpen,
+    onDelete,
+    dragHandlers,
+    dragState,
+}: Readonly<ScheduleEventProps>) {
     const {start, end} = getEventHours(event)
     const {colors} = useSubjectColors()
 
@@ -44,9 +59,16 @@ export function ScheduleEvent({event, firstHour, onOpen, onDelete}: Readonly<Sch
         (event.eventType === 'PERSONAL' ? '#c7d8ff' : '#d9c7f0')
 
     const isHidden = Boolean(event.occurrence?.isHidden)
-    const className = `lesson-card lesson-${eventColors[event.eventType]}${
-        isHidden ? ' lesson-card-hidden' : ''
-    }`
+    const className = [
+        'lesson-card',
+        `lesson-${eventColors[event.eventType]}`,
+        isHidden && 'lesson-card-hidden',
+        dragHandlers && 'lesson-card-draggable',
+        dragState === 'source' && 'lesson-card-drag-source',
+        (dragState === 'preview' || dragState === 'saving') && 'lesson-card-drag-preview',
+    ]
+        .filter(Boolean)
+        .join(' ')
     const openLabel = event.eventType === 'PERSONAL' ? 'Деталі події' : 'Деталі заняття'
     const meetingHref = getMeetingHref(event.location)
     // Row height comes from the --hour-height CSS custom property (layout.css), so the card
@@ -96,9 +118,26 @@ export function ScheduleEvent({event, firstHour, onOpen, onDelete}: Readonly<Sch
         </>
     )
 
+    // Outline of where a dragged card would land: the new time is the point of it.
+    if (dragState === 'preview' || dragState === 'saving') {
+        return (
+            <article className={className} style={style} aria-hidden="true">
+                <span className="lesson-drag-time">
+                    {dragState === 'saving' ? 'Зберігаємо… ' : ''}
+                    {timeRange}
+                </span>
+                <strong className="lesson-title">{event.name}</strong>
+            </article>
+        )
+    }
+
     if (onOpen || onDelete) {
         return (
-            <article className={`${className} lesson-card-editable`} style={style}>
+            <article
+                className={`${className} lesson-card-editable`}
+                style={style}
+                {...dragHandlers}
+            >
                 {onOpen && (
                     <button
                         type="button"

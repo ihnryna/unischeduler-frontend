@@ -1008,6 +1008,39 @@
     text-decoration: line-through;
 }
 
+/* Drag-and-drop of cards in the week grid (features/schedule/useEventDrag.ts).
+   Uses the theme's own card colours: the source fades, the drop target is a dashed copy. */
+.app[data-theme] .lesson-card-draggable {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.app[data-theme] .lesson-card-draggable .lesson-card-hit {
+    cursor: grab;
+}
+
+.app[data-theme] .calendar-dragging,
+.app[data-theme] .calendar-dragging .lesson-card-hit {
+    cursor: grabbing;
+}
+
+.app[data-theme] .lesson-card-drag-source {
+    opacity: 0.35;
+}
+
+.app[data-theme] .lesson-card-drag-preview {
+    z-index: 3;
+    border-style: dashed;
+    pointer-events: none;
+}
+
+.app[data-theme] .lesson-drag-time {
+    display: block;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
 /* =========================================
    MOBILE MENU (≤ 900px)
    The sidebar becomes an off-canvas menu opened by .menu-toggle in the
@@ -1208,4 +1241,62 @@
 .app[data-theme] .admin-integration-latency {
     flex-shrink: 0;
     white-space: nowrap;
+}
+
+/* =========================================
+   USER MENU — account menu opened by .profile-button in the header
+   ========================================= */
+
+.app[data-theme] .user-menu {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.app[data-theme] .user-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    z-index: 1;
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    width: max-content;
+    min-width: 220px;
+    max-width: min(300px, calc(100vw - 32px));
+    padding: 8px;
+}
+
+.app[data-theme] .user-menu-header {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    padding: 6px 10px 8px;
+}
+
+.app[data-theme] .user-menu-email {
+    overflow-wrap: anywhere;
+}
+
+.app[data-theme] .user-menu-divider {
+    margin: 2px 0;
+}
+
+.app[data-theme] .user-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    text-align: left;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.app[data-theme] .user-menu-icon {
+    flex-shrink: 0;
+    width: 16px;
+    text-align: center;
 }

@@ -1,4 +1,5 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
+import {useLocation, useNavigate} from 'react-router'
 
 import {
     ClassOverrideModal,
@@ -16,8 +17,13 @@ import {
 import {EventDetailsModal} from '../../components/events/EventDetailsModal'
 import {HiddenClassesList} from '../../components/events/HiddenClassesList'
 import {ScheduleGrid} from '../../components/schedule/ScheduleGrid'
-import {isEditablePersonalEvent} from '../../features/events/usePersonalEventMutations'
-import {hidingOverrides} from '../../features/schedule/classOverrides'
+import type {AccessDeniedState} from '../../features/auth/RequireRole'
+import {
+    isEditablePersonalEvent,
+    usePersonalEventMutations,
+} from '../../features/events/usePersonalEventMutations'
+import {buildMovePatch, hidingOverrides} from '../../features/schedule/classOverrides'
+import type {EventMove} from '../../features/schedule/eventMove'
 import {useSchedule} from '../../features/schedule/useSchedule'
 import {useClassOverrideMutations} from '../../features/schedule/useClassOverrideMutations'
 import type {CalendarEvent, PersonalEvent} from '../../types/schedule'
@@ -40,6 +46,25 @@ function canEditScheduleEvent(event: CalendarEvent): boolean {
     return isEditablePersonalEvent(event) || Boolean(event.occurrence)
 }
 
+/**
+ * What can be dragged to another time: own personal events, and university classes shown in
+ * the schedule (moving one records a one-off change for that week only, D-06).
+ */
+function canMoveScheduleEvent(event: CalendarEvent): boolean {
+    return (
+        isEditablePersonalEvent(event) ||
+        Boolean(event.occurrence && !event.occurrence.isHidden)
+    )
+}
+
+/** "21 листопада, 10:00–11:30" */
+function formatMoveTarget(move: EventMove): string {
+    const startsAt = new Date(move.startsAt)
+    return `${startsAt.getDate()} ${MONTH_NAMES_GENITIVE[startsAt.getMonth()]}, ${formatTime(
+        move.startsAt,
+    )}–${formatTime(move.endsAt)}`
+}
+
 const CLASS_CHANGE_MESSAGES: Record<ClassOverrideResult, (name: string) => string> = {
     changed: (name) => `Зміни заняття «${name}» збережено. Їх бачите лише ви.`,
     hidden: (name) => `Заняття «${name}» приховано з вашого розкладу.`,
@@ -55,8 +80,20 @@ export function SchedulePage() {
     const [editingClass, setEditingClass] = useState<EditableClass | null>(null)
     const [viewingEvent, setViewingEvent] = useState<CalendarEvent | null>(null)
     const [successMessage, setSuccessMessage] = useState<string | null>(null)
+    const [moveError, setMoveError] = useState<string | null>(null)
     // Hidden (cancelled) classes are drawn faded in the grid only on request.
     const [showHidden, setShowHidden] = useState(false)
+    // Set by RequireRole when a student opens /admin and is sent here.
+    const location = useLocation()
+    const navigate = useNavigate()
+    const [accessNotice] = useState<string | null>(
+        () => (location.state as AccessDeniedState | null)?.accessNotice ?? null,
+    )
+
+    // Drop the notice from history so a reload does not show it again.
+    useEffect(() => {
+        if (location.state) navigate(location.pathname, {replace: true, state: null})
+    }, [location.state, location.pathname, navigate])
     const {events, hiddenEvents, isLoading, error, refetch} = useSchedule(CURRENT_USER_ID, weekOffset)
     const {
         unhide,
@@ -64,6 +101,9 @@ export function SchedulePage() {
         error: restoreError,
         resetError: resetRestoreError,
     } = useClassOverrideMutations()
+    // Separate instances, so a drag-and-drop save does not disable the other forms.
+    const {save: saveClassChange} = useClassOverrideMutations()
+    const {update: updatePersonalEvent} = usePersonalEventMutations()
 
     // New events default to the selected day, else today (if visible), else Monday.
     const weekDays = getWeekDays(weekOffset)
@@ -134,8 +174,58 @@ export function SchedulePage() {
         }
     }
 
+    // Drag-and-drop in the grid. No optimistic update: the grid shows a "saving" outline
+    // until the schedule is reloaded; on failure the event stays where it was.
+    const handleMoveEvent = async (event: CalendarEvent, move: EventMove) => {
+        setSuccessMessage(null)
+        setMoveError(null)
+        const failure = `Не вдалося перенести «${event.name}». Спробуйте ще раз.`
+
+        if (event.eventType === 'PERSONAL') {
+            const saved = await updatePersonalEvent({
+                id: event.eventId,
+                name: event.name,
+                location: event.location,
+                description: event.description,
+                ...move,
+            })
+            if (!saved) {
+                setMoveError(failure)
+                return
+            }
+            await refetch()
+            setSuccessMessage(`Подію «${event.name}» перенесено: ${formatMoveTarget(move)}.`)
+            return
+        }
+
+        const occurrence = event.occurrence
+        if (!occurrence) return
+        const {patch, error: invalid} = buildMovePatch(occurrence, move.startsAt, move.endsAt)
+        if (invalid) {
+            setMoveError(invalid)
+            return
+        }
+        const ok = await saveClassChange({
+            userId: CURRENT_USER_ID,
+            courseClassId: occurrence.courseClassId,
+            existing: occurrence.occurrenceOverride,
+            patch,
+        })
+        if (!ok) {
+            setMoveError(failure)
+            return
+        }
+        await refetch()
+        setSuccessMessage(
+            patch === null
+                ? `Заняття «${event.name}» повернуто на час за розкладом університету.`
+                : `Заняття «${event.name}» перенесено: ${formatMoveTarget(move)}. Цю зміну бачите лише ви.`,
+        )
+    }
+
     const handleOpenEvent = (event: CalendarEvent) => {
         setSuccessMessage(null)
+        setMoveError(null)
         setViewingEvent(event)
     }
 
@@ -268,6 +358,10 @@ export function SchedulePage() {
                 />
             )}
 
+            {accessNotice && (
+                <p className="demo-notice" role="alert">{accessNotice}</p>
+            )}
+
             {/* Live region stays mounted so the success message is announced. */}
             <div role="status" aria-live="polite">
                 {successMessage && (
@@ -362,7 +456,16 @@ export function SchedulePage() {
                 onOpenEvent={handleOpenEvent}
                 onDeleteEvent={handleDeleteEvent}
                 canDeleteEvent={isEditablePersonalEvent}
+                onMoveEvent={handleMoveEvent}
+                canMoveEvent={canMoveScheduleEvent}
             />
+
+            {moveError && (
+                <p className="form-error-alert" role="alert">
+                    <span aria-hidden="true">!! </span>
+                    {moveError}
+                </p>
+            )}
 
             {restoreError && (
                 <p className="form-error-alert" role="alert">

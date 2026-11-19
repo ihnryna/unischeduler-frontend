@@ -2717,3 +2717,71 @@
 .app[data-theme="theme-10"] .admin-table:has(.admin-cell-actions) th:last-child {
     box-shadow: -8px 0 8px -8px rgba(41, 37, 31, 0.35);
 }
+
+/* User menu (profile button dropdown) */
+.app[data-theme="theme-10"] .profile-button[aria-expanded="true"] {
+    background: var(--retro-yellow);
+}
+
+.app[data-theme="theme-10"] .user-menu-dropdown {
+    background-color: var(--retro-paper);
+    color: var(--retro-ink);
+    border: 2px solid var(--retro-ink);
+    border-radius: 16px;
+    box-shadow: 4px 4px 0 var(--retro-ink);
+    animation: retro-modal-pop 140ms ease-out;
+}
+
+.app[data-theme="theme-10"] .user-menu-role {
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .user-menu-email {
+    font-size: 0.8rem;
+    color: var(--retro-muted);
+}
+
+.app[data-theme="theme-10"] .user-menu-divider {
+    border: 0;
+    border-top: 2px solid var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .user-menu-item {
+    background: transparent;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    color: var(--retro-ink);
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.app[data-theme="theme-10"] .user-menu-item:hover,
+.app[data-theme="theme-10"] .user-menu-item:focus-visible {
+    background-color: var(--retro-yellow);
+    border-color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .user-menu-item-logout:hover,
+.app[data-theme="theme-10"] .user-menu-item-logout:focus-visible {
+    background-color: var(--retro-pink);
+}
+
+.app[data-theme="theme-10"] .user-menu-item:focus-visible {
+    outline: 2px solid var(--retro-ink);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app[data-theme="theme-10"] .user-menu-dropdown {
+        animation: none;
+    }
+
+    .app[data-theme="theme-10"] .user-menu-item {
+        transition: none;
+    }
+}

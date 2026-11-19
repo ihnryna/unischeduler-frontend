@@ -3,15 +3,13 @@ import {HOUR_HEIGHT} from '../../features/schedule/scheduleConfig'
 import {useSubjectColors} from '../../features/schedule/subjectColors'
 import {formatTime} from '../../utils/formatTime'
 import {formatWeeksList} from '../../utils/dateUtils'
-import {isLinkLike, isValidLink} from '../../features/events/personalEventValidation'
+import {getMeetingHref} from '../../features/events/personalEventValidation'
 
 type ScheduleEventProps = {
     event: CalendarEvent
-    /**
-     * When set, the card is a button that opens the event's edit form: the personal-event
-     * form, or for a university class the form for the student's own change of it.
-     */
-    onEdit?: () => void
+    /** When set, the card is a button that opens the event's details (FE-18). */
+    onOpen?: () => void
+    /** When set, a trash button opens the delete confirmation (own personal events). */
     onDelete?: () => void
 }
 
@@ -27,13 +25,6 @@ const eventColors: Record<EventType, string> = {
     PERSONAL: 'blue',
 }
 
-/** Meeting link to open, or `null` when the location is a room / not a valid link. */
-function getMeetingHref(location: string | null): string | null {
-    if (!location || !isLinkLike(location) || !isValidLink(location)) return null
-    const trimmed = location.trim()
-    return /^www\./i.test(trimmed) ? `https://${trimmed}` : trimmed
-}
-
 function hoursFromStartOfDay(value: string) {
     const date = new Date(value)
     return date.getHours() + date.getMinutes() / 60
@@ -41,10 +32,11 @@ function hoursFromStartOfDay(value: string) {
 
 /**
  * One event card in the week grid, positioned by its start/end time. Read-only by default;
- * with `onEdit` it becomes a button that opens the edit form (FE-23). A meeting-link
- * location is rendered as a separate "Онлайн-зустріч" link.
+ * with `onOpen` the whole card is a button that opens the event's details (FE-18). A
+ * meeting-link location is rendered as a separate "Онлайн-зустріч" link. A class the student
+ * hid (shown only when the page asks for hidden classes) is drawn faded and labelled.
  */
-export function ScheduleEvent({event, onEdit, onDelete}: Readonly<ScheduleEventProps>) {
+export function ScheduleEvent({event, onOpen, onDelete}: Readonly<ScheduleEventProps>) {
     const startsAt = hoursFromStartOfDay(event.startsAt)
     const endsAt = hoursFromStartOfDay(event.endsAt)
     const {colors} = useSubjectColors()
@@ -53,9 +45,11 @@ export function ScheduleEvent({event, onEdit, onDelete}: Readonly<ScheduleEventP
         colors[event.name] ??
         (event.eventType === 'PERSONAL' ? '#c7d8ff' : '#d9c7f0')
 
-    const className = `lesson-card lesson-${eventColors[event.eventType]}`
-    const isPersonal = event.eventType === 'PERSONAL'
-    const editLabel = isPersonal ? 'Редагувати подію' : 'Змінити заняття'
+    const isHidden = Boolean(event.occurrence?.isHidden)
+    const className = `lesson-card lesson-${eventColors[event.eventType]}${
+        isHidden ? ' lesson-card-hidden' : ''
+    }`
+    const openLabel = event.eventType === 'PERSONAL' ? 'Деталі події' : 'Деталі заняття'
     const meetingHref = getMeetingHref(event.location)
     const style = {
         top: (startsAt - 8) * HOUR_HEIGHT + 4,
@@ -69,7 +63,9 @@ export function ScheduleEvent({event, onEdit, onDelete}: Readonly<ScheduleEventP
                 {formatTime(event.startsAt)} – {formatTime(event.endsAt)}
             </span>
             <strong className="lesson-title">{event.name}</strong>
-            <span className="lesson-type">{eventLabels[event.eventType]}</span>
+            <span className="lesson-type">
+                {isHidden ? 'Приховано вами' : eventLabels[event.eventType]}
+            </span>
             {meetingHref ? (
                 <a
                     className="lesson-detail lesson-link"
@@ -99,30 +95,22 @@ export function ScheduleEvent({event, onEdit, onDelete}: Readonly<ScheduleEventP
         </>
     )
 
-    if (onEdit || onDelete) {
+    if (onOpen || onDelete) {
         return (
             <article className={`${className} lesson-card-editable`} style={style}>
-                {onEdit && (
+                {onOpen && (
                     <button
                         type="button"
                         className="lesson-card-hit"
-                        onClick={onEdit}
+                        onClick={onOpen}
                         aria-haspopup="dialog"
-                        title={editLabel}
+                        title={openLabel}
                     >
-                        <span className="visually-hidden">{editLabel}: {event.name}</span>
+                        <span className="visually-hidden">{openLabel}: {event.name}</span>
                     </button>
                 )}
-                <span className="lesson-card-actions">
-                    {onEdit && (
-                        <span className="lesson-edit-icon" aria-hidden="true">
-                            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M9.5 2.5l2 2L5 11l-2.5.5L3 9z"/>
-                                <path d="M8.5 3.5l2 2"/>
-                            </svg>
-                        </span>
-                    )}
-                    {onDelete && (
+                {onDelete && (
+                    <span className="lesson-card-actions">
                         <button
                             type="button"
                             className="lesson-delete-btn"
@@ -138,8 +126,8 @@ export function ScheduleEvent({event, onEdit, onDelete}: Readonly<ScheduleEventP
                                 <path d="M6 6v3.5M8 6v3.5"/>
                             </svg>
                         </button>
-                    )}
-                </span>
+                    </span>
+                )}
                 {content}
             </article>
         )

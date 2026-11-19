@@ -18,6 +18,8 @@ import {isLinkLike, isRealDate, isValidLink} from '../events/personalEventValida
  *   cancelled this week). A cancelled occurrence keeps its original start/end.
  *
  * Field precedence: occurrence override → series override → SAZ timetable.
+ * Hiding is the exception: a hidden series (class dropped for the semester) hides every
+ * occurrence, including ones with a one-off change.
  * If several overrides of the same kind match, the newest (highest id) wins.
  */
 
@@ -93,7 +95,7 @@ export function applyClassOverrides(
         originalLocation: base.location,
         occurrenceOverride: occurrence,
         seriesOverride: series,
-        isHidden: occurrence ? occurrence.isHidden : (series?.isHidden ?? false),
+        isHidden: Boolean(occurrence?.isHidden || series?.isHidden),
     }
 
     if (!occurrence && !series) {
@@ -153,6 +155,16 @@ export function getWeekBounds(value: LocalDateTime): {min: string; max: string} 
             d.getDate(),
         ).padStart(2, '0')}`
     return {min: iso(monday), max: iso(sunday)}
+}
+
+/**
+ * Overrides that hide the occurrence (series first). Showing the class again must clear
+ * every one of them.
+ */
+export function hidingOverrides(occurrence: ClassOccurrence): ClassOverride[] {
+    return [occurrence.seriesOverride, occurrence.occurrenceOverride].filter(
+        (override): override is ClassOverride => Boolean(override?.isHidden),
+    )
 }
 
 /** Override that the form edits for the chosen scope. */

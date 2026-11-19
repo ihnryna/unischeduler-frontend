@@ -809,7 +809,6 @@
     pointer-events: none;
 }
 
-.app[data-theme] .lesson-card-editable .lesson-edit-icon,
 .app[data-theme] .lesson-card-editable .lesson-delete-btn {
     display: inline-flex;
     align-items: center;
@@ -827,8 +826,69 @@
     pointer-events: auto;
 }
 
-.app[data-theme] .lesson-card-editable .lesson-time {
-    padding-right: 52px;
+.app[data-theme] .lesson-card-editable:has(.lesson-card-actions) .lesson-time {
+    padding-right: 28px;
+}
+
+/* Event details modal (FE-18) */
+.app[data-theme] .event-details {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.app[data-theme] .event-details-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.app[data-theme] .event-details-title {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.app[data-theme] .event-details-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.app[data-theme] .event-details-list {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+.app[data-theme] .event-details-row {
+    display: grid;
+    grid-template-columns: minmax(120px, 34%) minmax(0, 1fr);
+    gap: 12px;
+    padding: 10px 0;
+}
+
+.app[data-theme] .event-details-row dt,
+.app[data-theme] .event-details-row dd {
+    margin: 0;
+    min-width: 0;
+}
+
+.app[data-theme] .event-details-row dd {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-wrap: anywhere;
+}
+
+.app[data-theme] .event-details-text {
+    white-space: pre-line;
+}
+
+@media (max-width: 480px) {
+    .app[data-theme] .event-details-row {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
 }
 
 /* Class change form (personal class override) */
@@ -914,4 +974,16 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+}
+
+/* "Показати приховані" toggle above the week grid */
+.app[data-theme] .hidden-toggle-row {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 0 10px;
+}
+
+/* A hidden class drawn in the grid on request (faded, not clickable through) */
+.app[data-theme] .lesson-card-hidden .lesson-title {
+    text-decoration: line-through;
 }

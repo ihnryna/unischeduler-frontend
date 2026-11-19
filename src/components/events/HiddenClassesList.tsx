@@ -1,4 +1,5 @@
 import type {CalendarEvent} from '../../types/schedule'
+import {hidingOverrides} from '../../features/schedule/classOverrides'
 import {DAY_NAMES_SHORT} from '../../utils/dateUtils'
 import {formatTime} from '../../utils/formatTime'
 
@@ -36,9 +37,9 @@ export function HiddenClassesList({
                     const startsAt = original?.originalStartsAt ?? event.startsAt
                     const endsAt = original?.originalEndsAt ?? event.endsAt
                     const dayName = DAY_NAMES_SHORT[(new Date(startsAt).getDay() + 6) % 7]
-                    const isSeries = !original?.occurrenceOverride
-                    const note = (original?.occurrenceOverride ?? original?.seriesOverride)
-                        ?.description
+                    const hiding = original ? hidingOverrides(original) : []
+                    const isSeries = Boolean(original?.seriesOverride?.isHidden)
+                    const note = hiding.find((override) => override.description)?.description
                     return (
                         <li key={`${event.eventType}-${event.eventId}`} className="hidden-classes-item">
                             <span className="hidden-classes-text">

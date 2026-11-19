@@ -68,8 +68,12 @@ export function ClassOverrideModal({
     const formId = `${idPrefix}-form`
     const fieldId = (field: ClassOverrideFormField) => `${idPrefix}-${field}`
 
+    // A class hidden for the whole semester opens on that change, so it can be undone.
     const initialScope: ClassOverrideScope =
-        occurrence.occurrenceOverride || !occurrence.seriesOverride ? 'occurrence' : 'series'
+        occurrence.seriesOverride?.isHidden ||
+        (occurrence.seriesOverride && !occurrence.occurrenceOverride)
+            ? 'series'
+            : 'occurrence'
     const [values, setValues] = useState<ClassOverrideFormValues>(() =>
         getInitialFormValues(occurrence, initialScope),
     )
@@ -266,6 +270,13 @@ export function ClassOverrideModal({
                         />
                         <span>Усі заняття цього предмета в семестрі</span>
                     </label>
+                    {isOccurrence && occurrence.seriesOverride?.isHidden && (
+                        <p className="form-field-hint">
+                            Це заняття приховано на весь семестр, тож зміни лише для цього
+                            тижня не будуть видні. Щоб повернути заняття, оберіть «Усі
+                            заняття…» і натисніть «Скинути зміни».
+                        </p>
+                    )}
                 </fieldset>
 
                 {isChange && isOccurrence && (

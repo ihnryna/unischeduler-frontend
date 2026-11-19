@@ -2523,7 +2523,6 @@
     outline: none;
 }
 
-.app[data-theme="theme-10"] .lesson-edit-icon,
 .app[data-theme="theme-10"] .lesson-delete-btn {
     border: 1.5px solid var(--retro-ink);
     background-color: var(--retro-paper);
@@ -2533,11 +2532,6 @@
 
 .app[data-theme="theme-10"] .lesson-delete-btn:hover {
     background-color: var(--retro-pink);
-}
-
-.app[data-theme="theme-10"] .lesson-card-editable:has(.lesson-card-hit:hover) .lesson-edit-icon,
-.app[data-theme="theme-10"] .lesson-card-editable:has(.lesson-card-hit:focus-visible) .lesson-edit-icon {
-    background-color: var(--retro-yellow);
 }
 
 .app[data-theme="theme-10"] .lesson-delete-btn:focus-visible {
@@ -2605,4 +2599,74 @@
 
 .app[data-theme="theme-10"] .hidden-classes-text span {
     color: var(--retro-muted);
+}
+
+/* Event details modal (FE-18) */
+.app[data-theme="theme-10"] .event-details-summary {
+    padding: 12px 14px;
+    background-color: var(--retro-lilac);
+    border: 1.5px solid var(--retro-ink);
+    border-radius: 12px;
+}
+
+.app[data-theme="theme-10"] .event-details-title {
+    font-size: 1.1rem;
+    font-weight: 850;
+    line-height: 1.25;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .event-details-tags .chip {
+    padding: 3px 10px;
+}
+
+.app[data-theme="theme-10"] .event-details-row + .event-details-row {
+    border-top: 1.5px dashed var(--retro-muted);
+}
+
+.app[data-theme="theme-10"] .event-details-row dt {
+    font-size: 0.8rem;
+    font-weight: 750;
+    color: var(--retro-muted);
+}
+
+.app[data-theme="theme-10"] .event-details-row dd {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .event-details-original {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--retro-muted);
+}
+
+.app[data-theme="theme-10"] .event-details-link {
+    color: var(--retro-ink);
+    font-weight: 750;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.app[data-theme="theme-10"] .event-details-link:focus-visible {
+    outline: 2px solid var(--retro-ink);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Hidden (cancelled) class shown on request: dashed, striped, no shadow.
+   Text stays ink-on-light, so contrast is unchanged. */
+.app[data-theme="theme-10"] .lesson-card.lesson-card-hidden {
+    border-style: dashed;
+    box-shadow: none;
+    background-image: repeating-linear-gradient(
+        -45deg,
+        color-mix(in srgb, var(--retro-paper) 70%, transparent) 0 6px,
+        transparent 6px 12px
+    );
+}
+
+.app[data-theme="theme-10"] .hidden-toggle[aria-pressed="true"] {
+    background-color: var(--retro-lilac);
 }

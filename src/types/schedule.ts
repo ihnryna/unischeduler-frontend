@@ -1,4 +1,4 @@
-import type {ClassOverride} from './catalog'
+import type {ClassOverride, Course} from './catalog'
 import type {LocalDateTime} from './common'
 
 export type EventType = 'COURSE_CLASS' | 'CLASS_OVERRIDE' | 'PERSONAL'
@@ -19,6 +19,11 @@ export type CalendarEvent = {
      * shown week, so the student's personal changes (`ClassOverride`) can be edited.
      */
     occurrence?: ClassOccurrence
+    /**
+     * Frontend-only (not in the backend DTO): the course of a projected university class,
+     * for the class details (department, faculty).
+     */
+    course?: Course | null
 }
 
 /** Frontend-only: one weekly occurrence of a `CourseClass` and the overrides applied to it. */

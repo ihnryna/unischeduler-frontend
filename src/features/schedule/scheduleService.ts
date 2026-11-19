@@ -129,6 +129,7 @@ export const scheduleService = {
                         startsAt: projectedStartsAt,
                         endsAt: projectedEndsAt,
                         weeks: classWeeks,
+                        course: cls.course ?? null,
                     },
                     cls.id,
                     overrides,

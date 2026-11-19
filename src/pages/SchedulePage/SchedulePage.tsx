@@ -13,9 +13,11 @@ import {
     PersonalEventModal,
     type EditablePersonalEvent,
 } from '../../components/events/PersonalEventModal'
+import {EventDetailsModal} from '../../components/events/EventDetailsModal'
 import {HiddenClassesList} from '../../components/events/HiddenClassesList'
 import {ScheduleGrid} from '../../components/schedule/ScheduleGrid'
 import {isEditablePersonalEvent} from '../../features/events/usePersonalEventMutations'
+import {hidingOverrides} from '../../features/schedule/classOverrides'
 import {useSchedule} from '../../features/schedule/useSchedule'
 import {useClassOverrideMutations} from '../../features/schedule/useClassOverrideMutations'
 import type {CalendarEvent, PersonalEvent} from '../../types/schedule'
@@ -33,7 +35,7 @@ import {formatTime} from '../../utils/formatTime'
 // TODO(FE-13): replace with useAuth().user.id
 const CURRENT_USER_ID = 1
 
-/** Personal events are edited; university classes get the student's own change form. */
+/** Own personal events are edited; university classes get the student's own change form. */
 function canEditScheduleEvent(event: CalendarEvent): boolean {
     return isEditablePersonalEvent(event) || Boolean(event.occurrence)
 }
@@ -51,7 +53,10 @@ export function SchedulePage() {
     const [editingEvent, setEditingEvent] = useState<EditablePersonalEvent | null>(null)
     const [deletingEvent, setDeletingEvent] = useState<DeletablePersonalEvent | null>(null)
     const [editingClass, setEditingClass] = useState<EditableClass | null>(null)
+    const [viewingEvent, setViewingEvent] = useState<CalendarEvent | null>(null)
     const [successMessage, setSuccessMessage] = useState<string | null>(null)
+    // Hidden (cancelled) classes are drawn faded in the grid only on request.
+    const [showHidden, setShowHidden] = useState(false)
     const {events, hiddenEvents, isLoading, error, refetch} = useSchedule(CURRENT_USER_ID, weekOffset)
     const {
         unhide,
@@ -95,6 +100,7 @@ export function SchedulePage() {
     }
 
     const handleDeleteEvent = (event: CalendarEvent) => {
+        setViewingEvent(null)
         setSuccessMessage(null)
         setDeletingEvent({
             id: event.eventId,
@@ -112,17 +118,29 @@ export function SchedulePage() {
 
     const handleRestoreClass = async (event: CalendarEvent) => {
         const occurrence = event.occurrence
-        const override = occurrence?.occurrenceOverride ?? occurrence?.seriesOverride
-        if (!occurrence || !override) return
+        if (!occurrence) return
+        const overrides = hidingOverrides(occurrence)
+        if (overrides.length === 0) return
         setSuccessMessage(null)
-        const ok = await unhide(override, occurrence)
+        let ok = true
+        for (const override of overrides) {
+            ok = await unhide(override, occurrence)
+            if (!ok) break
+        }
         if (ok) {
+            setViewingEvent(null)
             refetch()
             setSuccessMessage(`Заняття «${event.name}» знову у вашому розкладі.`)
         }
     }
 
+    const handleOpenEvent = (event: CalendarEvent) => {
+        setSuccessMessage(null)
+        setViewingEvent(event)
+    }
+
     const handleEditEvent = (event: CalendarEvent) => {
+        setViewingEvent(null)
         setSuccessMessage(null)
         resetRestoreError()
         if (event.eventType !== 'PERSONAL') {
@@ -140,6 +158,11 @@ export function SchedulePage() {
             endsAt: event.endsAt,
         })
     }
+
+    const isShowingHidden = showHidden && hiddenEvents.length > 0
+    const gridEvents = isShowingHidden
+        ? [...events, ...hiddenEvents].sort((a, b) => a.startsAt.localeCompare(b.startsAt))
+        : events
 
     const monday = getMondayOfWeek()
     monday.setDate(monday.getDate() + weekOffset * 7)
@@ -196,6 +219,25 @@ export function SchedulePage() {
                     defaultDate={defaultEventDate}
                     onClose={() => setIsCreateOpen(false)}
                     onSaved={(event) => handleEventSaved(event, 'додано')}
+                />
+            )}
+
+            {viewingEvent && (
+                <EventDetailsModal
+                    event={viewingEvent}
+                    onClose={() => setViewingEvent(null)}
+                    onEdit={
+                        canEditScheduleEvent(viewingEvent)
+                            ? () => handleEditEvent(viewingEvent)
+                            : undefined
+                    }
+                    onDelete={
+                        isEditablePersonalEvent(viewingEvent)
+                            ? () => handleDeleteEvent(viewingEvent)
+                            : undefined
+                    }
+                    onRestore={() => handleRestoreClass(viewingEvent)}
+                    isRestoring={isRestoringClass}
                 />
             )}
 
@@ -293,8 +335,23 @@ export function SchedulePage() {
                 <p className="demo-notice" role="alert">{error}</p>
             )}
 
+            {hiddenEvents.length > 0 && (
+                <div className="hidden-toggle-row">
+                    <button
+                        type="button"
+                        className="button modal-btn-secondary hidden-toggle"
+                        aria-pressed={isShowingHidden}
+                        onClick={() => setShowHidden((value) => !value)}
+                    >
+                        <span aria-hidden="true">{isShowingHidden ? '◉ ' : '◎ '}</span>
+                        {isShowingHidden ? 'Сховати приховані' : 'Показати приховані'} (
+                        {hiddenEvents.length})
+                    </button>
+                </div>
+            )}
+
             <ScheduleGrid
-                events={events}
+                events={gridEvents}
                 selectedDay={selectedDay}
                 onSelectDay={(dayIndex) => {
                     setSelectedDay((current) =>
@@ -302,9 +359,8 @@ export function SchedulePage() {
                     )
                 }}
                 weekOffset={weekOffset}
-                onEditEvent={handleEditEvent}
+                onOpenEvent={handleOpenEvent}
                 onDeleteEvent={handleDeleteEvent}
-                canEditEvent={canEditScheduleEvent}
                 canDeleteEvent={isEditablePersonalEvent}
             />
 
@@ -315,12 +371,14 @@ export function SchedulePage() {
                 </p>
             )}
 
-            <HiddenClassesList
-                events={hiddenEvents}
-                onRestore={handleRestoreClass}
-                onEdit={handleEditEvent}
-                isBusy={isRestoringClass}
-            />
+            {isShowingHidden && (
+                <HiddenClassesList
+                    events={hiddenEvents}
+                    onRestore={handleRestoreClass}
+                    onEdit={handleEditEvent}
+                    isBusy={isRestoringClass}
+                />
+            )}
 
             <div className="bottom-widgets">
                 <section className="widget" id="upcoming">

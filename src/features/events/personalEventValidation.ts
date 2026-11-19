@@ -46,6 +46,13 @@ export function isValidLink(value: string): boolean {
     }
 }
 
+/** Meeting link to open, or `null` when the location is a room / not a valid link. */
+export function getMeetingHref(location: string | null): string | null {
+    if (!location || !isLinkLike(location) || !isValidLink(location)) return null
+    const trimmed = location.trim()
+    return /^www\./i.test(trimmed) ? `https://${trimmed}` : trimmed
+}
+
 /** True for an existing calendar date in `YYYY-MM-DD` format. */
 export function isRealDate(value: string): boolean {
     if (!DATE_PATTERN.test(value)) return false

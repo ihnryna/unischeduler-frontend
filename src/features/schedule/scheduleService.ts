@@ -1,10 +1,12 @@
 import {apiClient} from '../../services/api/apiClient'
+import {classOverrideService} from '../../services/api/classOverrideService'
 import {courseService} from '../../services/api/courseService'
 import {courseClassService} from '../../services/api/courseClassService'
 import {specialityService} from '../../services/api/specialityService'
-import type {Course, CourseClass, Speciality} from '../../types/catalog'
+import type {ClassOverride, Course, CourseClass, Speciality} from '../../types/catalog'
 import type {CalendarEvent, CalendarEventFilter} from '../../types/schedule'
 import {getAcademicWeekInfo, getMondayOfWeek} from '../../utils/dateUtils'
+import {applyClassOverrides} from './classOverrides'
 
 function formatLocalDateTime(d: Date): string {
     const yyyy = d.getFullYear()
@@ -21,6 +23,12 @@ export const scheduleService = {
      * Fetches user's schedule (university classes, overrides, and personal events)
      * for the selected week. Combines backend calendar API events with recurring
      * weekly course classes so that timetable lessons repeat across semester weeks.
+     *
+     * The student's class overrides (`/class-override`) are applied here, on the frontend,
+     * to each projected occurrence (rules in `classOverrides.ts`). Class entries from
+     * `/calendar` are therefore ignored: the backend would apply an override to every week
+     * and does not drop hidden classes. Hidden occurrences are returned with
+     * `occurrence.isHidden = true` so the page can list them and offer to show them again.
      */
     async getCalendar(filters: CalendarEventFilter = {}): Promise<CalendarEvent[]> {
         const {userId = 1, weekOffset = 0} = filters
@@ -36,22 +44,26 @@ export const scheduleService = {
         const startsAt = filters.startsAt || formatLocalDateTime(monday)
         const endsAt = filters.endsAt || formatLocalDateTime(sunday)
 
-        // 1. Fetch specific week events from backend (personal events, overrides)
-        // and all classes from /api/class (the university timetable)
-        const [backendCalendarEvents, allClasses] = await Promise.all([
+        // 1. Fetch the week's personal events, all classes from /api/class (the university
+        // timetable) and this student's class overrides.
+        const [calendarEvents, allClasses, overrides] = await Promise.all([
             apiClient.get<CalendarEvent[]>('/calendar', {
                 userId,
                 startsAt,
                 endsAt,
             }).catch(() => [] as CalendarEvent[]),
             courseClassService.getAll().catch(() => [] as CourseClass[]),
+            classOverrideService.getForUser(userId).catch(() => [] as ClassOverride[]),
         ])
+        const backendCalendarEvents = (calendarEvents || []).filter(
+            (event) => event.eventType === 'PERSONAL',
+        )
 
         const {semesterWeek, isVacation, semesterName, semesterYear} = getAcademicWeekInfo(monday)
 
         // During vacation or outside teaching weeks (1-15), regular university classes do not take place
         if (isVacation || semesterWeek === null || semesterWeek < 1 || semesterWeek > 15) {
-            return backendCalendarEvents || []
+            return backendCalendarEvents
         }
 
         // Stored weeks map from admin settings if any
@@ -104,28 +116,28 @@ export const scheduleService = {
             const projectedStartsAt = `${yyyy}-${mm}-${dd}T${cleanStartTime}`
             const projectedEndsAt = `${yyyy}-${mm}-${dd}T${cleanEndTime}`
 
-            // Check if backend already has this class in calendar for this week
-            const alreadyInCalendar = (backendCalendarEvents || []).some(
-                (e) => (e.eventType === 'COURSE_CLASS' || e.eventType === 'CLASS_OVERRIDE') && e.eventId === cls.id
+            recurringCourseEvents.push(
+                applyClassOverrides(
+                    {
+                        eventId: cls.id,
+                        eventType: 'COURSE_CLASS',
+                        name: cls.course?.name || 'Навчальне заняття',
+                        teacher: cls.teacher || null,
+                        group: cls.group || null,
+                        location: cls.location || null,
+                        description: cls.course?.faculty || cls.course?.department || null,
+                        startsAt: projectedStartsAt,
+                        endsAt: projectedEndsAt,
+                        weeks: classWeeks,
+                        course: cls.course ?? null,
+                    },
+                    cls.id,
+                    overrides,
+                ),
             )
-
-            if (!alreadyInCalendar) {
-                recurringCourseEvents.push({
-                    eventId: cls.id,
-                    eventType: 'COURSE_CLASS',
-                    name: cls.course?.name || 'Навчальне заняття',
-                    teacher: cls.teacher || null,
-                    group: cls.group || null,
-                    location: cls.location || null,
-                    description: cls.course?.faculty || cls.course?.department || null,
-                    startsAt: projectedStartsAt,
-                    endsAt: projectedEndsAt,
-                    weeks: classWeeks,
-                })
-            }
         }
 
-        const combinedEvents = [...(backendCalendarEvents || []), ...recurringCourseEvents].sort((a, b) =>
+        const combinedEvents = [...backendCalendarEvents, ...recurringCourseEvents].sort((a, b) =>
             a.startsAt.localeCompare(b.startsAt)
         )
 

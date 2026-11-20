@@ -1,5 +1,11 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
+import {useLocation, useNavigate} from 'react-router'
 
+import {
+    ClassOverrideModal,
+    type ClassOverrideResult,
+    type EditableClass,
+} from '../../components/events/ClassOverrideModal'
 import {
     ConfirmDeleteDialog,
     type DeletablePersonalEvent,
@@ -8,9 +14,18 @@ import {
     PersonalEventModal,
     type EditablePersonalEvent,
 } from '../../components/events/PersonalEventModal'
+import {EventDetailsModal} from '../../components/events/EventDetailsModal'
+import {HiddenClassesList} from '../../components/events/HiddenClassesList'
 import {ScheduleGrid} from '../../components/schedule/ScheduleGrid'
-import {isEditablePersonalEvent} from '../../features/events/usePersonalEventMutations'
+import type {AccessDeniedState} from '../../features/auth/RequireRole'
+import {
+    isEditablePersonalEvent,
+    usePersonalEventMutations,
+} from '../../features/events/usePersonalEventMutations'
+import {buildMovePatch, hidingOverrides} from '../../features/schedule/classOverrides'
+import type {EventMove} from '../../features/schedule/eventMove'
 import {useSchedule} from '../../features/schedule/useSchedule'
+import {useClassOverrideMutations} from '../../features/schedule/useClassOverrideMutations'
 import type {CalendarEvent, PersonalEvent} from '../../types/schedule'
 import {
     formatWeekRange,
@@ -22,9 +37,40 @@ import {
     MONTH_SHORT_UA,
 } from '../../utils/dateUtils'
 import {formatTime} from '../../utils/formatTime'
+import {pluralUk} from '../../utils/plural'
 
 // TODO(FE-13): replace with useAuth().user.id
 const CURRENT_USER_ID = 1
+
+/** Own personal events are edited; university classes get the student's own change form. */
+function canEditScheduleEvent(event: CalendarEvent): boolean {
+    return isEditablePersonalEvent(event) || Boolean(event.occurrence)
+}
+
+/**
+ * What can be dragged to another time: own personal events, and university classes shown in
+ * the schedule (moving one records a one-off change for that week only, D-06).
+ */
+function canMoveScheduleEvent(event: CalendarEvent): boolean {
+    return (
+        isEditablePersonalEvent(event) ||
+        Boolean(event.occurrence && !event.occurrence.isHidden)
+    )
+}
+
+/** "21 листопада, 10:00–11:30" */
+function formatMoveTarget(move: EventMove): string {
+    const startsAt = new Date(move.startsAt)
+    return `${startsAt.getDate()} ${MONTH_NAMES_GENITIVE[startsAt.getMonth()]}, ${formatTime(
+        move.startsAt,
+    )}–${formatTime(move.endsAt)}`
+}
+
+const CLASS_CHANGE_MESSAGES: Record<ClassOverrideResult, (name: string) => string> = {
+    changed: (name) => `Зміни заняття «${name}» збережено. Їх бачите лише ви.`,
+    hidden: (name) => `Заняття «${name}» приховано з вашого розкладу.`,
+    restored: (name) => `Зміни заняття «${name}» скинуто.`,
+}
 
 export function SchedulePage() {
     const [weekOffset, setWeekOffset] = useState(0)
@@ -32,8 +78,41 @@ export function SchedulePage() {
     const [isCreateOpen, setIsCreateOpen] = useState(false)
     const [editingEvent, setEditingEvent] = useState<EditablePersonalEvent | null>(null)
     const [deletingEvent, setDeletingEvent] = useState<DeletablePersonalEvent | null>(null)
+    const [editingClass, setEditingClass] = useState<EditableClass | null>(null)
+    const [viewingEvent, setViewingEvent] = useState<CalendarEvent | null>(null)
     const [successMessage, setSuccessMessage] = useState<string | null>(null)
-    const {events, isLoading, error, refetch} = useSchedule(CURRENT_USER_ID, weekOffset)
+    const [moveError, setMoveError] = useState<string | null>(null)
+    // Hidden (cancelled) classes are drawn faded in the grid only on request.
+    const [showHidden, setShowHidden] = useState(false)
+    // Set by RequireRole when a student opens /admin and is sent here.
+    const location = useLocation()
+    const navigate = useNavigate()
+    const [accessNotice] = useState<string | null>(
+        () => (location.state as AccessDeniedState | null)?.accessNotice ?? null,
+    )
+
+    // The success toast floats over the page (it no longer pushes the grid down) and
+    // hides itself after a few seconds; the close button hides it at once.
+    useEffect(() => {
+        if (!successMessage) return
+        const timer = window.setTimeout(() => setSuccessMessage(null), 6000)
+        return () => window.clearTimeout(timer)
+    }, [successMessage])
+
+    // Drop the notice from history so a reload does not show it again.
+    useEffect(() => {
+        if (location.state) navigate(location.pathname, {replace: true, state: null})
+    }, [location.state, location.pathname, navigate])
+    const {events, hiddenEvents, isLoading, error, refetch} = useSchedule(CURRENT_USER_ID, weekOffset)
+    const {
+        unhide,
+        isSaving: isRestoringClass,
+        error: restoreError,
+        resetError: resetRestoreError,
+    } = useClassOverrideMutations()
+    // Separate instances, so a drag-and-drop save does not disable the other forms.
+    const {save: saveClassChange} = useClassOverrideMutations()
+    const {update: updatePersonalEvent} = usePersonalEventMutations()
 
     // New events default to the selected day, else today (if visible), else Monday.
     const weekDays = getWeekDays(weekOffset)
@@ -70,6 +149,7 @@ export function SchedulePage() {
     }
 
     const handleDeleteEvent = (event: CalendarEvent) => {
+        setViewingEvent(null)
         setSuccessMessage(null)
         setDeletingEvent({
             id: event.eventId,
@@ -79,8 +159,95 @@ export function SchedulePage() {
         })
     }
 
-    const handleEditEvent = (event: CalendarEvent) => {
+    const handleClassSaved = (name: string, result: ClassOverrideResult) => {
+        setEditingClass(null)
+        refetch()
+        setSuccessMessage(CLASS_CHANGE_MESSAGES[result](name))
+    }
+
+    const handleRestoreClass = async (event: CalendarEvent) => {
+        const occurrence = event.occurrence
+        if (!occurrence) return
+        const overrides = hidingOverrides(occurrence)
+        if (overrides.length === 0) return
         setSuccessMessage(null)
+        let ok = true
+        for (const override of overrides) {
+            ok = await unhide(override, occurrence)
+            if (!ok) break
+        }
+        if (ok) {
+            setViewingEvent(null)
+            refetch()
+            setSuccessMessage(`Заняття «${event.name}» знову у вашому розкладі.`)
+        }
+    }
+
+    // Drag-and-drop in the grid. No optimistic update: the grid shows a "saving" outline
+    // until the schedule is reloaded; on failure the event stays where it was.
+    const handleMoveEvent = async (event: CalendarEvent, move: EventMove) => {
+        setSuccessMessage(null)
+        setMoveError(null)
+        const failure = `Не вдалося перенести «${event.name}». Спробуйте ще раз.`
+
+        if (event.eventType === 'PERSONAL') {
+            const saved = await updatePersonalEvent({
+                id: event.eventId,
+                name: event.name,
+                location: event.location,
+                description: event.description,
+                ...move,
+            })
+            if (!saved) {
+                setMoveError(failure)
+                return
+            }
+            await refetch()
+            setSuccessMessage(`Подію «${event.name}» перенесено: ${formatMoveTarget(move)}.`)
+            return
+        }
+
+        const occurrence = event.occurrence
+        if (!occurrence) return
+        const {patch, error: invalid} = buildMovePatch(occurrence, move.startsAt, move.endsAt)
+        if (invalid) {
+            setMoveError(invalid)
+            return
+        }
+        const ok = await saveClassChange({
+            userId: CURRENT_USER_ID,
+            courseClassId: occurrence.courseClassId,
+            existing: occurrence.occurrenceOverride,
+            patch,
+        })
+        if (!ok) {
+            setMoveError(failure)
+            return
+        }
+        await refetch()
+        setSuccessMessage(
+            patch === null
+                ? `Заняття «${event.name}» повернуто на час за розкладом університету.`
+                : `Заняття «${event.name}» перенесено: ${formatMoveTarget(move)}. Цю зміну бачите лише ви.`,
+        )
+    }
+
+    const handleOpenEvent = (event: CalendarEvent) => {
+        setSuccessMessage(null)
+        setMoveError(null)
+        setViewingEvent(event)
+    }
+
+    const handleEditEvent = (event: CalendarEvent) => {
+        setViewingEvent(null)
+        setSuccessMessage(null)
+        resetRestoreError()
+        if (event.eventType !== 'PERSONAL') {
+            if (event.occurrence) {
+                setEditingClass({name: event.name, occurrence: event.occurrence})
+            }
+            return
+        }
         setEditingEvent({
             id: event.eventId,
             name: event.name,
@@ -90,6 +257,11 @@ export function SchedulePage() {
             endsAt: event.endsAt,
         })
     }
+
+    const isShowingHidden = showHidden && hiddenEvents.length > 0
+    const gridEvents = isShowingHidden
+        ? [...events, ...hiddenEvents].sort((a, b) => a.startsAt.localeCompare(b.startsAt))
+        : events
 
     const monday = getMondayOfWeek()
     monday.setDate(monday.getDate() + weekOffset * 7)
@@ -149,6 +321,25 @@ export function SchedulePage() {
                 />
             )}
 
+            {viewingEvent && (
+                <EventDetailsModal
+                    event={viewingEvent}
+                    onClose={() => setViewingEvent(null)}
+                    onEdit={
+                        canEditScheduleEvent(viewingEvent)
+                            ? () => handleEditEvent(viewingEvent)
+                            : undefined
+                    }
+                    onDelete={
+                        isEditablePersonalEvent(viewingEvent)
+                            ? () => handleDeleteEvent(viewingEvent)
+                            : undefined
+                    }
+                    onRestore={() => handleRestoreClass(viewingEvent)}
+                    isRestoring={isRestoringClass}
+                />
+            )}
+
             {editingEvent && (
                 <PersonalEventModal
                     mode="edit"
@@ -156,6 +347,15 @@ export function SchedulePage() {
                     onClose={() => setEditingEvent(null)}
                     onSaved={(event) => handleEventSaved(event, 'оновлено')}
                     onDeleted={handleEventDeleted}
+                />
+            )}
+
+            {editingClass && (
+                <ClassOverrideModal
+                    classItem={editingClass}
+                    userId={CURRENT_USER_ID}
+                    onClose={() => setEditingClass(null)}
+                    onSaved={(result) => handleClassSaved(editingClass.name, result)}
                 />
             )}
 
@@ -167,12 +367,26 @@ export function SchedulePage() {
                 />
             )}
 
+            {accessNotice && (
+                <p className="demo-notice" role="alert">{accessNotice}</p>
+            )}
+
             {/* Live region stays mounted so the success message is announced. */}
-            <div role="status" aria-live="polite">
+            <div className="toast-region" role="status" aria-live="polite">
                 {successMessage && (
-                    <p className="form-success-notice">
-                        <span aria-hidden="true">✓ </span>
-                        {successMessage}
+                    <p className="form-success-notice toast">
+                        <span>
+                            <span aria-hidden="true">✓ </span>
+                            {successMessage}
+                        </span>
+                        <button
+                            type="button"
+                            className="toast-close"
+                            onClick={() => setSuccessMessage(null)}
+                            aria-label="Закрити повідомлення"
+                        >
+                            ×
+                        </button>
                     </p>
                 )}
             </div>
@@ -234,8 +448,23 @@ export function SchedulePage() {
                 <p className="demo-notice" role="alert">{error}</p>
             )}
 
+            {hiddenEvents.length > 0 && (
+                <div className="hidden-toggle-row">
+                    <button
+                        type="button"
+                        className="button modal-btn-secondary hidden-toggle"
+                        aria-pressed={isShowingHidden}
+                        onClick={() => setShowHidden((value) => !value)}
+                    >
+                        <span aria-hidden="true">{isShowingHidden ? '◉ ' : '◎ '}</span>
+                        {isShowingHidden ? 'Сховати приховані' : 'Показати приховані'} (
+                        {hiddenEvents.length})
+                    </button>
+                </div>
+            )}
+
             <ScheduleGrid
-                events={events}
+                events={gridEvents}
                 selectedDay={selectedDay}
                 onSelectDay={(dayIndex) => {
                     setSelectedDay((current) =>
@@ -243,10 +472,35 @@ export function SchedulePage() {
                     )
                 }}
                 weekOffset={weekOffset}
-                onEditEvent={handleEditEvent}
+                onOpenEvent={handleOpenEvent}
                 onDeleteEvent={handleDeleteEvent}
-                canEditEvent={isEditablePersonalEvent}
+                canDeleteEvent={isEditablePersonalEvent}
+                onMoveEvent={handleMoveEvent}
+                canMoveEvent={canMoveScheduleEvent}
             />
+
+            {moveError && (
+                <p className="form-error-alert" role="alert">
+                    <span aria-hidden="true">!! </span>
+                    {moveError}
+                </p>
+            )}
+
+            {restoreError && (
+                <p className="form-error-alert" role="alert">
+                    <span aria-hidden="true">!! </span>
+                    {restoreError}
+                </p>
+            )}
+
+            {isShowingHidden && (
+                <HiddenClassesList
+                    events={hiddenEvents}
+                    onRestore={handleRestoreClass}
+                    onEdit={handleEditEvent}
+                    isBusy={isRestoringClass}
+                />
+            )}
 
             <div className="bottom-widgets">
                 <section className="widget" id="upcoming">
@@ -295,12 +549,12 @@ export function SchedulePage() {
                     <div className="overview-stats">
                         <div>
                             <strong>{events.length}</strong>
-                            <span>подій</span>
+                            <span>{pluralUk(events.length, ['подія', 'події', 'подій'])}</span>
                         </div>
 
                         <div>
                             <strong>{uniqueDaysCount}</strong>
-                            <span>навчальних днів</span>
+                            <span>{pluralUk(uniqueDaysCount, ['навчальний день', 'навчальні дні', 'навчальних днів'])}</span>
                         </div>
 
                         <div>
@@ -309,7 +563,12 @@ export function SchedulePage() {
                                     maximumFractionDigits: 1,
                                 })}
                             </strong>
-                            <span>годин</span>
+                            <span>
+                                {/* A fractional count takes "години" (5,3 години). */}
+                                {Number.isInteger(Math.round(totalHours * 10) / 10)
+                                    ? pluralUk(totalHours, ['година', 'години', 'годин'])
+                                    : 'години'}
+                            </span>
                         </div>
                     </div>
                 </section>

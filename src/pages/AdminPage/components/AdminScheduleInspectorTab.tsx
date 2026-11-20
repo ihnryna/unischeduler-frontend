@@ -2,6 +2,7 @@ import {useMemo, useState} from 'react'
 import type {CourseClass, Speciality} from '../../../types/catalog'
 import {mockSpecialities} from '../../../mocks/specialities'
 import {formatWeeksList} from '../../../utils/dateUtils'
+import {countUk} from '../../../utils/plural'
 
 type AdminScheduleInspectorTabProps = {
     classes: CourseClass[]
@@ -70,7 +71,7 @@ export function AdminScheduleInspectorTab({
                 <div className="admin-inspector-controls">
                     <div className="admin-inspector-stats">
                         <span className="admin-badge admin-badge-info">
-                            {inspectedClasses.length} навчальних пар
+                            {countUk(inspectedClasses.length, ['навчальна пара', 'навчальні пари', 'навчальних пар'])}
                         </span>
                         <span className="admin-badge admin-badge-success">
                             ✓ Колізій не виявлено
@@ -93,7 +94,7 @@ export function AdminScheduleInspectorTab({
                         <div className="admin-day-card" key={day.dayIndex}>
                             <div className="admin-day-card-header">
                                 <strong className="admin-day-name">{day.name}</strong>
-                                <span className="admin-day-count">{dayClasses.length} пар</span>
+                                <span className="admin-day-count">{countUk(dayClasses.length, ['пара', 'пари', 'пар'])}</span>
                             </div>
 
                             <div className="admin-day-card-body">

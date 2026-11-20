@@ -11,14 +11,19 @@ import {SettingsPage} from '../pages/SettingsPage/SettingsPage'
 import { GeneralSchedulePage } from '../pages/GeneralSchedulePage/GeneralSchedulePage'
 import { GoogleCalendarPage } from '../pages/GoogleCalendarPage/GoogleCalendarPage'
 import { AdminPage } from '../pages/AdminPage/AdminPage'
+import {NotFoundPage} from '../pages/NotFoundPage/NotFoundPage'
 
+import {RequireAuth} from '../features/auth/RequireAuth'
+import {RequireRole} from '../features/auth/RequireRole'
+import {useAuthSession} from '../features/auth/useAuthSession'
 import {useSchedule} from '../features/schedule/useSchedule'
 
 function MainLayout() {
     const {events} = useSchedule()
+    const {user, logout} = useAuthSession()
 
     return (
-        <AppLayout lessonCount={events.length}>
+        <AppLayout lessonCount={events.length} user={user} onLogout={logout}>
             <Outlet/>
         </AppLayout>
     )
@@ -31,7 +36,12 @@ export const router = createBrowserRouter([
     },
     {
         path: '/',
-        element: <MainLayout />,
+        // Every route below needs a signed-in user (Q-06 default: only /login is public).
+        element: (
+            <RequireAuth>
+                <MainLayout />
+            </RequireAuth>
+        ),
         children: [
             {
                 index: true,
@@ -55,7 +65,15 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'admin',
-                element: <AdminPage />,
+                element: (
+                    <RequireRole role="ADMIN">
+                        <AdminPage />
+                    </RequireRole>
+                ),
+            },
+            {
+                path: '*',
+                element: <NotFoundPage />,
             },
         ],
     }

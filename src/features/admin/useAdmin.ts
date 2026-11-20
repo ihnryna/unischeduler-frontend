@@ -8,6 +8,7 @@ import type {
     CourseFormData,
     SystemIntegration,
 } from './adminTypes'
+import {countUk} from '../../utils/plural'
 
 export function useAdmin() {
     const [courses, setCourses] = useState<Course[]>([])
@@ -149,7 +150,7 @@ export function useAdmin() {
             setSyncStatus(result)
             setAuditLogs(adminService.getAuditLogs())
             showNotification(
-                `Синхронізація завершена! Актуалізовано ${result.recordsCourses} дисциплін та ${result.recordsClasses} занять.`,
+                `Синхронізація завершена! Актуалізовано ${countUk(result.recordsCourses, ['дисципліну', 'дисципліни', 'дисциплін'])} та ${countUk(result.recordsClasses, ['заняття', 'заняття', 'занять'])}.`,
             )
         } catch {
             showNotification('Помилка з’єднання із сервером САЗ. Перевірте мережу.', 'error')

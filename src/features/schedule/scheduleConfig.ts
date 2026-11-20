@@ -8,9 +8,6 @@ export const DAYS = [
     { name: 'Нд', date: 1 },
 ]
 
-export const HOURS = Array.from({ length: 11 }, (_, index) => index + 8)
-export const HOUR_HEIGHT = 90
-
 /** Standard NaUKMA class slots ("пари"), used as time presets in forms. */
 export const PAIR_TIME_SLOTS = [
     {start: '08:30', end: '09:50'},

@@ -1,18 +1,58 @@
-import {useLocation} from 'react-router'
+import type {RefObject} from 'react'
+import {Link, useLocation} from 'react-router'
 
-export function AppHeader() {
+import {UserMenu, type UserMenuUser} from './UserMenu'
+
+type AppHeaderProps = {
+    isSidebarOpen: boolean
+    onToggleSidebar: () => void
+    menuButtonRef: RefObject<HTMLButtonElement | null>
+    user: UserMenuUser | null
+    onLogout: () => void
+    onUserMenuOpen?: () => void
+}
+
+export function AppHeader({
+    isSidebarOpen,
+    onToggleSidebar,
+    menuButtonRef,
+    user,
+    onLogout,
+    onUserMenuOpen,
+}: Readonly<AppHeaderProps>) {
     const location = useLocation()
     const isAdminPage = location.pathname.startsWith('/admin')
 
     return (
         <header className="topbar">
-            <a className="brand" href="#" aria-label="UNIScheduler — головна">
-                <span className="brand-logo">UNI</span>
+            <div className="topbar-left">
+                {/* Shown only on narrow screens, where the sidebar is hidden (layout.css). */}
+                <button
+                    ref={menuButtonRef}
+                    type="button"
+                    className="menu-toggle"
+                    aria-controls="app-sidebar"
+                    aria-expanded={isSidebarOpen}
+                    aria-label={isSidebarOpen ? 'Закрити меню' : 'Відкрити меню'}
+                    onClick={onToggleSidebar}
+                >
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                        {isSidebarOpen ? (
+                            <path d="M5 5l10 10M15 5L5 15"/>
+                        ) : (
+                            <path d="M3 5h14M3 10h14M3 15h14"/>
+                        )}
+                    </svg>
+                </button>
 
-                <span className="brand-text">
-                    <strong>UNIScheduler</strong>
-                </span>
-            </a>
+                <Link className="brand" to="/" aria-label="UNIScheduler — головна">
+                    <span className="brand-logo">UNI</span>
+
+                    <span className="brand-text">
+                        <strong>UNIScheduler</strong>
+                    </span>
+                </Link>
+            </div>
 
             <div className="topbar-right">
                 {isAdminPage && (
@@ -25,12 +65,7 @@ export function AppHeader() {
                     Осінній семестр · 2026
                 </span>
 
-                <button
-                    className="profile-button"
-                    aria-label="Профіль користувача"
-                >
-                    ІГ
-                </button>
+                <UserMenu user={user} onLogout={onLogout} onOpen={onUserMenuOpen}/>
             </div>
         </header>
     )

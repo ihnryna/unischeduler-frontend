@@ -9,6 +9,7 @@ import {AdminAuditLogsTab} from './components/AdminAuditLogsTab'
 import {CourseModal} from './components/CourseModal'
 import {ClassModal} from './components/ClassModal'
 import {ConfirmModal} from './components/ConfirmModal'
+import {Icon} from '../../components/ui/Icon'
 
 type AdminTab = 'OVERVIEW' | 'COURSES' | 'CLASSES' | 'INSPECTOR' | 'LOGS'
 
@@ -105,12 +106,9 @@ export function AdminPage() {
     return (
         <section className="admin-page-container">
             {/* Top Heading */}
-            <div className="page-heading admin-page-heading" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+            <div className="page-heading admin-page-heading">
                 <div>
                     <h1>Адміністративна панель</h1>
-                    <p style={{margin: '4px 0 0 0', color: 'var(--color-muted, #64748b)', fontSize: '0.9rem'}}>
-                        Керування базою даних Spring Boot + PostgreSQL, дисциплінами та розкладом
-                    </p>
                 </div>
                 <div>
                     <button
@@ -145,7 +143,7 @@ export function AdminPage() {
                     className={`admin-tab-btn ${activeTab === 'OVERVIEW' ? 'is-active' : ''}`}
                     onClick={() => setActiveTab('OVERVIEW')}
                 >
-                    <span className="admin-tab-icon">📊</span>
+                    <Icon name="chart" className="admin-tab-icon"/>
                     <span>Огляд та інтеграції</span>
                 </button>
 
@@ -154,7 +152,7 @@ export function AdminPage() {
                     className={`admin-tab-btn ${activeTab === 'COURSES' ? 'is-active' : ''}`}
                     onClick={() => setActiveTab('COURSES')}
                 >
-                    <span className="admin-tab-icon">📚</span>
+                    <Icon name="book" className="admin-tab-icon"/>
                     <span>Дисципліни</span>
                     <span className="admin-tab-counter">{courses.length}</span>
                 </button>
@@ -164,7 +162,7 @@ export function AdminPage() {
                     className={`admin-tab-btn ${activeTab === 'CLASSES' ? 'is-active' : ''}`}
                     onClick={() => setActiveTab('CLASSES')}
                 >
-                    <span className="admin-tab-icon">🗓️</span>
+                    <Icon name="calendar" className="admin-tab-icon"/>
                     <span>Розклад занять</span>
                     <span className="admin-tab-counter">{classes.length}</span>
                 </button>
@@ -174,7 +172,7 @@ export function AdminPage() {
                     className={`admin-tab-btn ${activeTab === 'INSPECTOR' ? 'is-active' : ''}`}
                     onClick={() => setActiveTab('INSPECTOR')}
                 >
-                    <span className="admin-tab-icon">🔍</span>
+                    <Icon name="search" className="admin-tab-icon"/>
                     <span>Перегляд розкладів</span>
                 </button>
 
@@ -183,7 +181,7 @@ export function AdminPage() {
                     className={`admin-tab-btn ${activeTab === 'LOGS' ? 'is-active' : ''}`}
                     onClick={() => setActiveTab('LOGS')}
                 >
-                    <span className="admin-tab-icon">📋</span>
+                    <Icon name="clipboard" className="admin-tab-icon"/>
                     <span>Журнал аудиту</span>
                     <span className="admin-tab-counter">{auditLogs.length}</span>
                 </button>

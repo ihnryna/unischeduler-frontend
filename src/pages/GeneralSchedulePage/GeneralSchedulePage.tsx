@@ -4,6 +4,7 @@ import {courseService} from '../../services/api/courseService'
 import {courseClassService} from '../../services/api/courseClassService'
 import {specialityService} from '../../services/api/specialityService'
 import {Loader} from '../../components/ui/Loader'
+import {countUk} from '../../utils/plural'
 
 const DAYS = [
     {dayIndex: 1, name: 'Понеділок'},
@@ -110,16 +111,11 @@ export function GeneralSchedulePage() {
     }
 
     return (
-        <section className="schedule-page" style={{padding: '1.5rem', maxWidth: '1400px', margin: '0 auto'}}>
-            {/* Header */}
-            <div className="page-heading" style={{marginBottom: '1.5rem'}}>
+        <section className="schedule-page">
+            {/* Header — same heading style as the other pages */}
+            <div className="page-heading">
                 <div>
-                    <h1 style={{fontSize: '1.75rem', fontWeight: 700, margin: 0}}>
-                        Загальний розклад НаУКМА
-                    </h1>
-                    <p style={{margin: '6px 0 0 0', color: 'var(--color-muted, #64748b)'}}>
-                        Перегляд університетського розкладу навчальних груп, спеціальностей та дисциплін
-                    </p>
+                    <h1>Загальний розклад НаУКМА</h1>
                 </div>
             </div>
 
@@ -136,7 +132,7 @@ export function GeneralSchedulePage() {
                 }}
             >
                 {/* Speciality selector */}
-                <div style={{flex: '1 1 220px', minWidth: '200px'}}>
+                <div style={{flex: '1 1 220px', minWidth: 'min(200px, 100%)'}}>
                     <label
                         htmlFor="filter-spec"
                         style={{display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px'}}
@@ -164,7 +160,7 @@ export function GeneralSchedulePage() {
                 </div>
 
                 {/* Course selector */}
-                <div style={{flex: '1 1 240px', minWidth: '200px'}}>
+                <div style={{flex: '1 1 240px', minWidth: 'min(200px, 100%)'}}>
                     <label
                         htmlFor="filter-course"
                         style={{display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px'}}
@@ -190,7 +186,7 @@ export function GeneralSchedulePage() {
                 </div>
 
                 {/* Group selector */}
-                <div style={{flex: '0 1 160px', minWidth: '130px'}}>
+                <div style={{flex: '0 1 160px', minWidth: 'min(130px, 100%)'}}>
                     <label
                         htmlFor="filter-group"
                         style={{display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px'}}
@@ -214,7 +210,7 @@ export function GeneralSchedulePage() {
                 </div>
 
                 {/* Search query */}
-                <div style={{flex: '2 1 260px', minWidth: '220px'}}>
+                <div style={{flex: '2 1 260px', minWidth: 'min(220px, 100%)'}}>
                     <label
                         htmlFor="filter-search"
                         style={{display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px'}}
@@ -252,13 +248,11 @@ export function GeneralSchedulePage() {
             {/* Error state */}
             {error && (
                 <div
-                    className="card"
+                    className="card notice notice-error"
+                    role="alert"
                     style={{
                         padding: '1.25rem',
                         marginBottom: '1.5rem',
-                        backgroundColor: '#fee2e2',
-                        borderColor: '#f87171',
-                        color: '#991b1b',
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
@@ -281,11 +275,10 @@ export function GeneralSchedulePage() {
             {/* Empty state */}
             {!isLoading && !error && filteredClasses.length === 0 && (
                 <div
-                    className="card"
+                    className="card text-muted"
                     style={{
                         padding: '3rem',
                         textAlign: 'center',
-                        color: 'var(--color-muted, #64748b)',
                     }}
                 >
                     <p style={{fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem'}}>
@@ -302,7 +295,9 @@ export function GeneralSchedulePage() {
                 <div
                     style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
+                        // min(…, 100%) lets a day card shrink below 360px on phones
+                        // instead of widening the whole page.
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(min(360px, 100%), 1fr))',
                         gap: '1.25rem',
                     }}
                 >
@@ -322,10 +317,9 @@ export function GeneralSchedulePage() {
                                 }}
                             >
                                 <div
+                                    className="gs-day-header"
                                     style={{
                                         padding: '0.85rem 1.25rem',
-                                        backgroundColor: 'var(--color-surface-hover, rgba(0,0,0,0.03))',
-                                        borderBottom: '1px solid var(--color-border)',
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         alignItems: 'center',
@@ -333,17 +327,17 @@ export function GeneralSchedulePage() {
                                 >
                                     <strong style={{fontSize: '1rem'}}>{day.name}</strong>
                                     <span className="badge" style={{fontSize: '0.8rem', padding: '2px 8px'}}>
-                                        {dayClasses.length} {dayClasses.length === 1 ? 'пара' : 'пар'}
+                                        {countUk(dayClasses.length, ['пара', 'пари', 'пар'])}
                                     </span>
                                 </div>
 
                                 <div style={{padding: '1rem', flex: 1}}>
                                     {dayClasses.length === 0 ? (
                                         <div
+                                            className="text-muted"
                                             style={{
                                                 padding: '1.5rem',
                                                 textAlign: 'center',
-                                                color: 'var(--color-muted, #94a3b8)',
                                                 fontSize: '0.9rem',
                                             }}
                                         >
@@ -356,12 +350,8 @@ export function GeneralSchedulePage() {
                                                 return (
                                                     <div
                                                         key={cls.id}
-                                                        style={{
-                                                            padding: '0.85rem',
-                                                            borderRadius: 'var(--radius-small, 6px)',
-                                                            border: '1px solid var(--color-border)',
-                                                            backgroundColor: 'var(--color-surface)',
-                                                        }}
+                                                        className="gs-class"
+                                                        style={{padding: '0.85rem'}}
                                                     >
                                                         <div
                                                             style={{
@@ -375,7 +365,6 @@ export function GeneralSchedulePage() {
                                                                 style={{
                                                                     fontSize: '0.85rem',
                                                                     fontWeight: 700,
-                                                                    color: 'var(--color-primary-text, #2563eb)',
                                                                 }}
                                                             >
                                                                 ⏱ {timeRange}
@@ -399,9 +388,9 @@ export function GeneralSchedulePage() {
                                                         </div>
 
                                                         <div
+                                                            className="text-muted"
                                                             style={{
                                                                 fontSize: '0.85rem',
-                                                                color: 'var(--color-muted, #64748b)',
                                                                 display: 'flex',
                                                                 flexDirection: 'column',
                                                                 gap: '3px',

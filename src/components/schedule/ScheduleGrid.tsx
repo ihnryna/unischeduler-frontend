@@ -1,5 +1,9 @@
+import {useRef} from 'react'
+
 import type {CalendarEvent} from '../../types/schedule'
-import {HOURS} from '../../features/schedule/scheduleConfig'
+import type {EventMove} from '../../features/schedule/eventMove'
+import {getHourRange, getHourRows, getOverlapLayout} from '../../features/schedule/gridHours'
+import {useEventDrag} from '../../features/schedule/useEventDrag'
 import {getWeekDays} from '../../utils/dateUtils'
 import {ScheduleEvent} from './ScheduleEvent'
 
@@ -8,23 +12,36 @@ type ScheduleGridProps = {
     selectedDay: number | null
     onSelectDay: (dayIndex: number) => void
     weekOffset: number
-    /** Opens the edit form for an event; only called for events `canEditEvent` allows. */
-    onEditEvent?: (event: CalendarEvent) => void
+    /** Opens an event's details when its card is clicked. Without it the cards are static. */
+    onOpenEvent?: (event: CalendarEvent) => void
     onDeleteEvent?: (event: CalendarEvent) => void
-    /** Which events are editable. Without it (or `onEditEvent`) the grid is read-only. */
-    canEditEvent?: (event: CalendarEvent) => boolean
+    /** Which events show a delete button. Without it (or `onDeleteEvent`) none do. */
+    canDeleteEvent?: (event: CalendarEvent) => boolean
+    /**
+     * Saves an event dragged to a new day/time of the shown week. Resolve it once the
+     * schedule shows the result: the drop preview stays until then. Without it (or
+     * `canMoveEvent`) nothing can be dragged.
+     */
+    onMoveEvent?: (event: CalendarEvent, move: EventMove) => Promise<unknown>
+    /** Which events can be dragged. */
+    canMoveEvent?: (event: CalendarEvent) => boolean
 }
+
+const eventKey = (event: CalendarEvent) => `${event.eventType}-${event.eventId}`
 
 export function ScheduleGrid({
     events,
     selectedDay,
     onSelectDay,
     weekOffset,
-    onEditEvent,
+    onOpenEvent,
     onDeleteEvent,
-    canEditEvent,
+    canDeleteEvent,
+    onMoveEvent,
+    canMoveEvent,
 }: Readonly<ScheduleGridProps>) {
     const weekDays = getWeekDays(weekOffset)
+    const bodyRef = useRef<HTMLDivElement>(null)
 
     const getDayIndex = (event: CalendarEvent) => {
         const sundayBasedDay = new Date(event.startsAt).getDay()
@@ -35,8 +52,22 @@ export function ScheduleGrid({
         (event) => selectedDay === null || getDayIndex(event) === selectedDay,
     )
 
+    // Range from all events, not only the selected day, so the grid does not jump
+    // when a day is selected.
+    const hourRange = getHourRange(events)
+    const hours = getHourRows(hourRange)
+
+    const {preview, isDragging, getDragHandlers} = useEventDrag({
+        containerRef: bodyRef,
+        hourRange,
+        weekDays,
+        canMove: canMoveEvent,
+        onMove: onMoveEvent,
+    })
+    const previewKey = preview ? eventKey(preview.event) : null
+
     return (
-        <section className="calendar" id="calendar">
+        <section className={`calendar${isDragging ? ' calendar-dragging' : ''}`} id="calendar">
             <div className="calendar-header">
                 <div className="time-header" aria-hidden="true" />
 
@@ -56,9 +87,9 @@ export function ScheduleGrid({
                 ))}
             </div>
 
-            <div className="calendar-body">
+            <div className="calendar-body" ref={bodyRef}>
                 <div className="time-column">
-                    {HOURS.map((hour) => (
+                    {hours.map((hour) => (
                         <div className="time-label" key={hour}>
                             {String(hour).padStart(2, '0')}:00
                         </div>
@@ -71,29 +102,45 @@ export function ScheduleGrid({
                             selectedDay === day.dayIndex ? 'day-column-selected' : ''
                         } ${day.isToday ? 'day-column-today' : ''}`}
                         key={day.isoDate}
+                        data-day-index={day.dayIndex}
                     >
-                        {HOURS.map((hour) => (
+                        {hours.map((hour) => (
                             <div className="hour-slot" key={hour} />
                         ))}
 
-                        {visibleEvents
-                            .filter((event) => getDayIndex(event) === day.dayIndex)
-                            .map((event) => (
+                        {(() => {
+                            const dayEvents = visibleEvents.filter(
+                                (event) => getDayIndex(event) === day.dayIndex,
+                            )
+                            // Overlapping events sit side by side instead of covering each other.
+                            const overlap = getOverlapLayout(dayEvents, eventKey)
+                            return dayEvents.map((event) => (
                                 <ScheduleEvent
-                                    key={`${event.eventType}-${event.eventId}`}
+                                    key={eventKey(event)}
                                     event={event}
-                                    onEdit={
-                                        onEditEvent && canEditEvent?.(event)
-                                            ? () => onEditEvent(event)
-                                            : undefined
-                                    }
+                                    firstHour={hourRange.first}
+                                    overlap={overlap.get(eventKey(event))}
+                                    onOpen={onOpenEvent ? () => onOpenEvent(event) : undefined}
                                     onDelete={
-                                        onDeleteEvent && canEditEvent?.(event)
+                                        onDeleteEvent && canDeleteEvent?.(event)
                                             ? () => onDeleteEvent(event)
                                             : undefined
                                     }
+                                    dragHandlers={getDragHandlers(event)}
+                                    dragState={
+                                        eventKey(event) === previewKey ? 'source' : undefined
+                                    }
                                 />
-                            ))}
+                            ))
+                        })()}
+
+                        {preview?.dayIndex === day.dayIndex && (
+                            <ScheduleEvent
+                                event={{...preview.event, ...preview.move}}
+                                firstHour={hourRange.first}
+                                dragState={preview.isSaving ? 'saving' : 'preview'}
+                            />
+                        )}
                     </div>
                 ))}
             </div>

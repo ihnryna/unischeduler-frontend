@@ -85,6 +85,9 @@
 }
 
 .app[data-theme] .calendar {
+    /* Height of one hour row. ScheduleEvent positions cards with the same value. */
+    --hour-height: 90px;
+
     width: 100%;
     min-width: 0;
     overflow: hidden;
@@ -118,14 +121,13 @@
 .app[data-theme] .day-column {
     position: relative;
     min-width: 0;
-    height: 704px;
     overflow: hidden;
 }
 
 .app[data-theme] .time-label,
 .app[data-theme] .hour-slot {
-    height: 64px;
-    min-height: 64px;
+    height: var(--hour-height);
+    min-height: var(--hour-height);
 }
 
 .app[data-theme] .hour-slot {
@@ -187,7 +189,7 @@
     }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
     .app[data-theme] .topbar {
         padding: 14px 16px;
     }
@@ -398,14 +400,13 @@
 .app[data-theme] .day-column {
     position: relative;
     min-width: 0;
-    height: 704px;
     overflow: hidden;
 }
 
 .app[data-theme] .time-label,
 .app[data-theme] .hour-slot {
-    height: 64px;
-    min-height: 64px;
+    height: var(--hour-height);
+    min-height: var(--hour-height);
 }
 
 .app[data-theme] .hour-slot {
@@ -475,7 +476,7 @@
     }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
     .app[data-theme] .topbar {
         padding: 8px 16px;
     }
@@ -561,10 +562,13 @@
     padding: 8px 16px;
 }
 
-/* 8-column grid */
+/* Two columns: a fixed-width sidebar and the content. The sidebar used to be 1/8 of the
+   width, which cut its labels on every screen narrower than ~1600px. */
 .app[data-theme] .app-layout {
+    --sidebar-width: 232px;
+
     display: grid;
-    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
     align-items: start;
 
     gap: 8px;
@@ -594,9 +598,9 @@
     z-index: 900;
 }
 
-/* Schedule — remaining seven columns */
+/* Content — second column */
 .app[data-theme] .main-content {
-    grid-column: 2 / 9;
+    grid-column: 2 / -1;
     grid-row: 1;
 
     display: flex;
@@ -609,9 +613,15 @@
     padding: 0;
 }
 
-/* Sidebar collapsed — schedule uses all columns */
+/* Sidebar collapsed — content uses all columns */
 .app[data-theme] .app-layout.sidebar-collapsed .main-content {
-    grid-column: 1 / 9;
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 1100px) {
+    .app[data-theme] .app-layout {
+        --sidebar-width: 200px;
+    }
 }
 
 /* Keep calendar within its grid area */
@@ -625,7 +635,7 @@
    RESPONSIVE
    ========================================= */
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
     .app[data-theme] .app-layout {
         grid-template-columns: minmax(0, 1fr);
         padding: 84px 16px 16px;
@@ -809,7 +819,6 @@
     pointer-events: none;
 }
 
-.app[data-theme] .lesson-card-editable .lesson-edit-icon,
 .app[data-theme] .lesson-card-editable .lesson-delete-btn {
     display: inline-flex;
     align-items: center;
@@ -827,6 +836,755 @@
     pointer-events: auto;
 }
 
-.app[data-theme] .lesson-card-editable .lesson-time {
-    padding-right: 52px;
+/* Keep the centred content clear of the delete button in the top-right corner;
+   the same space at the bottom keeps it visually centred. On narrow columns the text wraps
+   to more lines, so the bottom space is dropped to keep everything inside the card. */
+.app[data-theme] .lesson-card-editable:has(.lesson-card-actions) {
+    padding-block: 26px;
+}
+
+@media (max-width: 1100px) {
+    .app[data-theme] .lesson-card-editable:has(.lesson-card-actions) {
+        padding-bottom: 6px;
+    }
+}
+
+/* Event details modal (FE-18) */
+.app[data-theme] .event-details {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.app[data-theme] .event-details-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.app[data-theme] .event-details-title {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.app[data-theme] .event-details-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.app[data-theme] .event-details-list {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+.app[data-theme] .event-details-row {
+    display: grid;
+    grid-template-columns: minmax(120px, 34%) minmax(0, 1fr);
+    gap: 12px;
+    padding: 10px 0;
+}
+
+.app[data-theme] .event-details-row dt,
+.app[data-theme] .event-details-row dd {
+    margin: 0;
+    min-width: 0;
+}
+
+.app[data-theme] .event-details-row dd {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-wrap: anywhere;
+}
+
+.app[data-theme] .event-details-text {
+    white-space: pre-line;
+}
+
+@media (max-width: 480px) {
+    .app[data-theme] .event-details-row {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+}
+
+/* Class change form (personal class override) */
+.app[data-theme] .class-override-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.app[data-theme] .choice-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.app[data-theme] .choice-group legend {
+    margin-bottom: 6px;
+    padding: 0;
+}
+
+.app[data-theme] .choice-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.app[data-theme] .choice-option input {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin: 2px 0 0;
+    padding: 0;
+}
+
+/* Meeting link on an event card sits above the card's edit hit-area */
+.app[data-theme] .lesson-card .lesson-link {
+    position: relative;
+    z-index: 2;
+    display: inline-block;
+    align-self: flex-start;
+}
+
+/* Hidden (cancelled) classes of the week */
+.app[data-theme] .hidden-classes {
+    margin-top: 16px;
+    padding: 14px 18px;
+}
+
+.app[data-theme] .hidden-classes-title {
+    margin: 0 0 10px;
+}
+
+.app[data-theme] .hidden-classes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.app[data-theme] .hidden-classes-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+}
+
+.app[data-theme] .hidden-classes-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.app[data-theme] .hidden-classes-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* "Показати приховані" toggle above the week grid */
+.app[data-theme] .hidden-toggle-row {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 0 10px;
+}
+
+/* A hidden class drawn in the grid on request (faded, not clickable through) */
+.app[data-theme] .lesson-card-hidden .lesson-title {
+    text-decoration: line-through;
+}
+
+/* Drag-and-drop of cards in the week grid (features/schedule/useEventDrag.ts).
+   Uses the theme's own card colours: the source fades, the drop target is a dashed copy. */
+.app[data-theme] .lesson-card-draggable {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.app[data-theme] .lesson-card-draggable .lesson-card-hit {
+    cursor: grab;
+}
+
+.app[data-theme] .calendar-dragging,
+.app[data-theme] .calendar-dragging .lesson-card-hit {
+    cursor: grabbing;
+}
+
+.app[data-theme] .lesson-card-drag-source {
+    opacity: 0.35;
+}
+
+.app[data-theme] .lesson-card-drag-preview {
+    z-index: 3;
+    border-style: dashed;
+    pointer-events: none;
+}
+
+.app[data-theme] .lesson-drag-time {
+    display: block;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+/* =========================================
+   MOBILE MENU (≤ 900px)
+   The sidebar becomes an off-canvas menu opened by .menu-toggle in the
+   header; AppLayout adds .sidebar-open while it is shown.
+   ========================================= */
+
+.app[data-theme] .topbar-left {
+    min-width: 0;
+}
+
+.app[data-theme] .brand {
+    min-width: 0;
+}
+
+.app[data-theme] .brand-text {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.app[data-theme] .menu-toggle,
+.app[data-theme] .sidebar-backdrop {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    .app[data-theme] .menu-toggle {
+        display: inline-grid;
+        place-items: center;
+        flex-shrink: 0;
+    }
+
+    .app[data-theme] .sidebar {
+        z-index: 1100;
+        visibility: hidden;
+        transform: translateX(calc(-100% - 32px));
+        transition: transform 200ms ease, visibility 0s linear 200ms;
+    }
+
+    .app[data-theme] .app-layout.sidebar-open .sidebar {
+        visibility: visible;
+        transform: none;
+        transition: transform 200ms ease;
+    }
+
+    .app[data-theme] .sidebar-backdrop {
+        display: block;
+        position: fixed;
+        inset: 76px 0 0 0;
+        z-index: 1050;
+    }
+
+    /* Header: keep only what fits next to the menu button and the brand. */
+    .app[data-theme] .topbar {
+        gap: 8px;
+    }
+
+    .app[data-theme] .topbar .admin-badge-admin-role {
+        display: none;
+    }
+
+    /* Page title + subtitle: let the subtitle drop below instead of widening the page. */
+    .app[data-theme] .page-heading > div {
+        flex-wrap: wrap;
+    }
+
+    .app[data-theme] .page-heading > div > * {
+        min-width: 0;
+    }
+}
+
+@media (max-width: 560px) {
+    .app[data-theme] .topbar .semester-label {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app[data-theme] .sidebar,
+    .app[data-theme] .app-layout.sidebar-open .sidebar {
+        transition: none;
+    }
+}
+
+/* =========================================
+   EVENT CARD TEXT
+   A long name must not push the type, place and teacher out of the card:
+   the name is cut to two lines, every other line to one, all with "…".
+   The full text is in the card's tooltip and in the details modal.
+   ========================================= */
+
+.app[data-theme] .lesson-card > * {
+    flex-shrink: 0;
+    max-width: 100%;
+}
+
+.app[data-theme] .lesson-card .lesson-title {
+    /* In narrow cards (e.g. two overlapping events) long words split by Ukrainian
+       hyphenation rules ("Переві-рка") instead of at an arbitrary letter. */
+    hyphens: auto;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    overflow-wrap: break-word;
+}
+
+.app[data-theme] .lesson-card .lesson-type,
+.app[data-theme] .lesson-card .lesson-detail,
+.app[data-theme] .lesson-card .lesson-teacher {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* =========================================
+   HEADER — keep pills on one line
+   ========================================= */
+
+.app[data-theme] .topbar .semester-label,
+.app[data-theme] .topbar .admin-badge-admin-role {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* =========================================
+   ADMIN PANEL — nothing cut off or hidden
+   ========================================= */
+
+/* Tabs wrap onto a second row instead of scrolling out of view. */
+.app[data-theme] nav.admin-tabs-nav {
+    flex-wrap: wrap;
+    row-gap: 4px;
+    overflow: visible;
+}
+
+/* Slightly tighter tabs so all five fit on one row on common laptop widths. */
+.app[data-theme] .admin-tabs-nav .admin-tab-btn {
+    padding-inline: 13px;
+    gap: 6px;
+}
+
+@media (max-width: 900px) {
+    .app[data-theme] .admin-tabs-nav .admin-tab-btn {
+        padding-inline: 10px;
+    }
+}
+
+/* Phones: drop the decorative icons so two tabs fit per row. */
+@media (max-width: 560px) {
+    .app[data-theme] .admin-tabs-nav .admin-tab-icon {
+        display: none;
+    }
+
+    .app[data-theme] .admin-tabs-nav .admin-tab-btn {
+        padding-inline: 8px;
+        font-size: 0.78rem;
+    }
+}
+
+/* Filters: the search field grows, the select keeps its own width. */
+.app[data-theme] .admin-filter-group .admin-search-input {
+    flex: 1 1 320px;
+    width: auto;
+    max-width: 480px;
+    min-width: min(240px, 100%);
+}
+
+.app[data-theme] .admin-filter-group .admin-filter-select {
+    flex: 0 1 220px;
+    width: auto;
+    min-width: min(170px, 100%);
+}
+
+/* Tables: the actions column stays visible while the table scrolls sideways. */
+.app[data-theme] .admin-table td.admin-cell-actions,
+.app[data-theme] .admin-table:has(.admin-cell-actions) th:last-child {
+    position: sticky;
+    right: 0;
+    z-index: 1;
+}
+
+/* Buttons and pills that must not break onto two lines. */
+.app[data-theme] .admin-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.app[data-theme] .admin-integration-footer {
+    min-width: 0;
+}
+
+.app[data-theme] .admin-integration-detail {
+    min-width: 0;
+}
+
+.app[data-theme] .admin-integration-latency {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* =========================================
+   USER MENU — account menu opened by .profile-button in the header
+   ========================================= */
+
+.app[data-theme] .user-menu {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.app[data-theme] .user-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    z-index: 1;
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    width: max-content;
+    min-width: 220px;
+    max-width: min(300px, calc(100vw - 32px));
+    padding: 8px;
+}
+
+.app[data-theme] .user-menu-header {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    padding: 6px 10px 8px;
+}
+
+.app[data-theme] .user-menu-email {
+    overflow-wrap: anywhere;
+}
+
+.app[data-theme] .user-menu-divider {
+    margin: 2px 0;
+}
+
+.app[data-theme] .user-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    text-align: left;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.app[data-theme] .user-menu-icon {
+    flex-shrink: 0;
+    width: 16px;
+    text-align: center;
+}
+
+/* =========================================
+   PAGE HEADINGS — same spacing on every page
+   ========================================= */
+
+.app[data-theme] .schedule-page > .page-heading {
+    margin-bottom: 24px;
+}
+
+/* Admin filters: search, select and buttons share one height and baseline. */
+.app[data-theme] .admin-toolbar-row :is(.input, .select, .button) {
+    height: 42px;
+    min-height: 42px;
+    box-sizing: border-box;
+}
+
+.app[data-theme] .admin-toolbar-row .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding-block: 0;
+}
+
+/* =========================================
+   OVERVIEW STATS — number above label
+   ========================================= */
+
+.app[data-theme] .overview-stats > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+/* =========================================
+   TOAST — success messages float over the page
+   so they never push the schedule down
+   ========================================= */
+
+.app[data-theme] .toast-region {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 1500;
+    max-width: min(480px, calc(100vw - 32px));
+    pointer-events: none;
+}
+
+.app[data-theme] .toast-region .toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 0;
+    pointer-events: auto;
+}
+
+.app[data-theme] .toast-close {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    cursor: pointer;
+}
+
+@media (max-width: 560px) {
+    .app[data-theme] .toast-region {
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+        max-width: none;
+    }
+}
+
+/* =========================================
+   SHARED PAGE PIECES — every page uses the same building blocks
+   (colours live in the theme file)
+   ========================================= */
+
+.app[data-theme] .page-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    min-width: 0;
+}
+
+.app[data-theme] .page-intro {
+    margin: -8px 0 0;
+    max-width: 70ch;
+}
+
+.app[data-theme] .card-title {
+    margin: 0 0 16px;
+    font-size: 1.1rem;
+}
+
+.app[data-theme] .notice {
+    margin: 0;
+    padding: 12px 16px;
+}
+
+.app[data-theme] .button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.app[data-theme] .button-row .button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.app[data-theme] .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+    gap: 12px;
+}
+
+.app[data-theme] .stat-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 14px;
+}
+
+.app[data-theme] .stat-tile span {
+    font-size: 0.85rem;
+}
+
+/* Google Calendar connection status */
+.app[data-theme] .gcal-status {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.app[data-theme] .gcal-status-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+}
+
+.app[data-theme] .gcal-status h2 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.app[data-theme] .gcal-status p {
+    margin: 4px 0 0;
+    font-size: 0.9rem;
+}
+
+/* Sign-in page */
+.app[data-theme] .login-page {
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 24px 16px;
+}
+
+.app[data-theme] .login-card {
+    width: 100%;
+    max-width: 440px;
+    padding: 36px 28px;
+}
+
+.app[data-theme] .login-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 28px;
+    text-align: center;
+}
+
+.app[data-theme] .login-brand h1 {
+    margin: 4px 0 0;
+    font-size: 1.8rem;
+}
+
+.app[data-theme] .login-brand p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.app[data-theme] .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.app[data-theme] .login-form .input {
+    width: 100%;
+}
+
+.app[data-theme] .login-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.app[data-theme] .login-actions .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+}
+
+.app[data-theme] .login-footnote {
+    margin: 12px 0 0;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* Spinner */
+.app[data-theme] .loader {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    border: 3px solid;
+    border-radius: 50%;
+    animation: app-spin 1s ease-in-out infinite;
+}
+
+@keyframes app-spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app[data-theme] .loader {
+        animation-duration: 3s;
+    }
+}
+
+/* =========================================
+   ADMIN GRIDS — fixed column counts so a group of four cards never leaves
+   one card alone on the last row (4 → 2 → 1 columns, integrations 2 → 1; six days 3 → 2 → 1)
+   ========================================= */
+
+.app[data-theme] .admin-page-container :is(.admin-metrics-grid, .admin-sync-meta-grid) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* Integration cards hold a lot of text: always 2 × 2 */
+.app[data-theme] .admin-page-container .admin-integrations-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.app[data-theme] .admin-page-container .admin-inspector-days-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 1100px) {
+    .app[data-theme] .admin-page-container :is(.admin-metrics-grid, .admin-sync-meta-grid, .admin-integrations-grid, .admin-inspector-days-grid) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .app[data-theme] .admin-page-container :is(.admin-metrics-grid, .admin-sync-meta-grid, .admin-integrations-grid, .admin-inspector-days-grid) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* Navigation icons (components/ui/Icon.tsx): fixed box so labels line up */
+.app[data-theme] .nav-link .nav-icon,
+.app[data-theme] .admin-tab-btn .admin-tab-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+}
+
+/* Settings: one card per colour group, spaced like the rest of the page */
+.app[data-theme] .settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }

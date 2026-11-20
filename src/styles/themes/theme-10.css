@@ -19,7 +19,10 @@
     background: var(--retro-bg);
     color: var(--retro-ink);
     font-family: "Kyiv Type Sans", sans-serif;
-    min-height: 100%;
+    /* Fill the whole viewport so short pages never show the browser canvas below
+       (black in dark-mode browsers). `100%` did nothing: the parents have no height. */
+    min-height: 100vh;
+    min-height: 100dvh;
     scrollbar-gutter: stable;
 }
 
@@ -246,7 +249,7 @@
 .app[data-theme="theme-10"] .today-button,
 .app[data-theme="theme-10"] .icon-button,
 .app[data-theme="theme-10"] .reset-button,
-.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn) {
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):not(.toast-close) {
     border: 2px solid var(--retro-ink);
     border-radius: 14px;
     background: var(--retro-paper);
@@ -265,7 +268,7 @@
 .app[data-theme="theme-10"] .today-button:hover,
 .app[data-theme="theme-10"] .icon-button:hover,
 .app[data-theme="theme-10"] .reset-button:hover,
-.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):hover {
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):not(.toast-close):hover {
     background: var(--retro-yellow);
     transform: translate(2px, 2px);
     box-shadow: 1px 1px 0 var(--retro-ink);
@@ -277,7 +280,7 @@
 .app[data-theme="theme-10"] .today-button:active,
 .app[data-theme="theme-10"] .icon-button:active,
 .app[data-theme="theme-10"] .reset-button:active,
-.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):active {
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):not(.toast-close):active {
     transform: translate(3px, 3px);
     box-shadow: none;
 }
@@ -288,7 +291,7 @@
 .app[data-theme="theme-10"] .today-button:disabled,
 .app[data-theme="theme-10"] .icon-button:disabled,
 .app[data-theme="theme-10"] .reset-button:disabled,
-.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):disabled {
+.app[data-theme="theme-10"] .main-content button:not(.color-swatch-btn):not(.day-header):not(.admin-tab-btn):not(.admin-switch-btn):not(.admin-modal-close-btn):not(.admin-week-num-pill):not(.admin-slot-pill):not(.lesson-card-hit):not(.lesson-delete-btn):not(.toast-close):disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
@@ -858,13 +861,18 @@
     border-left: 1px solid #e9e1d6;
 }
 
-/* Lesson cards */
+/* Lesson cards: content centred vertically, text aligned to the start (leading) edge;
+   `safe` keeps the name visible (top-aligned) when a short card cannot fit all lines. */
 .app[data-theme="theme-10"] .lesson-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: safe center;
     padding: 8px;
     border: 1px solid var(--retro-ink);
     border-radius: 9px;
     box-shadow: 1px 1px 0 var(--retro-ink);
     line-height: 1.35;
+    text-align: start;
 }
 
 .app[data-theme="theme-10"] .lesson-time {
@@ -1264,7 +1272,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 11px 18px 10px !important;
+    padding: 11px 18px 10px;
     border: 2px solid var(--retro-ink) !important;
     border-bottom: 2px solid var(--retro-ink) !important;
     border-top-left-radius: 12px !important;
@@ -1336,7 +1344,7 @@
 /* Overview Metrics */
 .app[data-theme="theme-10"] .admin-metrics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
     gap: 16px;
 }
 
@@ -1456,7 +1464,7 @@
 
 .app[data-theme="theme-10"] .admin-sync-meta-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
     gap: 14px;
     padding-top: 16px;
     border-top: 1.5px dashed var(--retro-ink);
@@ -1489,7 +1497,7 @@
 /* Integrations Grid */
 .app[data-theme="theme-10"] .admin-integrations-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: 16px;
 }
 
@@ -1897,7 +1905,7 @@
 
 .app[data-theme="theme-10"] .admin-inspector-days-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
     gap: 16px;
 }
 
@@ -2523,7 +2531,6 @@
     outline: none;
 }
 
-.app[data-theme="theme-10"] .lesson-edit-icon,
 .app[data-theme="theme-10"] .lesson-delete-btn {
     border: 1.5px solid var(--retro-ink);
     background-color: var(--retro-paper);
@@ -2535,11 +2542,6 @@
     background-color: var(--retro-pink);
 }
 
-.app[data-theme="theme-10"] .lesson-card-editable:has(.lesson-card-hit:hover) .lesson-edit-icon,
-.app[data-theme="theme-10"] .lesson-card-editable:has(.lesson-card-hit:focus-visible) .lesson-edit-icon {
-    background-color: var(--retro-yellow);
-}
-
 .app[data-theme="theme-10"] .lesson-delete-btn:focus-visible {
     outline: 2px solid var(--retro-ink);
     outline-offset: 1px;
@@ -2549,4 +2551,340 @@
     .app[data-theme="theme-10"] .lesson-card-editable {
         transition: none;
     }
+}
+
+/* Class change form + hidden classes (personal class override) */
+.app[data-theme="theme-10"] .class-override-summary {
+    padding: 10px 14px;
+    background-color: var(--retro-lilac);
+    border: 1.5px solid var(--retro-ink);
+    border-radius: 12px;
+    font-size: 0.85rem;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .choice-option {
+    font-size: 0.88rem;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .choice-option input {
+    accent-color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .choice-option input:focus-visible {
+    outline: 3px solid var(--retro-yellow);
+    outline-offset: 2px;
+}
+
+.app[data-theme="theme-10"] .lesson-card .lesson-link {
+    color: var(--retro-ink);
+    font-weight: 750;
+    text-decoration: underline;
+}
+
+.app[data-theme="theme-10"] .lesson-card .lesson-link:focus-visible {
+    outline: 2px solid var(--retro-ink);
+    outline-offset: 1px;
+}
+
+.app[data-theme="theme-10"] .hidden-classes {
+    background-color: var(--retro-paper);
+    border: 2px solid var(--retro-ink);
+    border-radius: 16px;
+    box-shadow: 3px 3px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .hidden-classes-title {
+    font-size: 1rem;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .hidden-classes-text {
+    font-size: 0.85rem;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .hidden-classes-text span {
+    color: var(--retro-muted);
+}
+
+/* Event details modal (FE-18) */
+.app[data-theme="theme-10"] .event-details-summary {
+    padding: 12px 14px;
+    background-color: var(--retro-lilac);
+    border: 1.5px solid var(--retro-ink);
+    border-radius: 12px;
+}
+
+.app[data-theme="theme-10"] .event-details-title {
+    font-size: 1.1rem;
+    font-weight: 850;
+    line-height: 1.25;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .event-details-tags .chip {
+    padding: 3px 10px;
+}
+
+.app[data-theme="theme-10"] .event-details-row + .event-details-row {
+    border-top: 1.5px dashed var(--retro-muted);
+}
+
+.app[data-theme="theme-10"] .event-details-row dt {
+    font-size: 0.8rem;
+    font-weight: 750;
+    color: var(--retro-muted);
+}
+
+.app[data-theme="theme-10"] .event-details-row dd {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .event-details-original {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--retro-muted);
+}
+
+.app[data-theme="theme-10"] .event-details-link {
+    color: var(--retro-ink);
+    font-weight: 750;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.app[data-theme="theme-10"] .event-details-link:focus-visible {
+    outline: 2px solid var(--retro-ink);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Hidden (cancelled) class shown on request: dashed, striped, no shadow.
+   Text stays ink-on-light, so contrast is unchanged. */
+.app[data-theme="theme-10"] .lesson-card.lesson-card-hidden {
+    border-style: dashed;
+    box-shadow: none;
+    background-image: repeating-linear-gradient(
+        -45deg,
+        color-mix(in srgb, var(--retro-paper) 70%, transparent) 0 6px,
+        transparent 6px 12px
+    );
+}
+
+.app[data-theme="theme-10"] .hidden-toggle[aria-pressed="true"] {
+    background-color: var(--retro-lilac);
+}
+
+/* Mobile menu button and backdrop (layout: layout.css "MOBILE MENU") */
+.app[data-theme="theme-10"] .menu-toggle {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: var(--retro-paper);
+    border: 2px solid var(--retro-ink);
+    border-radius: 12px;
+    color: var(--retro-ink);
+    box-shadow: 2px 2px 0 var(--retro-ink);
+    cursor: pointer;
+    transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.app[data-theme="theme-10"] .menu-toggle:hover,
+.app[data-theme="theme-10"] .menu-toggle[aria-expanded="true"] {
+    background: var(--retro-yellow);
+}
+
+.app[data-theme="theme-10"] .menu-toggle:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .sidebar-backdrop {
+    background-color: rgba(41, 37, 31, 0.45);
+}
+
+/* Sticky actions column in admin tables (layout: layout.css "ADMIN PANEL") */
+.app[data-theme="theme-10"] .admin-table td.admin-cell-actions {
+    background-color: var(--retro-paper);
+    box-shadow: -8px 0 8px -8px rgba(41, 37, 31, 0.35);
+}
+
+.app[data-theme="theme-10"] .admin-table tr:hover td.admin-cell-actions {
+    background-color: #fff9ed;
+}
+
+.app[data-theme="theme-10"] .admin-table:has(.admin-cell-actions) th:last-child {
+    box-shadow: -8px 0 8px -8px rgba(41, 37, 31, 0.35);
+}
+
+/* User menu (profile button dropdown) */
+.app[data-theme="theme-10"] .profile-button[aria-expanded="true"] {
+    background: var(--retro-yellow);
+}
+
+.app[data-theme="theme-10"] .user-menu-dropdown {
+    background-color: var(--retro-paper);
+    color: var(--retro-ink);
+    border: 2px solid var(--retro-ink);
+    border-radius: 16px;
+    box-shadow: 4px 4px 0 var(--retro-ink);
+    animation: retro-modal-pop 140ms ease-out;
+}
+
+.app[data-theme="theme-10"] .user-menu-role {
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .user-menu-email {
+    font-size: 0.8rem;
+    color: var(--retro-muted);
+}
+
+.app[data-theme="theme-10"] .user-menu-divider {
+    border: 0;
+    border-top: 2px solid var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .user-menu-item {
+    background: transparent;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    color: var(--retro-ink);
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.app[data-theme="theme-10"] .user-menu-item:hover,
+.app[data-theme="theme-10"] .user-menu-item:focus-visible {
+    background-color: var(--retro-yellow);
+    border-color: var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .user-menu-item-logout:hover,
+.app[data-theme="theme-10"] .user-menu-item-logout:focus-visible {
+    background-color: var(--retro-pink);
+}
+
+.app[data-theme="theme-10"] .user-menu-item:focus-visible {
+    outline: 2px solid var(--retro-ink);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app[data-theme="theme-10"] .user-menu-dropdown {
+        animation: none;
+    }
+
+    .app[data-theme="theme-10"] .user-menu-item {
+        transition: none;
+    }
+}
+
+/* Week stats: number above its label (layout: layout.css "OVERVIEW STATS") */
+.app[data-theme="theme-10"] .overview-stats strong {
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+}
+
+.app[data-theme="theme-10"] .overview-stats span {
+    font-size: 0.8rem;
+    color: var(--retro-muted);
+}
+
+/* Success toast (layout: layout.css "TOAST") */
+.app[data-theme="theme-10"] .toast {
+    box-shadow: 4px 4px 0 var(--retro-ink);
+    animation: retro-modal-fade 160ms ease-out;
+}
+
+.app[data-theme="theme-10"] .toast-close {
+    background: transparent;
+    border: 2px solid var(--retro-ink);
+    border-radius: 50%;
+    color: var(--retro-ink);
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.app[data-theme="theme-10"] .toast-close:hover {
+    background: var(--retro-paper);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app[data-theme="theme-10"] .toast {
+        animation: none;
+    }
+}
+
+/* Shared page pieces (layout: layout.css "SHARED PAGE PIECES") */
+.app[data-theme="theme-10"] .text-muted {
+    color: var(--retro-muted);
+}
+
+.app[data-theme="theme-10"] .text-success {
+    color: #2f6a1c;
+}
+
+.app[data-theme="theme-10"] .notice {
+    border: 2px solid var(--retro-ink);
+    border-radius: 14px;
+    box-shadow: 2px 2px 0 var(--retro-ink);
+    color: var(--retro-ink);
+    font-weight: 700;
+}
+
+.app[data-theme="theme-10"] .notice-error {
+    background-color: var(--retro-pink);
+}
+
+.app[data-theme="theme-10"] .notice-success {
+    background-color: var(--retro-green);
+}
+
+.app[data-theme="theme-10"] .notice-info {
+    background-color: var(--retro-blue);
+}
+
+.app[data-theme="theme-10"] .stat-tile {
+    background-color: var(--retro-bg);
+    border: 1.5px solid var(--retro-ink);
+    border-radius: 12px;
+}
+
+.app[data-theme="theme-10"] .login-page {
+    background: var(--retro-bg);
+}
+
+.app[data-theme="theme-10"] .login-brand .brand-logo {
+    width: 56px;
+    height: 56px;
+    font-size: 1.2rem;
+}
+
+.app[data-theme="theme-10"] .gs-day-header {
+    background-color: var(--retro-bg);
+    border-bottom: 2px solid var(--retro-ink);
+}
+
+.app[data-theme="theme-10"] .gs-class {
+    background-color: var(--retro-paper);
+    border: 1.5px solid var(--retro-ink);
+    border-radius: 12px;
+}
+
+.app[data-theme="theme-10"] .loader {
+    border-color: #e3dacd;
+    border-top-color: var(--retro-ink);
 }

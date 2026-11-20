@@ -198,7 +198,7 @@ export function ClassModal({
                                     id="class-teacher"
                                     className="input admin-form-input"
                                     type="text"
-                                    placeholder="наприклад, проф. В. Бублик"
+                                    placeholder="напр., В. Бублик"
                                     value={teacher}
                                     onChange={(e) => {
                                         setTeacher(e.target.value)

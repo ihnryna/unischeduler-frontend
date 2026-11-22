@@ -19,6 +19,6 @@ export const mockCourses: Course[] = [
     faculty: 'Факультет інформатики',
     department: 'Кафедра мережних технологій',
     semester: 'AUTUMN',
-    year: 2026,
+    year: 4,
     specialities: mockSpecialities,
 }))

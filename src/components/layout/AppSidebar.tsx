@@ -70,17 +70,6 @@ export function AppSidebar({lessonCount: _lessonCount, sidebarRef, onNavigate, i
 
                 <NavLink
                     onClick={onNavigate}
-                    to="/calendar-integration"
-                    className={({isActive}) =>
-                        `nav-link ${isActive ? 'active' : ''}`
-                    }
-                >
-                    <Icon name="sync" className="nav-icon"/>
-                    Google Calendar
-                </NavLink>
-
-                <NavLink
-                    onClick={onNavigate}
                     to="/settings"
                     className={({isActive}) =>
                         `nav-link ${isActive ? 'active' : ''}`

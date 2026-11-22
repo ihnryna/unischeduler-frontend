@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react'
-import {useLocation, useNavigate} from 'react-router'
+import {Link, useLocation, useNavigate} from 'react-router'
 
 import {
     ClassOverrideModal,
@@ -18,6 +18,7 @@ import {EventDetailsModal} from '../../components/events/EventDetailsModal'
 import {HiddenClassesList} from '../../components/events/HiddenClassesList'
 import {ScheduleGrid} from '../../components/schedule/ScheduleGrid'
 import type {AccessDeniedState} from '../../features/auth/RequireRole'
+import {useAuthSession} from '../../features/auth/useAuthSession'
 import {
     isEditablePersonalEvent,
     usePersonalEventMutations,
@@ -38,9 +39,6 @@ import {
 } from '../../utils/dateUtils'
 import {formatTime} from '../../utils/formatTime'
 import {pluralUk} from '../../utils/plural'
-
-// TODO(FE-13): replace with useAuth().user.id
-const CURRENT_USER_ID = 1
 
 /** Own personal events are edited; university classes get the student's own change form. */
 function canEditScheduleEvent(event: CalendarEvent): boolean {
@@ -87,6 +85,9 @@ export function SchedulePage() {
     // Set by RequireRole when a student opens /admin and is sent here.
     const location = useLocation()
     const navigate = useNavigate()
+    const {user} = useAuthSession()
+    const currentUserId = user?.id ?? 1
+
     const [accessNotice] = useState<string | null>(
         () => (location.state as AccessDeniedState | null)?.accessNotice ?? null,
     )
@@ -103,7 +104,7 @@ export function SchedulePage() {
     useEffect(() => {
         if (location.state) navigate(location.pathname, {replace: true, state: null})
     }, [location.state, location.pathname, navigate])
-    const {events, hiddenEvents, isLoading, error, refetch} = useSchedule(CURRENT_USER_ID, weekOffset)
+    const {events, hiddenEvents, isLoading, error, refetch} = useSchedule(currentUserId, weekOffset)
     const {
         unhide,
         isSaving: isRestoringClass,
@@ -215,7 +216,7 @@ export function SchedulePage() {
             return
         }
         const ok = await saveClassChange({
-            userId: CURRENT_USER_ID,
+            userId: currentUserId,
             courseClassId: occurrence.courseClassId,
             existing: occurrence.occurrenceOverride,
             patch,
@@ -314,7 +315,7 @@ export function SchedulePage() {
             {isCreateOpen && (
                 <PersonalEventModal
                     mode="create"
-                    userId={CURRENT_USER_ID}
+                    userId={currentUserId}
                     defaultDate={defaultEventDate}
                     onClose={() => setIsCreateOpen(false)}
                     onSaved={(event) => handleEventSaved(event, 'додано')}
@@ -353,7 +354,7 @@ export function SchedulePage() {
             {editingClass && (
                 <ClassOverrideModal
                     classItem={editingClass}
-                    userId={CURRENT_USER_ID}
+                    userId={currentUserId}
                     onClose={() => setEditingClass(null)}
                     onSaved={(result) => handleClassSaved(editingClass.name, result)}
                 />
@@ -460,6 +461,24 @@ export function SchedulePage() {
                         {isShowingHidden ? 'Сховати приховані' : 'Показати приховані'} (
                         {hiddenEvents.length})
                     </button>
+                </div>
+            )}
+
+            {!isLoading && !error && gridEvents.length === 0 && (
+                <div className="card" style={{padding: '2rem', textAlign: 'center', margin: '1rem 0'}}>
+                    <div style={{fontSize: '2.5rem', marginBottom: '0.5rem'}}>🗓️</div>
+                    <h3 style={{fontSize: '1.15rem', marginBottom: '0.5rem'}}>У вашому персональному розкладі немає занять на цей тиждень</h3>
+                    <p className="text-muted" style={{maxWidth: '540px', margin: '0 auto 1.25rem auto', fontSize: '0.9rem'}}>
+                        Якщо ви ще не обрали предмети вашого індивідуального плану, перейдіть до «Мої дисципліни» та вкажіть групи. Також ви можете переглянути повний розклад усіх занять в університеті.
+                    </p>
+                    <div style={{display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap'}}>
+                        <Link to="/my-courses" className="button primary-button">
+                            📚 Перейти до «Мої дисципліни»
+                        </Link>
+                        <Link to="/general-schedule" className="button">
+                            🔍 Загальний розклад
+                        </Link>
+                    </div>
                 </div>
             )}
 

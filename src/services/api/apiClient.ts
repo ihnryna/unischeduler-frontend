@@ -54,6 +54,7 @@ async function request<T>(
     headers.set('Accept', 'application/json')
 
     const response = await fetch(url, {
+        credentials: 'include',
         ...options,
         headers,
     })
@@ -107,7 +108,7 @@ export const apiClient = {
         })
     },
 
-    delete<T = void>(endpoint: string): Promise<T> {
-        return request<T>(endpoint, {method: 'DELETE'})
+    delete<T = void>(endpoint: string, params?: QueryParams): Promise<T> {
+        return request<T>(endpoint, {method: 'DELETE'}, params)
     },
 }

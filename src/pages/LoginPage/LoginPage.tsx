@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {useLocation, useNavigate} from 'react-router'
 
 import {authService} from '../../features/auth/authService'
@@ -17,37 +17,39 @@ export function LoginPage() {
     const location = useLocation()
     const redirectTarget = readRedirectTarget(location.state)
     const [isLoading, setIsLoading] = useState(false)
-    const [email, setEmail] = useState('diana.tsisaruk@ukma.edu.ua')
     const [error, setError] = useState<string | null>(null)
 
-    // The admin button passes its own email: setEmail() would not be applied yet here.
-    const handleLogin = (role: 'STUDENT' | 'ADMIN', loginEmail = email) => {
-        setIsLoading(true)
-        setError(null)
-
-        if (!loginEmail.endsWith('@ukma.edu.ua')) {
+    useEffect(() => {
+        // Parse error from URL redirect if backend rejected OAuth
+        const params = new URLSearchParams(location.search)
+        const errorParam = params.get('error')
+        if (errorParam === 'auth_failed') {
+            setError('Не вдалося виконати авторизацію через Microsoft. Спробуйте ще раз.')
+        } else if (errorParam === 'invalid_domain') {
             setError('Авторизація дозволена лише для корпоративних поштових скриньок НаУКМА (*@ukma.edu.ua).')
-            setIsLoading(false)
-            return
+        } else if (errorParam === 'missing_email') {
+            setError('У вашому обліковому записі Microsoft не знайдено адресу електронної пошти.')
+        } else if (errorParam) {
+            setError(`Помилка авторизації: ${errorParam}`)
         }
 
-        setTimeout(() => {
-            setIsLoading(false)
-            authService.saveSession({
-                email: loginEmail,
-                role,
-                name: loginEmail.split('@')[0].replace('.', ' '),
-            })
-            // Back to the page that sent the user here; otherwise the role's home page.
-            navigate(redirectTarget ?? (role === 'ADMIN' ? '/admin' : '/schedule'), {replace: true})
-        }, 600)
+        // If user is already authenticated, redirect them
+        const currentUser = authService.getSessionUser()
+        if (currentUser) {
+            navigate(redirectTarget ?? (currentUser.role === 'ADMIN' ? '/admin' : '/schedule'), {replace: true})
+        }
+    }, [location.search, navigate, redirectTarget])
+
+    const handleMicrosoftLogin = () => {
+        setIsLoading(true)
+        setError(null)
+        authService.loginWithMicrosoft()
     }
 
     return (
         <main className="login-page">
             <div className="card login-card">
                 <div className="login-brand">
-                    {/* Same logo as the app header, so the sign-in page looks like the app. */}
                     <span className="brand-logo" aria-hidden="true">UNI</span>
                     <h1>UNIScheduler</h1>
                     <p className="text-muted">
@@ -63,45 +65,26 @@ export function LoginPage() {
                 )}
 
                 <div className="login-form">
-                    <div className="form-field">
-                        <label htmlFor="login-email">Корпоративна пошта НаУКМА</label>
-                        <input
-                            id="login-email"
-                            type="email"
-                            className="input"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="username@ukma.edu.ua"
-                        />
-                    </div>
-
                     <div className="login-actions">
                         <button
                             type="button"
                             className="button primary-button"
+                            style={{width: '100%', justifyContent: 'center', padding: '12px 18px', fontSize: '1rem'}}
                             disabled={isLoading}
-                            onClick={() => handleLogin('STUDENT')}
+                            onClick={handleMicrosoftLogin}
                         >
-                            <span aria-hidden="true">🎓</span>
-                            <span>Увійти як Студент (Microsoft SSO)</span>
-                        </button>
-
-                        <button
-                            type="button"
-                            className="button"
-                            disabled={isLoading}
-                            onClick={() => {
-                                setEmail('admin@ukma.edu.ua')
-                                handleLogin('ADMIN', 'admin@ukma.edu.ua')
-                            }}
-                        >
-                            <span aria-hidden="true">🔑</span>
-                            <span>Увійти як Адміністратор</span>
+                            <svg width="20" height="20" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <rect width="10.8" height="10.8" fill="#F25022"/>
+                                <rect x="12.2" width="10.8" height="10.8" fill="#7FBA00"/>
+                                <rect y="12.2" width="10.8" height="10.8" fill="#00A4EF"/>
+                                <rect x="12.2" y="12.2" width="10.8" height="10.8" fill="#FFB900"/>
+                            </svg>
+                            <span>{isLoading ? 'Перенаправлення до Microsoft...' : 'Увійти через корпоративний акаунт НаУКМА'}</span>
                         </button>
                     </div>
 
-                    <p className="login-footnote text-muted">
-                        Авторизація через Microsoft Azure OAuth 2.0 / OpenID Connect НаУКМА
+                    <p className="login-footnote text-muted" style={{marginTop: '1.25rem', textAlign: 'center'}}>
+                        Авторизація через Microsoft Entra ID (OAuth 2.0 / OpenID Connect) для акаунтів @ukma.edu.ua
                     </p>
                 </div>
             </div>

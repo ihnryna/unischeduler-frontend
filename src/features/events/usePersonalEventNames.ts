@@ -21,23 +21,30 @@ export function usePersonalEventNames(userId = DEFAULT_USER_ID): UsePersonalEven
     useEffect(() => {
         let isActive = true
 
-        personalEventService
-            .getAll()
-            .then((events) => {
-                if (!isActive) return
-                const own = events.filter((event) => event.userId === userId)
-                setNames([...new Set(own.map((event) => event.name))].sort((a, b) => a.localeCompare(b, 'uk')))
-                setError(null)
-            })
-            .catch(() => {
-                if (isActive) setError('Не вдалося завантажити ваші особисті події.')
-            })
-            .finally(() => {
-                if (isActive) setIsLoading(false)
-            })
+        const fetchNames = () => {
+            setIsLoading(true)
+            personalEventService
+                .getAll()
+                .then((events) => {
+                    if (!isActive) return
+                    const own = events.filter((event) => Number(event.userId) === Number(userId))
+                    setNames([...new Set(own.map((event) => event.name))].sort((a, b) => a.localeCompare(b, 'uk')))
+                    setError(null)
+                })
+                .catch(() => {
+                    if (isActive) setError('Не вдалося завантажити ваші особисті події.')
+                })
+                .finally(() => {
+                    if (isActive) setIsLoading(false)
+                })
+        }
+
+        fetchNames()
+        window.addEventListener('unischeduler_personal_events_updated', fetchNames)
 
         return () => {
             isActive = false
+            window.removeEventListener('unischeduler_personal_events_updated', fetchNames)
         }
     }, [userId])
 

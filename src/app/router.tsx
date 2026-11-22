@@ -7,6 +7,8 @@ import {
 import {AppLayout} from '../components/layout/AppLayout'
 import {LoginPage} from '../pages/LoginPage/LoginPage'
 import {SchedulePage} from '../pages/SchedulePage/SchedulePage'
+import {MyCoursesPage} from '../pages/MyCoursesPage/MyCoursesPage'
+import {MyGroupsPage} from '../pages/MyGroupsPage/MyGroupsPage'
 import {SettingsPage} from '../pages/SettingsPage/SettingsPage'
 import { GeneralSchedulePage } from '../pages/GeneralSchedulePage/GeneralSchedulePage'
 import { GoogleCalendarPage } from '../pages/GoogleCalendarPage/GoogleCalendarPage'
@@ -50,6 +52,14 @@ export const router = createBrowserRouter([
             {
                 path: 'schedule',
                 element: <SchedulePage />,
+            },
+            {
+                path: 'my-courses',
+                element: <MyCoursesPage />,
+            },
+            {
+                path: 'my-groups',
+                element: <MyGroupsPage />,
             },
             {
                 path: 'general-schedule',

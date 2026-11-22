@@ -40,6 +40,7 @@ export type CourseClass = {
     startsAt: LocalDateTime
     endsAt: LocalDateTime
     weeks?: number[]
+    occurrenceIds?: number[]
 }
 
 export type CourseClassCreate = Omit<CourseClass, 'id' | 'course'> & {

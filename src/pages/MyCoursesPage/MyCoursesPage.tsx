@@ -1,7 +1,8 @@
 import {useCallback, useEffect, useMemo, useState} from 'react'
 import {Link} from 'react-router'
-import type {Course} from '../../types/catalog'
+import type {Course, Speciality} from '../../types/catalog'
 import {courseService} from '../../services/api/courseService'
+import {specialityService} from '../../services/api/specialityService'
 import {studentCourseService, type StudentCourse} from '../../services/api/studentCourseService'
 import {useAuthSession} from '../../features/auth/useAuthSession'
 import {Loader} from '../../components/ui/Loader'
@@ -11,22 +12,27 @@ export function MyCoursesPage() {
     const userId = user?.id ?? 1
 
     const [allCourses, setAllCourses] = useState<Course[]>([])
+    const [specialities, setSpecialities] = useState<Speciality[]>([])
     const [studentCourses, setStudentCourses] = useState<StudentCourse[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
     const [filterTab, setFilterTab] = useState<'ALL' | 'ENROLLED' | 'AVAILABLE'>('ALL')
+    const [selectedSpecialityId, setSelectedSpecialityId] = useState<number | 'ALL'>('ALL')
+    const [selectedYear, setSelectedYear] = useState<number | 'ALL'>('ALL')
     const [actionLoadingId, setActionLoadingId] = useState<number | null>(null)
     const [notification, setNotification] = useState<{type: 'success' | 'error' | 'info'; message: string} | null>(null)
 
     const loadData = useCallback(async () => {
         setIsLoading(true)
         try {
-            const [courses, enrolled] = await Promise.all([
+            const [courses, enrolled, specs] = await Promise.all([
                 courseService.getAll(),
                 studentCourseService.getStudentCourses(userId),
+                specialityService.getAll().catch(() => [] as Speciality[]),
             ])
             setAllCourses(courses)
             setStudentCourses(enrolled)
+            setSpecialities(specs)
         } catch {
             setNotification({
                 type: 'error',
@@ -81,12 +87,29 @@ export function MyCoursesPage() {
         }
     }
 
+    const availableYears = useMemo(() => {
+        const set = new Set<number>()
+        allCourses.forEach((c) => {
+            if (c.year) set.add(c.year)
+        })
+        return Array.from(set).sort((a, b) => a - b)
+    }, [allCourses])
+
     const filteredCourses = useMemo(() => {
         return allCourses.filter((course) => {
             const isEnrolled = enrolledCourseIds.has(course.id)
 
             if (filterTab === 'ENROLLED' && !isEnrolled) return false
             if (filterTab === 'AVAILABLE' && isEnrolled) return false
+
+            if (selectedSpecialityId !== 'ALL') {
+                const matchesSpec = course.specialities?.some((s) => s.id === selectedSpecialityId)
+                if (!matchesSpec) return false
+            }
+
+            if (selectedYear !== 'ALL') {
+                if (course.year !== selectedYear) return false
+            }
 
             if (searchQuery.trim()) {
                 const q = searchQuery.toLowerCase()
@@ -98,7 +121,7 @@ export function MyCoursesPage() {
 
             return true
         })
-    }, [allCourses, enrolledCourseIds, filterTab, searchQuery])
+    }, [allCourses, enrolledCourseIds, filterTab, selectedSpecialityId, selectedYear, searchQuery])
 
     return (
         <section className="page-section">
@@ -126,8 +149,8 @@ export function MyCoursesPage() {
             )}
 
             <div className="card" style={{padding: '1.25rem', marginBottom: '1.5rem'}}>
-                <div style={{display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'space-between', alignItems: 'center'}}>
-                    <div style={{display: 'flex', gap: '0.5rem'}}>
+                <div style={{display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem'}}>
+                    <div style={{display: 'flex', flexWrap: 'wrap', gap: '0.5rem'}}>
                         <button
                             type="button"
                             className={`button ${filterTab === 'ALL' ? 'primary-button' : ''}`}
@@ -151,15 +174,73 @@ export function MyCoursesPage() {
                         </button>
                     </div>
 
-                    <div style={{flex: '1', minWidth: '240px', maxWidth: '400px'}}>
+                    <div style={{flex: '1', minWidth: '220px', maxWidth: '350px'}}>
                         <input
                             type="search"
                             className="input"
-                            placeholder="Пошук дисципліни за назвою або кафедрою..."
+                            placeholder="Пошук дисципліни за назвою..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
+                </div>
+
+                {/* Filters by Speciality & Year */}
+                <div style={{display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', paddingTop: '0.75rem', borderTop: '1px solid var(--border-color, #e2e8f0)'}}>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem', flex: '1', minWidth: '220px'}}>
+                        <label htmlFor="filter-spec" style={{fontSize: '0.85rem', fontWeight: 600, whiteSpace: 'nowrap'}}>
+                            Спеціальність:
+                        </label>
+                        <select
+                            id="filter-spec"
+                            className="select"
+                            value={selectedSpecialityId}
+                            onChange={(e) => setSelectedSpecialityId(e.target.value === 'ALL' ? 'ALL' : Number(e.target.value))}
+                            style={{padding: '6px 10px', fontSize: '0.85rem', width: '100%'}}
+                        >
+                            <option value="ALL">Всі спеціальності ({specialities.length})</option>
+                            {specialities.map((spec) => (
+                                <option key={spec.id} value={spec.id}>
+                                    {spec.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: '180px'}}>
+                        <label htmlFor="filter-year" style={{fontSize: '0.85rem', fontWeight: 600, whiteSpace: 'nowrap'}}>
+                            Рік навчання:
+                        </label>
+                        <select
+                            id="filter-year"
+                            className="select"
+                            value={selectedYear}
+                            onChange={(e) => setSelectedYear(e.target.value === 'ALL' ? 'ALL' : Number(e.target.value))}
+                            style={{padding: '6px 10px', fontSize: '0.85rem'}}
+                        >
+                            <option value="ALL">Всі роки</option>
+                            {availableYears.map((yr) => (
+                                <option key={yr} value={yr}>
+                                    {yr >= 1900 ? `${yr} рік` : `${yr}-й курс`}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {(selectedSpecialityId !== 'ALL' || selectedYear !== 'ALL' || searchQuery) && (
+                        <button
+                            type="button"
+                            className="button"
+                            style={{fontSize: '0.85rem', padding: '6px 12px'}}
+                            onClick={() => {
+                                setSelectedSpecialityId('ALL')
+                                setSelectedYear('ALL')
+                                setSearchQuery('')
+                            }}
+                        >
+                            ✕ Скинути фільтри
+                        </button>
+                    )}
                 </div>
             </div>
 

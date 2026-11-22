@@ -7,7 +7,7 @@ import {personalEventService} from '../events/personalEventService'
 import {mockSpecialities} from '../../mocks/specialities'
 import {mockCourses} from '../../mocks/courses'
 import {mockCourseClasses} from '../../mocks/courseClasses'
-import {getMondayOfWeek} from '../../utils/dateUtils'
+import {getAcademicWeekInfo, getMondayOfWeek} from '../../utils/dateUtils'
 import type {
     AuditLogEntry,
     CazSyncStatus,
@@ -119,14 +119,77 @@ export const adminService = {
                 return {}
             }
         })()
-        return classes.map((c) => ({
+
+        const grouped = new Map<string, CourseClass & {occurrenceIds: number[]}>()
+
+        for (const cls of classes) {
+            const date = new Date(cls.startsAt)
+            // dayOfWeek: 1 = Mon, ..., 7 = Sun
+            const dayOfWeek = isNaN(date.getTime()) ? 1 : ((date.getDay() + 6) % 7) + 1
+            const startTime = cls.startsAt ? cls.startsAt.slice(11, 16) : '08:30'
+            const endTime = cls.endsAt ? cls.endsAt.slice(11, 16) : '09:50'
+            const courseId = cls.course?.id ?? 0
+            const group = (cls.group || '').trim().toLowerCase()
+            const teacher = (cls.teacher || '').trim().toLowerCase()
+            const location = (cls.location || '').trim().toLowerCase()
+
+            // Key identifying this recurring timetable slot
+            const slotKey = `${courseId}_${dayOfWeek}_${startTime}_${endTime}_${group}_${teacher}_${location}`
+
+            // Calculate semester week for this occurrence
+            const academicInfo = !isNaN(date.getTime()) ? getAcademicWeekInfo(getMondayOfWeek(date)) : null
+            const weekNum = academicInfo?.semesterWeek
+
+            if (!grouped.has(slotKey)) {
+                const initialWeeks: number[] = weekNum
+                    ? [weekNum]
+                    : (cls.weeks || storedWeeksMap[cls.id] || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
+
+                grouped.set(slotKey, {
+                    ...cls,
+                    weeks: initialWeeks,
+                    occurrenceIds: [cls.id],
+                })
+            } else {
+                const existing = grouped.get(slotKey)!
+                existing.occurrenceIds.push(cls.id)
+                if (weekNum && !existing.weeks?.includes(weekNum)) {
+                    existing.weeks?.push(weekNum)
+                }
+            }
+        }
+
+        return Array.from(grouped.values()).map((c) => ({
             ...c,
-            weeks: c.weeks || storedWeeksMap[c.id] || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            weeks: Array.from(new Set(c.weeks || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])).sort((a, b) => a - b),
         }))
     },
 
     getSpecialities(): Promise<Speciality[]> {
         return specialityService.getAll()
+    },
+
+    async addSpeciality(name: string): Promise<Speciality> {
+        const created = await specialityService.create({name: name.trim()})
+        this.addAuditLog(
+            'Створення спеціальності',
+            `Додано спеціальність «${created.name}» (ID: ${created.id})`,
+            'INFO',
+        )
+        window.dispatchEvent(new CustomEvent('unischeduler_specialities_updated'))
+        return created
+    },
+
+    async deleteSpeciality(id: number): Promise<void> {
+        await specialityService.delete(id)
+        this.addAuditLog(
+            'Видалення спеціальності',
+            `Видалено спеціальність ID ${id} та всі її дисципліни`,
+            'WARNING',
+        )
+        window.dispatchEvent(new CustomEvent('unischeduler_specialities_updated'))
+        window.dispatchEvent(new CustomEvent('unischeduler_courses_updated'))
+        window.dispatchEvent(new CustomEvent('unischeduler_classes_updated'))
     },
 
     async addCourse(data: CourseFormData): Promise<Course> {
@@ -224,50 +287,74 @@ export const adminService = {
         }
     },
 
-    async updateCourseClass(id: number, data: CourseClassFormData): Promise<CourseClass> {
-        const startsAt = calculateClassDate(data.dayOfWeek, data.startTime)
-        const endsAt = calculateClassDate(data.dayOfWeek, data.endTime)
+    async updateCourseClass(
+        id: number,
+        data: CourseClassFormData,
+        occurrenceIds?: number[],
+    ): Promise<CourseClass> {
+        const idsToUpdate = occurrenceIds && occurrenceIds.length > 0 ? occurrenceIds : [id]
+        let firstUpdated: CourseClass | null = null
 
-        const updated = await courseClassService.update({
-            id,
-            course: data.courseId,
-            teacher: data.teacher.trim(),
-            group: data.group.trim(),
-            location: data.location.trim(),
-            startsAt,
-            endsAt,
-        })
+        for (const clsId of idsToUpdate) {
+            try {
+                const existing = await courseClassService.getById(clsId)
+                const dateStr = existing.startsAt ? existing.startsAt.slice(0, 10) : ''
+                const startsAt = dateStr
+                    ? `${dateStr}T${data.startTime}:00`
+                    : calculateClassDate(data.dayOfWeek, data.startTime)
+                const endsAt = dateStr
+                    ? `${dateStr}T${data.endTime}:00`
+                    : calculateClassDate(data.dayOfWeek, data.endTime)
+
+                const updated = await courseClassService.update({
+                    id: clsId,
+                    course: data.courseId,
+                    teacher: data.teacher.trim(),
+                    group: data.group.trim(),
+                    location: data.location.trim(),
+                    startsAt,
+                    endsAt,
+                })
+                if (!firstUpdated) firstUpdated = updated
+            } catch {
+                // Best-effort for individual instances
+            }
+        }
 
         if (data.weeks && data.weeks.length > 0) {
             try {
                 const map = JSON.parse(localStorage.getItem('unischeduler_class_weeks_map') || '{}')
-                map[id] = data.weeks
+                idsToUpdate.forEach((clsId) => {
+                    map[clsId] = data.weeks
+                })
                 localStorage.setItem('unischeduler_class_weeks_map', JSON.stringify(map))
             } catch {}
         }
 
         this.addAuditLog(
             'Редагування заняття',
-            `Оновлено розклад заняття ID ${id}`,
+            `Оновлено розклад заняття ID ${id}${idsToUpdate.length > 1 ? ` (${idsToUpdate.length} занять)` : ''}`,
             'INFO',
         )
         window.dispatchEvent(new CustomEvent('unischeduler_classes_updated'))
         return {
-            ...updated,
+            ...(firstUpdated || ({} as CourseClass)),
             weeks: data.weeks || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            occurrenceIds: idsToUpdate,
         }
     },
 
-    async deleteCourseClass(id: number): Promise<void> {
-        await courseClassService.delete(id)
+    async deleteCourseClass(id: number, occurrenceIds?: number[]): Promise<void> {
+        const idsToDelete = occurrenceIds && occurrenceIds.length > 0 ? occurrenceIds : [id]
+        await Promise.all(idsToDelete.map((clsId) => courseClassService.delete(clsId)))
         try {
             const map = JSON.parse(localStorage.getItem('unischeduler_class_weeks_map') || '{}')
-            delete map[id]
+            idsToDelete.forEach((clsId) => delete map[clsId])
             localStorage.setItem('unischeduler_class_weeks_map', JSON.stringify(map))
         } catch {}
         this.addAuditLog(
             'Видалення заняття',
-            `Видалено заняття ID ${id} з розкладу`,
+            `Видалено розклад заняття ID ${id}${idsToDelete.length > 1 ? ` (всі ${idsToDelete.length} повторів)` : ''} з розкладу`,
             'WARNING',
         )
         window.dispatchEvent(new CustomEvent('unischeduler_classes_updated'))

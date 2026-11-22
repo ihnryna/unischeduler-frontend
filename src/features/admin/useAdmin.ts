@@ -72,13 +72,18 @@ export function useAdmin() {
         const handleClassesUpdate = () => {
             adminService.getCourseClasses().then(setClasses).catch(() => {})
         }
+        const handleSpecialitiesUpdate = () => {
+            adminService.getSpecialities().then(setSpecialities).catch(() => {})
+        }
 
         window.addEventListener('unischeduler_courses_updated', handleCoursesUpdate)
         window.addEventListener('unischeduler_classes_updated', handleClassesUpdate)
+        window.addEventListener('unischeduler_specialities_updated', handleSpecialitiesUpdate)
 
         return () => {
             window.removeEventListener('unischeduler_courses_updated', handleCoursesUpdate)
             window.removeEventListener('unischeduler_classes_updated', handleClassesUpdate)
+            window.removeEventListener('unischeduler_specialities_updated', handleSpecialitiesUpdate)
         }
     }, [])
 
@@ -106,9 +111,14 @@ export function useAdmin() {
         try {
             await adminService.deleteCourse(id)
             await reloadData()
-            showNotification('Дисципліну успішно видалено із сервера.', 'info')
-        } catch {
-            showNotification('Не вдалося видалити дисципліну.', 'error')
+            showNotification('Дисципліну успішно видалено.', 'info')
+        } catch (err: unknown) {
+            const status = (err as {status?: number})?.status
+            if (status === 403) {
+                showNotification('Помилка доступу (403): необхідні права адміністратора.', 'error')
+            } else {
+                showNotification('Не вдалося видалити дисципліну.', 'error')
+            }
         }
     }
 
@@ -122,9 +132,13 @@ export function useAdmin() {
         }
     }
 
-    const handleUpdateClass = async (id: number, data: CourseClassFormData) => {
+    const handleUpdateClass = async (
+        id: number,
+        data: CourseClassFormData,
+        occurrenceIds?: number[],
+    ) => {
         try {
-            await adminService.updateCourseClass(id, data)
+            await adminService.updateCourseClass(id, data, occurrenceIds)
             await reloadData()
             showNotification('Заняття успішно оновлено.')
         } catch {
@@ -132,13 +146,38 @@ export function useAdmin() {
         }
     }
 
-    const handleDeleteClass = async (id: number) => {
+    const handleDeleteClass = async (id: number, occurrenceIds?: number[]) => {
         try {
-            await adminService.deleteCourseClass(id)
+            await adminService.deleteCourseClass(id, occurrenceIds)
             await reloadData()
             showNotification('Заняття видалено із системи.', 'info')
         } catch {
             showNotification('Не вдалося видалити заняття.', 'error')
+        }
+    }
+
+    const handleCreateSpeciality = async (name: string) => {
+        try {
+            const created = await adminService.addSpeciality(name)
+            await reloadData()
+            showNotification(`Спеціальність «${created.name}» успішно додано.`)
+        } catch {
+            showNotification('Не вдалося створити спеціальність на сервері.', 'error')
+        }
+    }
+
+    const handleDeleteSpeciality = async (id: number) => {
+        try {
+            await adminService.deleteSpeciality(id)
+            await reloadData()
+            showNotification('Спеціальність успішно видалено.', 'info')
+        } catch (err: unknown) {
+            const status = (err as {status?: number})?.status
+            if (status === 403) {
+                showNotification('Помилка доступу (403): необхідні права адміністратора.', 'error')
+            } else {
+                showNotification('Не вдалося видалити спеціальність.', 'error')
+            }
         }
     }
 
@@ -215,6 +254,8 @@ export function useAdmin() {
         createClass: handleCreateClass,
         updateClass: handleUpdateClass,
         deleteClass: handleDeleteClass,
+        createSpeciality: handleCreateSpeciality,
+        deleteSpeciality: handleDeleteSpeciality,
         triggerCazSync: handleTriggerCazSync,
         checkIntegrations: handleCheckIntegrations,
         clearLogs: handleClearLogs,

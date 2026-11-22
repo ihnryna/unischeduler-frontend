@@ -1,9 +1,10 @@
 import {useState} from 'react'
-import type {Course, CourseClass} from '../../types/catalog'
+import type {Course, CourseClass, Speciality} from '../../types/catalog'
 import {useAdmin} from '../../features/admin/useAdmin'
 import {AdminOverviewTab} from './components/AdminOverviewTab'
 import {AdminCoursesTab} from './components/AdminCoursesTab'
 import {AdminClassesTab} from './components/AdminClassesTab'
+import {AdminSpecialitiesTab} from './components/AdminSpecialitiesTab'
 import {AdminScheduleInspectorTab} from './components/AdminScheduleInspectorTab'
 import {AdminAuditLogsTab} from './components/AdminAuditLogsTab'
 import {CourseModal} from './components/CourseModal'
@@ -11,7 +12,12 @@ import {ClassModal} from './components/ClassModal'
 import {ConfirmModal} from './components/ConfirmModal'
 import {Icon} from '../../components/ui/Icon'
 
-type AdminTab = 'OVERVIEW' | 'COURSES' | 'CLASSES' | 'INSPECTOR' | 'LOGS'
+type AdminTab = 'OVERVIEW' | 'COURSES' | 'CLASSES' | 'SPECIALITIES' | 'INSPECTOR' | 'LOGS'
+
+type DeleteTarget =
+    | {type: 'COURSE'; id: number; name: string}
+    | {type: 'CLASS'; id: number; name: string; occurrenceIds?: number[]}
+    | {type: 'SPECIALITY'; id: number; name: string}
 
 export function AdminPage() {
     const {
@@ -31,6 +37,8 @@ export function AdminPage() {
         createClass,
         updateClass,
         deleteClass,
+        createSpeciality,
+        deleteSpeciality,
         triggerCazSync,
         checkIntegrations,
         clearLogs,
@@ -46,11 +54,7 @@ export function AdminPage() {
     const [isClassModalOpen, setIsClassModalOpen] = useState(false)
     const [classToEdit, setClassToEdit] = useState<CourseClass | null>(null)
 
-    const [deleteTarget, setDeleteTarget] = useState<{
-        type: 'COURSE' | 'CLASS'
-        id: number
-        name: string
-    } | null>(null)
+    const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null)
 
     const [isClearLogsModalOpen, setIsClearLogsModalOpen] = useState(false)
 
@@ -88,7 +92,16 @@ export function AdminPage() {
         setDeleteTarget({
             type: 'CLASS',
             id: cls.id,
+            occurrenceIds: cls.occurrenceIds,
             name: `заняття курсу «${cls.course.name}» для групи ${cls.group}`,
+        })
+    }
+
+    const handlePromptDeleteSpeciality = (spec: Speciality) => {
+        setDeleteTarget({
+            type: 'SPECIALITY',
+            id: spec.id,
+            name: `спеціальність «${spec.name}»`,
         })
     }
 
@@ -97,8 +110,10 @@ export function AdminPage() {
         if (!deleteTarget) return
         if (deleteTarget.type === 'COURSE') {
             deleteCourse(deleteTarget.id)
-        } else {
-            deleteClass(deleteTarget.id)
+        } else if (deleteTarget.type === 'CLASS') {
+            deleteClass(deleteTarget.id, deleteTarget.occurrenceIds)
+        } else if (deleteTarget.type === 'SPECIALITY') {
+            deleteSpeciality(deleteTarget.id)
         }
         setDeleteTarget(null)
     }
@@ -169,6 +184,16 @@ export function AdminPage() {
 
                 <button
                     type="button"
+                    className={`admin-tab-btn ${activeTab === 'SPECIALITIES' ? 'is-active' : ''}`}
+                    onClick={() => setActiveTab('SPECIALITIES')}
+                >
+                    <Icon name="users" className="admin-tab-icon"/>
+                    <span>Спеціальності</span>
+                    <span className="admin-tab-counter">{specialities.length}</span>
+                </button>
+
+                <button
+                    type="button"
                     className={`admin-tab-btn ${activeTab === 'INSPECTOR' ? 'is-active' : ''}`}
                     onClick={() => setActiveTab('INSPECTOR')}
                 >
@@ -220,6 +245,15 @@ export function AdminPage() {
                 />
             )}
 
+            {activeTab === 'SPECIALITIES' && (
+                <AdminSpecialitiesTab
+                    specialities={specialities}
+                    courses={courses}
+                    onAddSpeciality={createSpeciality}
+                    onDeleteSpeciality={handlePromptDeleteSpeciality}
+                />
+            )}
+
             {activeTab === 'INSPECTOR' && (
                 <AdminScheduleInspectorTab
                     classes={classes}
@@ -259,7 +293,7 @@ export function AdminPage() {
                 courses={courses}
                 onSave={(data) => {
                     if (classToEdit) {
-                        updateClass(classToEdit.id, data)
+                        updateClass(classToEdit.id, data, classToEdit.occurrenceIds)
                     } else {
                         createClass(data)
                     }
@@ -274,7 +308,11 @@ export function AdminPage() {
             <ConfirmModal
                 isOpen={deleteTarget !== null}
                 title="Підтвердження видалення"
-                message={`Ви впевнені, що бажаєте видалити ${deleteTarget?.name}? Цю дію буде зафіксовано в системному журналі аудиту.`}
+                message={
+                    deleteTarget?.type === 'SPECIALITY'
+                        ? `Ви впевнені, що бажаєте видалити спеціальність ${deleteTarget?.name}? Разом із нею буде видалено всі її дисципліни та їхні розклади занять.`
+                        : `Ви впевнені, що бажаєте видалити ${deleteTarget?.name}? Цю дію буде зафіксовано в системному журналі аудиту.`
+                }
                 confirmLabel="Так, видалити"
                 cancelLabel="Скасувати"
                 isDestructive={true}

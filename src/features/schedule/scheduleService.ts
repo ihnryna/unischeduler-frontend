@@ -3,6 +3,7 @@ import {classOverrideService} from '../../services/api/classOverrideService'
 import {courseService} from '../../services/api/courseService'
 import {courseClassService} from '../../services/api/courseClassService'
 import {specialityService} from '../../services/api/specialityService'
+import {studentCourseService, type StudentCourse} from '../../services/api/studentCourseService'
 import type {ClassOverride, Course, CourseClass, Speciality} from '../../types/catalog'
 import type {CalendarEvent, CalendarEventFilter} from '../../types/schedule'
 import {getAcademicWeekInfo, getMondayOfWeek} from '../../utils/dateUtils'
@@ -45,8 +46,8 @@ export const scheduleService = {
         const endsAt = filters.endsAt || formatLocalDateTime(sunday)
 
         // 1. Fetch the week's personal events, all classes from /api/class (the university
-        // timetable) and this student's class overrides.
-        const [calendarEvents, allClasses, overrides] = await Promise.all([
+        // timetable), this student's class overrides, and chosen courses/groups.
+        const [calendarEvents, allClasses, overrides, studentCourses] = await Promise.all([
             apiClient.get<CalendarEvent[]>('/calendar', {
                 userId,
                 startsAt,
@@ -54,6 +55,7 @@ export const scheduleService = {
             }).catch(() => [] as CalendarEvent[]),
             courseClassService.getAll().catch(() => [] as CourseClass[]),
             classOverrideService.getForUser(userId).catch(() => [] as ClassOverride[]),
+            studentCourseService.getStudentCourses(userId).catch(() => [] as StudentCourse[]),
         ])
         const backendCalendarEvents = (calendarEvents || []).filter(
             (event) => event.eventType === 'PERSONAL',
@@ -75,9 +77,53 @@ export const scheduleService = {
             }
         })()
 
+        // If the student has not selected any courses, their personal university schedule has no course classes.
+        // (They can select courses in "Мої дисципліни" or view all university classes in "Загальний розклад").
+        if (!studentCourses || studentCourses.length === 0) {
+            return backendCalendarEvents
+        }
+
+        // Detect which courses have multiple distinct calendar dates across the semester
+        // (e.g. parser/SQL import generates a separate class occurrence for each week).
+        const courseDatesCount = new Map<number, Set<string>>()
+        for (const cls of allClasses) {
+            const cId = cls.course?.id
+            if (!cId) continue
+            const dateStr = cls.startsAt ? cls.startsAt.slice(0, 10) : ''
+            if (!courseDatesCount.has(cId)) {
+                courseDatesCount.set(cId, new Set())
+            }
+            if (dateStr) {
+                courseDatesCount.get(cId)!.add(dateStr)
+            }
+        }
+
         const recurringCourseEvents: CalendarEvent[] = []
 
         for (const cls of allClasses) {
+            const courseId = cls.course?.id
+            const enrollment = studentCourses.find((sc) => sc.courseId === courseId)
+            if (!enrollment) {
+                continue // Course not chosen by student
+            }
+
+            const assignedGroup = (enrollment.group || '').trim().toLowerCase()
+            const classGroup = (cls.group || '').trim().toLowerCase()
+
+            // Lectures are common for all enrolled groups
+            const isLecture = classGroup === '' ||
+                classGroup.includes('лек') ||
+                classGroup.includes('все') ||
+                classGroup === 'all'
+
+            if (!isLecture && assignedGroup) {
+                const classGroupNum = classGroup.replace(/\D/g, '')
+                const assignedGroupNum = assignedGroup.replace(/\D/g, '')
+                if (classGroupNum && assignedGroupNum && classGroupNum !== assignedGroupNum) {
+                    continue // Practice/seminar for another group
+                }
+            }
+
             // Check semester match: e.g. 'AUTUMN' course must only appear in 'AUTUMN' semester
             if (cls.course?.semester && cls.course.semester !== semesterName) {
                 continue
@@ -88,33 +134,46 @@ export const scheduleService = {
                 continue
             }
 
-            const classWeeks = cls.weeks || storedWeeksMap[cls.id] || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+            const isMultiDateCourse = (courseDatesCount.get(courseId || 0)?.size ?? 0) > 1
+            const classStartDate = new Date(cls.startsAt)
 
-            // Check if this class is scheduled for this specific semester week
-            if (!classWeeks.includes(semesterWeek)) {
-                continue
+            let eventStartsAt: string
+            let eventEndsAt: string
+
+            if (isMultiDateCourse) {
+                // If the course has real calendar dates spanning multiple weeks,
+                // only include the class if it actually takes place in THIS selected week!
+                if (isNaN(classStartDate.getTime()) || classStartDate < monday || classStartDate > sunday) {
+                    continue
+                }
+                eventStartsAt = cls.startsAt
+                eventEndsAt = cls.endsAt
+            } else {
+                // Single-date template course (e.g. mock test courses): project to the selected week
+                const classWeeks = cls.weeks || storedWeeksMap[cls.id] || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+                if (!classWeeks.includes(semesterWeek)) {
+                    continue
+                }
+
+                const dayOffset = !isNaN(classStartDate.getTime())
+                    ? (classStartDate.getDay() + 6) % 7
+                    : 0
+
+                const startTimeStr = cls.startsAt && cls.startsAt.length >= 16 ? cls.startsAt.slice(11, 19) : '08:30:00'
+                const endTimeStr = cls.endsAt && cls.endsAt.length >= 16 ? cls.endsAt.slice(11, 19) : '09:50:00'
+
+                const targetDate = new Date(monday)
+                targetDate.setDate(targetDate.getDate() + dayOffset)
+                const yyyy = targetDate.getFullYear()
+                const mm = String(targetDate.getMonth() + 1).padStart(2, '0')
+                const dd = String(targetDate.getDate()).padStart(2, '0')
+
+                const cleanStartTime = startTimeStr.length === 5 ? `${startTimeStr}:00` : startTimeStr.slice(0, 8)
+                const cleanEndTime = endTimeStr.length === 5 ? `${endTimeStr}:00` : endTimeStr.slice(0, 8)
+
+                eventStartsAt = `${yyyy}-${mm}-${dd}T${cleanStartTime}`
+                eventEndsAt = `${yyyy}-${mm}-${dd}T${cleanEndTime}`
             }
-
-            // Determine day of week from cls.startsAt (0 = Monday, ..., 6 = Sunday)
-            const startDate = new Date(cls.startsAt)
-            const dayOffset = !isNaN(startDate.getTime())
-                ? (startDate.getDay() + 6) % 7
-                : 0
-
-            const startTimeStr = cls.startsAt && cls.startsAt.length >= 16 ? cls.startsAt.slice(11, 19) : '08:30:00'
-            const endTimeStr = cls.endsAt && cls.endsAt.length >= 16 ? cls.endsAt.slice(11, 19) : '09:50:00'
-
-            const targetDate = new Date(monday)
-            targetDate.setDate(targetDate.getDate() + dayOffset)
-            const yyyy = targetDate.getFullYear()
-            const mm = String(targetDate.getMonth() + 1).padStart(2, '0')
-            const dd = String(targetDate.getDate()).padStart(2, '0')
-
-            const cleanStartTime = startTimeStr.length === 5 ? `${startTimeStr}:00` : startTimeStr.slice(0, 8)
-            const cleanEndTime = endTimeStr.length === 5 ? `${endTimeStr}:00` : endTimeStr.slice(0, 8)
-
-            const projectedStartsAt = `${yyyy}-${mm}-${dd}T${cleanStartTime}`
-            const projectedEndsAt = `${yyyy}-${mm}-${dd}T${cleanEndTime}`
 
             recurringCourseEvents.push(
                 applyClassOverrides(
@@ -126,9 +185,9 @@ export const scheduleService = {
                         group: cls.group || null,
                         location: cls.location || null,
                         description: cls.course?.faculty || cls.course?.department || null,
-                        startsAt: projectedStartsAt,
-                        endsAt: projectedEndsAt,
-                        weeks: classWeeks,
+                        startsAt: eventStartsAt,
+                        endsAt: eventEndsAt,
+                        weeks: [semesterWeek],
                         course: cls.course ?? null,
                     },
                     cls.id,

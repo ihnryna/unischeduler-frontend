@@ -302,9 +302,19 @@ export function GeneralSchedulePage() {
                     }}
                 >
                     {DAYS.map((day) => {
-                        const dayClasses = filteredClasses
+                        const allDayClasses = filteredClasses
                             .filter((c) => getDayIndex(c.startsAt) === day.dayIndex)
                             .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
+
+                        // Deduplicate repeating weekly occurrences of the same course slot for the day timetable overview
+                        const seenSlots = new Set<string>()
+                        const dayClasses = allDayClasses.filter((c) => {
+                            const timeSlot = `${c.startsAt.slice(11, 16)}_${c.endsAt.slice(11, 16)}`
+                            const key = `${c.course?.id}_${c.group}_${timeSlot}_${c.location}_${c.teacher}`
+                            if (seenSlots.has(key)) return false
+                            seenSlots.add(key)
+                            return true
+                        })
 
                         return (
                             <div

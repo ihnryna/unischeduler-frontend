@@ -48,6 +48,28 @@ export function AppSidebar({lessonCount: _lessonCount, sidebarRef, onNavigate, i
             <nav className="navigation" aria-label="Персональні функції">
                 <NavLink
                     onClick={onNavigate}
+                    to="/my-courses"
+                    className={({isActive}) =>
+                        `nav-link ${isActive ? 'active' : ''}`
+                    }
+                >
+                    <Icon name="book" className="nav-icon"/>
+                    Мої дисципліни
+                </NavLink>
+
+                <NavLink
+                    onClick={onNavigate}
+                    to="/my-groups"
+                    className={({isActive}) =>
+                        `nav-link ${isActive ? 'active' : ''}`
+                    }
+                >
+                    <Icon name="users" className="nav-icon"/>
+                    Групи
+                </NavLink>
+
+                <NavLink
+                    onClick={onNavigate}
                     to="/calendar-integration"
                     className={({isActive}) =>
                         `nav-link ${isActive ? 'active' : ''}`

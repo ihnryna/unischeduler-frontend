@@ -46,20 +46,30 @@ export function usePersonalEventMutations(): UsePersonalEventMutationsResult {
     )
 
     const create = useCallback(
-        (data: PersonalEventCreate) =>
-            run(
+        async (data: PersonalEventCreate) => {
+            const res = await run(
                 () => personalEventService.create(data),
                 'Не вдалося зберегти подію. Спробуйте ще раз.',
-            ),
+            )
+            if (res) {
+                window.dispatchEvent(new CustomEvent('unischeduler_personal_events_updated'))
+            }
+            return res
+        },
         [run],
     )
 
     const update = useCallback(
-        (data: PersonalEventUpdate) =>
-            run(
+        async (data: PersonalEventUpdate) => {
+            const res = await run(
                 () => personalEventService.update(data),
                 'Не вдалося зберегти зміни. Спробуйте ще раз.',
-            ),
+            )
+            if (res) {
+                window.dispatchEvent(new CustomEvent('unischeduler_personal_events_updated'))
+            }
+            return res
+        },
         [run],
     )
 
@@ -72,6 +82,9 @@ export function usePersonalEventMutations(): UsePersonalEventMutationsResult {
                 },
                 'Не вдалося видалити подію. Спробуйте ще раз.',
             )
+            if (result === true) {
+                window.dispatchEvent(new CustomEvent('unischeduler_personal_events_updated'))
+            }
             return result === true
         },
         [run],

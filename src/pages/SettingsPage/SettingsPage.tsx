@@ -1,4 +1,5 @@
 import {useEffect, useRef, useState} from 'react'
+import {Link} from 'react-router'
 
 import {
     FALLBACK_CLASS_COLOR,
@@ -8,9 +9,9 @@ import {
     useSubjectColors,
     type ColorScope,
 } from '../../features/schedule/subjectColors'
-import {adminService} from '../../features/admin/adminService'
+import {studentCourseService, type StudentCourse} from '../../services/api/studentCourseService'
 import {usePersonalEventNames} from '../../features/events/usePersonalEventNames'
-import type {Course} from '../../types/catalog'
+import {useAuthSession} from '../../features/auth/useAuthSession'
 
 type SavedNotice = {scope: ColorScope; text: string}
 
@@ -70,22 +71,41 @@ function ColorRow({title, subtitle, activeColor, onSelect}: Readonly<ColorRowPro
 }
 
 export function SettingsPage() {
+    const {user} = useAuthSession()
+    const userId = user?.id ?? 1
+
     const {colors, setColor, resetColors} = useSubjectColors()
     const [savedNotice, setSavedNotice] = useState<SavedNotice | null>(null)
-    const [courses, setCourses] = useState<Course[]>([])
-    const personalEvents = usePersonalEventNames()
+    const [studentCourses, setStudentCourses] = useState<StudentCourse[]>([])
+    const [isLoadingCourses, setIsLoadingCourses] = useState(true)
+    const personalEvents = usePersonalEventNames(userId)
     const noticeTimer = useRef<number | undefined>(undefined)
 
     useEffect(() => {
-        const load = () => {
-            adminService.getCourses().then(setCourses).catch(() => {})
+        let isActive = true
+        const load = async () => {
+            setIsLoadingCourses(true)
+            try {
+                const enrolled = await studentCourseService.getStudentCourses(userId)
+                if (isActive) {
+                    setStudentCourses(enrolled)
+                }
+            } catch {
+                // Ignore load error
+            } finally {
+                if (isActive) {
+                    setIsLoadingCourses(false)
+                }
+            }
         }
+
         load()
-        window.addEventListener('unischeduler_courses_updated', load)
+        window.addEventListener('unischeduler_student_courses_updated', load)
         return () => {
-            window.removeEventListener('unischeduler_courses_updated', load)
+            isActive = false
+            window.removeEventListener('unischeduler_student_courses_updated', load)
         }
-    }, [])
+    }, [userId])
 
     useEffect(() => () => window.clearTimeout(noticeTimer.current), [])
 
@@ -94,8 +114,6 @@ export function SettingsPage() {
         window.clearTimeout(noticeTimer.current)
         noticeTimer.current = window.setTimeout(() => setSavedNotice(null), 3000)
     }
-
-    const subjects = courses.map((c) => c.name)
 
     const renderNotice = (scope: ColorScope) =>
         savedNotice?.scope === scope && (
@@ -109,16 +127,20 @@ export function SettingsPage() {
             <div className="page-heading">
                 <div>
                     <h1>Налаштування</h1>
+                    <p className="page-intro text-muted">
+                        Персоналізація кольорової гами для ваших навчальних дисциплін та особистих подій
+                    </p>
                 </div>
             </div>
 
             <div className="settings-content">
+                {/* 1. Мої обрані дисципліни */}
                 <div className="settings-card">
                     <div className="settings-card-header">
                         <div>
-                            <h2>Кольори предметів у розкладі</h2>
+                            <h2>Кольори моїх дисциплін</h2>
                             <p className="settings-card-description">
-                                Оберіть колір для кожної дисципліни. Картки занять у вашому календарі
+                                Оберіть колір для кожної дисципліни вашого індивідуального плану. Картки занять у вашому календарі
                                 автоматично підсвічуватимуться обраним відтінком із фірмової ретро-палітри.
                             </p>
                         </div>
@@ -140,28 +162,51 @@ export function SettingsPage() {
                     </div>
 
                     <div className="subject-color-list">
-                        {subjects.map((subject) => (
-                            <ColorRow
-                                key={subject}
-                                title={subject}
-                                subtitle="ІПЗ-4 · Осінній семестр"
-                                activeColor={colors[subject] ?? FALLBACK_CLASS_COLOR}
-                                onSelect={(colorHex, colorName) => {
-                                    setColor(subject, colorHex)
-                                    showNotice('subjects', `Колір для «${subject}» оновлено (${colorName})`)
-                                }}
-                            />
-                        ))}
+                        {isLoadingCourses && (
+                            <p className="text-muted">Завантажуємо обрані дисципліни…</p>
+                        )}
+
+                        {!isLoadingCourses && studentCourses.length === 0 && (
+                            <div style={{padding: '2rem 1rem', textAlign: 'center'}}>
+                                <div style={{fontSize: '2.5rem', marginBottom: '0.5rem'}}>📚</div>
+                                <p style={{fontWeight: 600, marginBottom: '0.5rem'}}>У вас ще немає обраних дисциплін</p>
+                                <p className="text-muted" style={{maxWidth: '480px', margin: '0 auto 1.25rem auto', fontSize: '0.9rem'}}>
+                                    Оберіть дисципліни у розділі «Мої дисципліни», щоб вони з’явилися тут і ви могли налаштувати для них власні кольори.
+                                </p>
+                                <Link to="/my-courses" className="button primary-button" style={{fontSize: '0.9rem'}}>
+                                    + Обрати дисципліни
+                                </Link>
+                            </div>
+                        )}
+
+                        {!isLoadingCourses && studentCourses.map((sc) => {
+                            const courseName = sc.course?.name || `Дисципліна #${sc.courseId}`
+                            const subtitle = `${sc.course?.faculty ? `${sc.course.faculty} · ` : ''}Група ${sc.group || '1'}`
+
+                            return (
+                                <ColorRow
+                                    key={sc.courseId}
+                                    title={courseName}
+                                    subtitle={subtitle}
+                                    activeColor={colors[courseName] ?? FALLBACK_CLASS_COLOR}
+                                    onSelect={(colorHex, colorName) => {
+                                        setColor(courseName, colorHex)
+                                        showNotice('subjects', `Колір для «${courseName}» оновлено (${colorName})`)
+                                    }}
+                                />
+                            )
+                        })}
                     </div>
                 </div>
 
+                {/* 2. Мої особисті події */}
                 <div className="settings-card">
                     <div className="settings-card-header">
                         <div>
-                            <h2>Кольори особистих подій</h2>
+                            <h2>Кольори моїх особистих подій</h2>
                             <p className="settings-card-description">
-                                Оберіть колір для кожної особистої події. Події без власного кольору
-                                показуються блакитними.
+                                Оберіть колір для кожної створеної вами особистої події. Події без власного кольору
+                                показуються за замовчуванням блакитними.
                             </p>
                         </div>
 
@@ -189,12 +234,19 @@ export function SettingsPage() {
                             <p className="notice notice-error" role="alert">{personalEvents.error}</p>
                         )}
                         {!personalEvents.isLoading && !personalEvents.error && personalEvents.names.length === 0 && (
-                            <p className="text-muted">
-                                У вас ще немає особистих подій. Створіть подію в розкладі, і тут з’явиться її колір.
-                            </p>
+                            <div style={{padding: '2rem 1rem', textAlign: 'center'}}>
+                                <div style={{fontSize: '2.5rem', marginBottom: '0.5rem'}}>🗓️</div>
+                                <p style={{fontWeight: 600, marginBottom: '0.5rem'}}>У вас ще немає створених особистих подій</p>
+                                <p className="text-muted" style={{maxWidth: '480px', margin: '0 auto 1.25rem auto', fontSize: '0.9rem'}}>
+                                    Створіть особисту подію (консультацію, зустріч, дедлайн) на сторінці розкладу, і тут ви зможете обрати для неї колір.
+                                </p>
+                                <Link to="/schedule" className="button" style={{fontSize: '0.9rem'}}>
+                                    🗓️ Перейти до розкладу
+                                </Link>
+                            </div>
                         )}
 
-                        {personalEvents.names.map((name) => (
+                        {!personalEvents.isLoading && personalEvents.names.map((name) => (
                             <ColorRow
                                 key={name}
                                 title={name}

@@ -15,8 +15,17 @@ export type IconName =
     | 'book'
     | 'search'
     | 'clipboard'
+    | 'users'
 
 const PATHS: Record<IconName, ReactNode> = {
+    users: (
+        <>
+            <path d="M14 16v-1.5a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3V16"/>
+            <circle cx="9" cy="6" r="3"/>
+            <path d="M16 13a2.5 2.5 0 0 0 1.5-2.2V9.5"/>
+            <path d="M13.5 3.5a2.5 2.5 0 0 1 0 5"/>
+        </>
+    ),
     calendar: (
         <>
             <rect x="3" y="4.5" width="14" height="12.5" rx="2"/>

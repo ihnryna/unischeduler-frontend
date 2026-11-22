@@ -1,7 +1,6 @@
 import {useState} from 'react'
 import type {Course, CourseClass, Speciality} from '../../types/catalog'
 import {useAdmin} from '../../features/admin/useAdmin'
-import {AdminOverviewTab} from './components/AdminOverviewTab'
 import {AdminCoursesTab} from './components/AdminCoursesTab'
 import {AdminClassesTab} from './components/AdminClassesTab'
 import {AdminSpecialitiesTab} from './components/AdminSpecialitiesTab'
@@ -12,7 +11,7 @@ import {ClassModal} from './components/ClassModal'
 import {ConfirmModal} from './components/ConfirmModal'
 import {Icon} from '../../components/ui/Icon'
 
-type AdminTab = 'OVERVIEW' | 'COURSES' | 'CLASSES' | 'SPECIALITIES' | 'INSPECTOR' | 'LOGS'
+type AdminTab = 'COURSES' | 'CLASSES' | 'SPECIALITIES' | 'INSPECTOR' | 'LOGS'
 
 type DeleteTarget =
     | {type: 'COURSE'; id: number; name: string}
@@ -24,12 +23,7 @@ export function AdminPage() {
         courses,
         classes,
         specialities,
-        integrations,
-        syncStatus,
         auditLogs,
-        isLoading,
-        isSyncing,
-        isCheckingIntegrations,
         notification,
         createCourse,
         updateCourse,
@@ -39,13 +33,10 @@ export function AdminPage() {
         deleteClass,
         createSpeciality,
         deleteSpeciality,
-        triggerCazSync,
-        checkIntegrations,
         clearLogs,
-        resetDefaults,
     } = useAdmin()
 
-    const [activeTab, setActiveTab] = useState<AdminTab>('OVERVIEW')
+    const [activeTab, setActiveTab] = useState<AdminTab>('COURSES')
 
     // Modal states
     const [isCourseModalOpen, setIsCourseModalOpen] = useState(false)
@@ -125,17 +116,6 @@ export function AdminPage() {
                 <div>
                     <h1>Адміністративна панель</h1>
                 </div>
-                <div>
-                    <button
-                        type="button"
-                        className="button primary-button"
-                        disabled={isLoading}
-                        onClick={resetDefaults}
-                        title="Наповнити базу PostgreSQL початковими дисциплінами та парами НаУКМА"
-                    >
-                        {isLoading ? '⏳ Завантаження…' : '📦 Ініціалізувати базу НаУКМА'}
-                    </button>
-                </div>
             </div>
 
             {/* Notification Alert banner */}
@@ -153,15 +133,6 @@ export function AdminPage() {
 
             {/* Tab Navigation */}
             <nav className="admin-tabs-nav" aria-label="Розділи адміністративної панелі">
-                <button
-                    type="button"
-                    className={`admin-tab-btn ${activeTab === 'OVERVIEW' ? 'is-active' : ''}`}
-                    onClick={() => setActiveTab('OVERVIEW')}
-                >
-                    <Icon name="chart" className="admin-tab-icon"/>
-                    <span>Огляд та інтеграції</span>
-                </button>
-
                 <button
                     type="button"
                     className={`admin-tab-btn ${activeTab === 'COURSES' ? 'is-active' : ''}`}
@@ -213,23 +184,10 @@ export function AdminPage() {
             </nav>
 
             {/* Tab Panes */}
-            {activeTab === 'OVERVIEW' && (
-                <AdminOverviewTab
-                    coursesCount={courses.length}
-                    classesCount={classes.length}
-                    logsCount={auditLogs.length}
-                    integrations={integrations}
-                    syncStatus={syncStatus}
-                    isSyncing={isSyncing}
-                    isCheckingIntegrations={isCheckingIntegrations}
-                    onTriggerSync={triggerCazSync}
-                    onCheckIntegrations={checkIntegrations}
-                />
-            )}
-
             {activeTab === 'COURSES' && (
                 <AdminCoursesTab
                     courses={courses}
+                    specialities={specialities}
                     onAddCourse={handleOpenAddCourse}
                     onEditCourse={handleOpenEditCourse}
                     onDeleteCourse={handlePromptDeleteCourse}

@@ -1,8 +1,18 @@
 import {useMemo, useState} from 'react'
-import type {Course, Semester} from '../../../types/catalog'
+import {formatStudyYear} from '../../../utils/studyYear'
+import type {Course, Semester, Speciality} from '../../../types/catalog'
+import {
+    EMPTY_COURSE_FILTERS,
+    SEMESTER_OPTIONS,
+    getCourseYears,
+    isCourseFilterActive,
+    matchesCourseFilters,
+    type CourseFilterValues,
+} from '../../../features/courses/courseFilters'
 
 type AdminCoursesTabProps = {
     courses: Course[]
+    specialities: Speciality[]
     onAddCourse: () => void
     onEditCourse: (course: Course) => void
     onDeleteCourse: (course: Course) => void
@@ -10,12 +20,16 @@ type AdminCoursesTabProps = {
 
 export function AdminCoursesTab({
     courses,
+    specialities,
     onAddCourse,
     onEditCourse,
     onDeleteCourse,
 }: Readonly<AdminCoursesTabProps>) {
     const [searchQuery, setSearchQuery] = useState('')
-    const [semesterFilter, setSemesterFilter] = useState<'ALL' | Semester>('ALL')
+    const [filters, setFilters] = useState<CourseFilterValues>(EMPTY_COURSE_FILTERS)
+    const setFilter = <K extends keyof CourseFilterValues>(key: K, value: CourseFilterValues[K]) =>
+        setFilters((current) => ({...current, [key]: value}))
+    const availableYears = useMemo(() => getCourseYears(courses), [courses])
 
     const filteredCourses = useMemo(() => {
         return courses.filter((course) => {
@@ -24,12 +38,9 @@ export function AdminCoursesTab({
                 course.faculty.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 course.department.toLowerCase().includes(searchQuery.toLowerCase())
 
-            const matchesSemester =
-                semesterFilter === 'ALL' || course.semester === semesterFilter
-
-            return matchesSearch && matchesSemester
+            return matchesSearch && matchesCourseFilters(course, filters)
         })
-    }, [courses, searchQuery, semesterFilter])
+    }, [courses, searchQuery, filters])
 
     const getSemesterLabel = (semester: Semester) => {
         switch (semester) {
@@ -57,29 +68,62 @@ export function AdminCoursesTab({
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
 
+                    <div className="admin-filter-selects">
                     <select
                         className="select admin-filter-select"
-                        value={semesterFilter}
-                        onChange={(e) => setSemesterFilter(e.target.value as 'ALL' | Semester)}
+                        aria-label="Фільтр за спеціальністю"
+                        value={filters.specialityId}
+                        onChange={(e) => setFilter('specialityId', e.target.value === 'ALL' ? 'ALL' : Number(e.target.value))}
                     >
-                        <option value="ALL">Всі семестри</option>
-                        <option value="AUTUMN">Осінній семестр</option>
-                        <option value="SPRING">Весняний семестр</option>
-                        <option value="SUMMER">Літній семестр</option>
+                        <option value="ALL">Всі спеціальності</option>
+                        {specialities.map((spec) => (
+                            <option key={spec.id} value={spec.id}>
+                                {spec.name}
+                            </option>
+                        ))}
                     </select>
 
-                    {(searchQuery || semesterFilter !== 'ALL') && (
+                    <select
+                        className="select admin-filter-select"
+                        aria-label="Фільтр за семестром"
+                        value={filters.semester}
+                        onChange={(e) => setFilter('semester', e.target.value as Semester | 'ALL')}
+                    >
+                        <option value="ALL">Всі семестри</option>
+                        {SEMESTER_OPTIONS.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+
+                    <select
+                        className="select admin-filter-select"
+                        aria-label="Фільтр за роком навчання"
+                        value={filters.year}
+                        onChange={(e) => setFilter('year', e.target.value === 'ALL' ? 'ALL' : Number(e.target.value))}
+                    >
+                        <option value="ALL">Всі роки навчання</option>
+                        {availableYears.map((yr) => (
+                            <option key={yr} value={yr}>
+                                {formatStudyYear(yr)}
+                            </option>
+                        ))}
+                    </select>
+
+                    {(searchQuery || isCourseFilterActive(filters)) && (
                         <button
                             type="button"
                             className="button admin-btn-secondary"
                             onClick={() => {
                                 setSearchQuery('')
-                                setSemesterFilter('ALL')
+                                setFilters(EMPTY_COURSE_FILTERS)
                             }}
                         >
                             Скинути
                         </button>
                     )}
+                    </div>
                 </div>
 
                 <div className="admin-actions-right">
@@ -104,7 +148,7 @@ export function AdminCoursesTab({
                     <div className="admin-empty-state">
                         <p className="admin-empty-title">Дисциплін не знайдено</p>
                         <p className="admin-empty-desc">
-                            Спробуйте змінити пошуковий запит або додайте нову дисципліну до каталогу.
+                            Спробуйте змінити пошуковий запит чи фільтри або додайте нову дисципліну до каталогу.
                         </p>
                         <button
                             type="button"
@@ -140,7 +184,7 @@ export function AdminCoursesTab({
                                         </td>
                                         <td>
                                             <span className="admin-badge admin-badge-neutral">
-                                                {getSemesterLabel(course.semester)} · {course.year}
+                                                {getSemesterLabel(course.semester)} · {formatStudyYear(course.year)}
                                             </span>
                                         </td>
                                         <td>

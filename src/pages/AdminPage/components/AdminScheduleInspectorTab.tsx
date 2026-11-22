@@ -44,9 +44,6 @@ export function AdminScheduleInspectorTab({
                 <div className="admin-card-header-row">
                     <div>
                         <h3 className="admin-card-title">Діагностика та аудит розкладів</h3>
-                        <p className="admin-card-subtitle">
-                            Швидкий перегляд зведеного розкладу для перевірки звернень студентів і викладачів
-                        </p>
                     </div>
 
                     <div className="admin-inspector-select-wrap">
@@ -72,9 +69,6 @@ export function AdminScheduleInspectorTab({
                     <div className="admin-inspector-stats">
                         <span className="admin-badge admin-badge-info">
                             {countUk(inspectedClasses.length, ['навчальна пара', 'навчальні пари', 'навчальних пар'])}
-                        </span>
-                        <span className="admin-badge admin-badge-success">
-                            ✓ Колізій не виявлено
                         </span>
                     </div>
                 </div>

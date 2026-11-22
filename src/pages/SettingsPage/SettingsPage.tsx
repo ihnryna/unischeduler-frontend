@@ -3,17 +3,11 @@ import {Link} from 'react-router'
 
 import {
     FALLBACK_CLASS_COLOR,
-    FALLBACK_PERSONAL_COLOR,
     RETRO_COLOR_PALETTE,
-    personalColorKey,
     useSubjectColors,
-    type ColorScope,
 } from '../../features/schedule/subjectColors'
 import {studentCourseService, type StudentCourse} from '../../services/api/studentCourseService'
-import {usePersonalEventNames} from '../../features/events/usePersonalEventNames'
 import {useAuthSession} from '../../features/auth/useAuthSession'
-
-type SavedNotice = {scope: ColorScope; text: string}
 
 type ColorRowProps = {
     title: string
@@ -22,7 +16,7 @@ type ColorRowProps = {
     onSelect: (colorHex: string, colorName: string) => void
 }
 
-/** One subject / personal event with its preview and the palette to pick from. */
+/** One subject with its preview and the palette to pick from. */
 function ColorRow({title, subtitle, activeColor, onSelect}: Readonly<ColorRowProps>) {
     return (
         <div className="subject-color-item">
@@ -75,10 +69,9 @@ export function SettingsPage() {
     const userId = user?.id ?? 1
 
     const {colors, setColor, resetColors} = useSubjectColors()
-    const [savedNotice, setSavedNotice] = useState<SavedNotice | null>(null)
+    const [savedNotice, setSavedNotice] = useState<string | null>(null)
     const [studentCourses, setStudentCourses] = useState<StudentCourse[]>([])
     const [isLoadingCourses, setIsLoadingCourses] = useState(true)
-    const personalEvents = usePersonalEventNames(userId)
     const noticeTimer = useRef<number | undefined>(undefined)
 
     useEffect(() => {
@@ -109,16 +102,16 @@ export function SettingsPage() {
 
     useEffect(() => () => window.clearTimeout(noticeTimer.current), [])
 
-    const showNotice = (scope: ColorScope, text: string) => {
-        setSavedNotice({scope, text})
+    const showNotice = (text: string) => {
+        setSavedNotice(text)
         window.clearTimeout(noticeTimer.current)
         noticeTimer.current = window.setTimeout(() => setSavedNotice(null), 3000)
     }
 
-    const renderNotice = (scope: ColorScope) =>
-        savedNotice?.scope === scope && (
+    const renderNotice = () =>
+        savedNotice && (
             <span className="settings-saved-pill" role="status">
-                ✓ {savedNotice.text}
+                ✓ {savedNotice}
             </span>
         )
 
@@ -127,9 +120,6 @@ export function SettingsPage() {
             <div className="page-heading">
                 <div>
                     <h1>Налаштування</h1>
-                    <p className="page-intro text-muted">
-                        Персоналізація кольорової гами для ваших навчальних дисциплін та особистих подій
-                    </p>
                 </div>
             </div>
 
@@ -139,20 +129,16 @@ export function SettingsPage() {
                     <div className="settings-card-header">
                         <div>
                             <h2>Кольори моїх дисциплін</h2>
-                            <p className="settings-card-description">
-                                Оберіть колір для кожної дисципліни вашого індивідуального плану. Картки занять у вашому календарі
-                                автоматично підсвічуватимуться обраним відтінком із фірмової ретро-палітри.
-                            </p>
                         </div>
 
                         <div className="settings-actions">
-                            {renderNotice('subjects')}
+                            {renderNotice()}
                             <button
                                 type="button"
                                 className="reset-button"
                                 onClick={() => {
                                     resetColors('subjects')
-                                    showNotice('subjects', 'Кольори дисциплін скинуто до початкових')
+                                    showNotice('Кольори дисциплін скинуто до початкових')
                                 }}
                                 title="Повернути початкові кольори дисциплін"
                             >
@@ -191,7 +177,7 @@ export function SettingsPage() {
                                     activeColor={colors[courseName] ?? FALLBACK_CLASS_COLOR}
                                     onSelect={(colorHex, colorName) => {
                                         setColor(courseName, colorHex)
-                                        showNotice('subjects', `Колір для «${courseName}» оновлено (${colorName})`)
+                                        showNotice(`Колір для «${courseName}» оновлено (${colorName})`)
                                     }}
                                 />
                             )
@@ -199,67 +185,6 @@ export function SettingsPage() {
                     </div>
                 </div>
 
-                {/* 2. Мої особисті події */}
-                <div className="settings-card">
-                    <div className="settings-card-header">
-                        <div>
-                            <h2>Кольори моїх особистих подій</h2>
-                            <p className="settings-card-description">
-                                Оберіть колір для кожної створеної вами особистої події. Події без власного кольору
-                                показуються за замовчуванням блакитними.
-                            </p>
-                        </div>
-
-                        <div className="settings-actions">
-                            {renderNotice('personal')}
-                            <button
-                                type="button"
-                                className="reset-button"
-                                onClick={() => {
-                                    resetColors('personal')
-                                    showNotice('personal', 'Кольори особистих подій скинуто до початкових')
-                                }}
-                                title="Повернути початкові кольори особистих подій"
-                            >
-                                Скинути до початкових
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="subject-color-list">
-                        {personalEvents.isLoading && (
-                            <p className="text-muted">Завантажуємо ваші особисті події…</p>
-                        )}
-                        {personalEvents.error && (
-                            <p className="notice notice-error" role="alert">{personalEvents.error}</p>
-                        )}
-                        {!personalEvents.isLoading && !personalEvents.error && personalEvents.names.length === 0 && (
-                            <div style={{padding: '2rem 1rem', textAlign: 'center'}}>
-                                <div style={{fontSize: '2.5rem', marginBottom: '0.5rem'}}>🗓️</div>
-                                <p style={{fontWeight: 600, marginBottom: '0.5rem'}}>У вас ще немає створених особистих подій</p>
-                                <p className="text-muted" style={{maxWidth: '480px', margin: '0 auto 1.25rem auto', fontSize: '0.9rem'}}>
-                                    Створіть особисту подію (консультацію, зустріч, дедлайн) на сторінці розкладу, і тут ви зможете обрати для неї колір.
-                                </p>
-                                <Link to="/schedule" className="button" style={{fontSize: '0.9rem'}}>
-                                    🗓️ Перейти до розкладу
-                                </Link>
-                            </div>
-                        )}
-
-                        {!personalEvents.isLoading && personalEvents.names.map((name) => (
-                            <ColorRow
-                                key={name}
-                                title={name}
-                                subtitle="Особиста подія"
-                                activeColor={colors[personalColorKey(name)] ?? FALLBACK_PERSONAL_COLOR}
-                                onSelect={(colorHex, colorName) => {
-                                    setColor(personalColorKey(name), colorHex)
-                                    showNotice('personal', `Колір для «${name}» оновлено (${colorName})`)
-                                }}
-                            />
-                        ))}
-                    </div>
-                </div>
             </div>
         </section>
     )

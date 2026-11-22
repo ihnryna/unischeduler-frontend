@@ -29,11 +29,11 @@ export function AdminClassesTab({
     }, [classes])
 
     const filteredClasses = useMemo(() => {
+        const query = searchQuery.toLowerCase()
         return classes.filter((cls) => {
-            const matchesSearch =
-                cls.course.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                cls.teacher.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                cls.location.toLowerCase().includes(searchQuery.toLowerCase())
+            const matchesSearch = [cls.course?.name, cls.teacher, cls.location].some((field) =>
+                (field ?? '').toLowerCase().includes(query),
+            )
 
             const matchesGroup = groupFilter === 'ALL' || cls.group === groupFilter
 
@@ -161,7 +161,7 @@ export function AdminClassesTab({
                                             </td>
                                             <td>
                                                 <span className="admin-location-pill">
-                                                    📍 {cls.location}
+                                                    {cls.location}
                                                 </span>
                                             </td>
                                             <td>
@@ -169,7 +169,7 @@ export function AdminClassesTab({
                                                     className="admin-weeks-badge"
                                                     title={cls.weeks ? `Тижні: ${cls.weeks.join(', ')}` : 'Усі тижні'}
                                                 >
-                                                    🗓️ {formatWeeksList(cls.weeks)}
+                                                    {formatWeeksList(cls.weeks)}
                                                 </span>
                                             </td>
                                             <td className="admin-cell-actions">

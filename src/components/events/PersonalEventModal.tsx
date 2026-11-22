@@ -6,6 +6,13 @@ import {ConfirmDeleteDialog} from './ConfirmDeleteDialog'
 import {PAIR_TIME_SLOTS} from '../../features/schedule/scheduleConfig'
 import {usePersonalEventMutations} from '../../features/events/usePersonalEventMutations'
 import {
+    FALLBACK_PERSONAL_COLOR,
+    RETRO_COLOR_PALETTE,
+    getStoredSubjectColors,
+    personalColorKey,
+    saveSubjectColor,
+} from '../../features/schedule/subjectColors'
+import {
     DESCRIPTION_MAX_LENGTH,
     isLinkLike,
     LOCATION_MAX_LENGTH,
@@ -88,7 +95,7 @@ function formatDuration(startTime: string, endTime: string): string | null {
  * Modal with the personal-event form: `mode="create"` adds a new event (FE-22),
  * `mode="edit"` changes an existing one, prefilled with its current values (FE-23).
  *
- * Fields: name*, date*, start*, end*, room or online link, description. Validates on blur
+ * Fields: name*, date*, start*, end*, room or online link, description, card colour. Validates on blur
  * and on submit, shows inline errors, focuses the first invalid field, sends nothing while
  * the form is invalid and keeps the entered data if saving fails. Mount it only while open
  * so every opening starts from the event's current values.
@@ -103,6 +110,12 @@ export function PersonalEventModal(props: Readonly<PersonalEventModalProps>) {
 
     const [initialValues] = useState<PersonalEventFormValues>(() => getInitialValues(props))
     const [values, setValues] = useState<PersonalEventFormValues>(initialValues)
+    const [initialColor] = useState<string>(() =>
+        props.mode === 'edit'
+            ? getStoredSubjectColors()[personalColorKey(props.event.name)] ?? FALLBACK_PERSONAL_COLOR
+            : FALLBACK_PERSONAL_COLOR,
+    )
+    const [color, setColor] = useState<string>(initialColor)
     const [touched, setTouched] = useState<Partial<Record<PersonalEventFormField, boolean>>>({})
     const [submitAttempted, setSubmitAttempted] = useState(false)
     const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
@@ -113,9 +126,10 @@ export function PersonalEventModal(props: Readonly<PersonalEventModalProps>) {
     const visibleError = (field: PersonalEventFormField) =>
         submitAttempted || touched[field] ? errors[field] : undefined
     const hasErrors = Object.keys(errors).length > 0
-    const isDirty = PERSONAL_EVENT_FIELD_ORDER.some(
-        (field) => values[field] !== initialValues[field],
-    )
+    const isColorChanged = color.toLowerCase() !== initialColor.toLowerCase()
+    const isDirty =
+        isColorChanged ||
+        PERSONAL_EVENT_FIELD_ORDER.some((field) => values[field] !== initialValues[field])
 
     const update = (field: PersonalEventFormField, value: string) => {
         setValues((current) => ({...current, [field]: value}))
@@ -149,10 +163,21 @@ export function PersonalEventModal(props: Readonly<PersonalEventModalProps>) {
             return
         }
 
+        const trimmedName = values.name.trim()
+        const isOnlyColorChanged =
+            isEdit &&
+            PERSONAL_EVENT_FIELD_ORDER.every((field) => values[field] === initialValues[field])
+        if (props.mode === 'edit' && isOnlyColorChanged) {
+            // Colour lives on the client only — no need to call the API.
+            saveSubjectColor(personalColorKey(trimmedName), color)
+            onClose()
+            return
+        }
+
         const location = values.location.trim()
         const description = values.description.trim()
         const fields = {
-            name: values.name.trim(),
+            name: trimmedName,
             location: location || null,
             description: description || null,
             startsAt: `${values.date}T${values.startTime}:00`,
@@ -163,7 +188,10 @@ export function PersonalEventModal(props: Readonly<PersonalEventModalProps>) {
                 ? await updateEvent({id: props.event.id, ...fields})
                 : await create({userId: props.userId, ...fields})
 
-        if (saved) onSaved(saved)
+        if (saved) {
+            saveSubjectColor(personalColorKey(saved.name), color)
+            onSaved(saved)
+        }
     }
 
     const duration =
@@ -382,6 +410,36 @@ export function PersonalEventModal(props: Readonly<PersonalEventModalProps>) {
                             onBlur={() => markTouched('description')}
                         />
                     </FormField>
+
+                    <div className="form-field">
+                        <span className="form-field-label" id={`${idPrefix}-color`}>
+                            Колір картки
+                        </span>
+                        <div
+                            className="palette-swatches"
+                            role="radiogroup"
+                            aria-labelledby={`${idPrefix}-color`}
+                        >
+                            {RETRO_COLOR_PALETTE.map((paletteColor) => {
+                                const isSelected = color.toLowerCase() === paletteColor.bg.toLowerCase()
+                                return (
+                                    <button
+                                        type="button"
+                                        key={paletteColor.id}
+                                        role="radio"
+                                        aria-checked={isSelected}
+                                        aria-label={paletteColor.name}
+                                        title={paletteColor.name}
+                                        className={`color-swatch-btn ${isSelected ? 'is-selected' : ''}`}
+                                        style={{['--swatch-bg' as string]: paletteColor.bg}}
+                                        onClick={() => setColor(paletteColor.bg)}
+                                    >
+                                        {isSelected && <span className="swatch-check" aria-hidden="true">✓</span>}
+                                    </button>
+                                )
+                            })}
+                        </div>
+                    </div>
                 </form>
             </Modal>
 

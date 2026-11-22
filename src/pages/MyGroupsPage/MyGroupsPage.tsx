@@ -1,4 +1,5 @@
 import {useCallback, useEffect, useMemo, useState} from 'react'
+import {formatStudyYear} from '../../utils/studyYear'
 import {Link} from 'react-router'
 import {courseClassService} from '../../services/api/courseClassService'
 import {studentCourseService, type StudentCourse} from '../../services/api/studentCourseService'
@@ -150,10 +151,6 @@ export function MyGroupsPage() {
             <div className="page-heading">
                 <div>
                     <h1>Групи для дисциплін</h1>
-                    <p className="page-intro text-muted">
-                        Вкажіть номер вашої групи (числом) для кожної обраної дисципліни.
-                        Лекції відображатимуться для всіх, а семінари та практичні заняття — лише для вашої групи.
-                    </p>
                 </div>
                 <div style={{display: 'flex', gap: '0.75rem', alignItems: 'center'}}>
                     <Link to="/my-courses" className="button">
@@ -248,7 +245,7 @@ export function MyGroupsPage() {
                                     <p className="text-muted" style={{fontSize: '0.85rem', margin: 0}}>
                                         {course?.faculty ? `${course.faculty} · ` : ''}
                                         {course?.department || ''}
-                                        {course?.year ? ` · ${course.year} рік` : ''}
+                                        {course?.year ? ` · ${formatStudyYear(course.year)}` : ''}
                                     </p>
 
                                     {detectedGroups.length > 0 && (
@@ -290,28 +287,33 @@ export function MyGroupsPage() {
                                         >
                                             Моя група:
                                         </label>
-                                        <input
+                                        <select
                                             id={`group-input-${courseId}`}
-                                            type="number"
-                                            min="1"
-                                            max="50"
-                                            className="input"
-                                            style={{width: '80px', textAlign: 'center', fontWeight: 600, fontSize: '1rem', padding: '6px 8px'}}
+                                            className="select"
+                                            style={{width: '110px', textAlign: 'center', fontWeight: 600, fontSize: '1rem', padding: '6px 8px'}}
                                             value={currentInput}
+                                            disabled={detectedGroups.length === 0}
                                             onChange={(e) => handleGroupChange(courseId, e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    handleSaveGroup(courseId)
-                                                }
-                                            }}
-                                            placeholder="1"
-                                        />
+                                        >
+                                            {detectedGroups.length === 0 && (
+                                                <option value={currentInput}>—</option>
+                                            )}
+                                            {/* Keep a saved group that is no longer in the timetable visible. */}
+                                            {detectedGroups.length > 0 && !detectedGroups.includes(currentInput) && (
+                                                <option value={currentInput}>{currentInput} (немає в розкладі)</option>
+                                            )}
+                                            {detectedGroups.map((grp) => (
+                                                <option key={grp} value={grp}>
+                                                    {grp}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
 
                                     <button
                                         type="button"
                                         className={`button ${isSuccess ? '' : 'primary-button'}`}
-                                        disabled={isSaving}
+                                        disabled={isSaving || detectedGroups.length === 0}
                                         style={{minWidth: '100px'}}
                                         onClick={() => handleSaveGroup(courseId)}
                                     >

@@ -1,4 +1,14 @@
 import {useCallback, useEffect, useMemo, useState} from 'react'
+import {formatStudyYear} from '../../utils/studyYear'
+import {
+    EMPTY_COURSE_FILTERS,
+    SEMESTER_OPTIONS,
+    getCourseYears,
+    isCourseFilterActive,
+    matchesCourseFilters,
+    type CourseFilterValues,
+} from '../../features/courses/courseFilters'
+import type {Semester} from '../../types/catalog'
 import {Link} from 'react-router'
 import type {Course, Speciality} from '../../types/catalog'
 import {courseService} from '../../services/api/courseService'
@@ -17,8 +27,9 @@ export function MyCoursesPage() {
     const [isLoading, setIsLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
     const [filterTab, setFilterTab] = useState<'ALL' | 'ENROLLED' | 'AVAILABLE'>('ALL')
-    const [selectedSpecialityId, setSelectedSpecialityId] = useState<number | 'ALL'>('ALL')
-    const [selectedYear, setSelectedYear] = useState<number | 'ALL'>('ALL')
+    const [filters, setFilters] = useState<CourseFilterValues>(EMPTY_COURSE_FILTERS)
+    const setFilter = <K extends keyof CourseFilterValues>(key: K, value: CourseFilterValues[K]) =>
+        setFilters((current) => ({...current, [key]: value}))
     const [actionLoadingId, setActionLoadingId] = useState<number | null>(null)
     const [notification, setNotification] = useState<{type: 'success' | 'error' | 'info'; message: string} | null>(null)
 
@@ -87,13 +98,7 @@ export function MyCoursesPage() {
         }
     }
 
-    const availableYears = useMemo(() => {
-        const set = new Set<number>()
-        allCourses.forEach((c) => {
-            if (c.year) set.add(c.year)
-        })
-        return Array.from(set).sort((a, b) => a - b)
-    }, [allCourses])
+    const availableYears = useMemo(() => getCourseYears(allCourses), [allCourses])
 
     const filteredCourses = useMemo(() => {
         return allCourses.filter((course) => {
@@ -102,14 +107,7 @@ export function MyCoursesPage() {
             if (filterTab === 'ENROLLED' && !isEnrolled) return false
             if (filterTab === 'AVAILABLE' && isEnrolled) return false
 
-            if (selectedSpecialityId !== 'ALL') {
-                const matchesSpec = course.specialities?.some((s) => s.id === selectedSpecialityId)
-                if (!matchesSpec) return false
-            }
-
-            if (selectedYear !== 'ALL') {
-                if (course.year !== selectedYear) return false
-            }
+            if (!matchesCourseFilters(course, filters)) return false
 
             if (searchQuery.trim()) {
                 const q = searchQuery.toLowerCase()
@@ -121,16 +119,13 @@ export function MyCoursesPage() {
 
             return true
         })
-    }, [allCourses, enrolledCourseIds, filterTab, selectedSpecialityId, selectedYear, searchQuery])
+    }, [allCourses, enrolledCourseIds, filterTab, filters, searchQuery])
 
     return (
         <section className="page-section">
             <div className="page-heading">
                 <div>
                     <h1>Мої дисципліни</h1>
-                    <p className="page-intro text-muted">
-                        Оберіть вибіркові та обов’язкові дисципліни вашого індивідуального плану для відображення в розкладі
-                    </p>
                 </div>
                 <div style={{display: 'flex', gap: '0.75rem', alignItems: 'center'}}>
                     <Link to="/my-groups" className="button primary-button">
@@ -185,7 +180,7 @@ export function MyCoursesPage() {
                     </div>
                 </div>
 
-                {/* Filters by Speciality & Year */}
+                {/* Filters by speciality, semester & year of study */}
                 <div style={{display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', paddingTop: '0.75rem', borderTop: '1px solid var(--border-color, #e2e8f0)'}}>
                     <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem', flex: '1', minWidth: '220px'}}>
                         <label htmlFor="filter-spec" style={{fontSize: '0.85rem', fontWeight: 600, whiteSpace: 'nowrap'}}>
@@ -194,8 +189,8 @@ export function MyCoursesPage() {
                         <select
                             id="filter-spec"
                             className="select"
-                            value={selectedSpecialityId}
-                            onChange={(e) => setSelectedSpecialityId(e.target.value === 'ALL' ? 'ALL' : Number(e.target.value))}
+                            value={filters.specialityId}
+                            onChange={(e) => setFilter('specialityId', e.target.value === 'ALL' ? 'ALL' : Number(e.target.value))}
                             style={{padding: '6px 10px', fontSize: '0.85rem', width: '100%'}}
                         >
                             <option value="ALL">Всі спеціальності ({specialities.length})</option>
@@ -208,33 +203,52 @@ export function MyCoursesPage() {
                     </div>
 
                     <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: '180px'}}>
+                        <label htmlFor="filter-semester" style={{fontSize: '0.85rem', fontWeight: 600, whiteSpace: 'nowrap'}}>
+                            Семестр:
+                        </label>
+                        <select
+                            id="filter-semester"
+                            className="select"
+                            value={filters.semester}
+                            onChange={(e) => setFilter('semester', e.target.value as Semester | 'ALL')}
+                            style={{padding: '6px 10px', fontSize: '0.85rem'}}
+                        >
+                            <option value="ALL">Всі семестри</option>
+                            {SEMESTER_OPTIONS.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: '180px'}}>
                         <label htmlFor="filter-year" style={{fontSize: '0.85rem', fontWeight: 600, whiteSpace: 'nowrap'}}>
                             Рік навчання:
                         </label>
                         <select
                             id="filter-year"
                             className="select"
-                            value={selectedYear}
-                            onChange={(e) => setSelectedYear(e.target.value === 'ALL' ? 'ALL' : Number(e.target.value))}
+                            value={filters.year}
+                            onChange={(e) => setFilter('year', e.target.value === 'ALL' ? 'ALL' : Number(e.target.value))}
                             style={{padding: '6px 10px', fontSize: '0.85rem'}}
                         >
                             <option value="ALL">Всі роки</option>
                             {availableYears.map((yr) => (
                                 <option key={yr} value={yr}>
-                                    {yr >= 1900 ? `${yr} рік` : `${yr}-й курс`}
+                                    {formatStudyYear(yr)}
                                 </option>
                             ))}
                         </select>
                     </div>
 
-                    {(selectedSpecialityId !== 'ALL' || selectedYear !== 'ALL' || searchQuery) && (
+                    {(isCourseFilterActive(filters) || searchQuery) && (
                         <button
                             type="button"
                             className="button"
                             style={{fontSize: '0.85rem', padding: '6px 12px'}}
                             onClick={() => {
-                                setSelectedSpecialityId('ALL')
-                                setSelectedYear('ALL')
+                                setFilters(EMPTY_COURSE_FILTERS)
                                 setSearchQuery('')
                             }}
                         >
@@ -304,7 +318,7 @@ export function MyCoursesPage() {
                                     <div style={{display: 'flex', flexWrap: 'wrap', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--text-muted)'}}>
                                         <span>Семестр: {course.semester === 'AUTUMN' ? 'Осінній' : course.semester === 'SPRING' ? 'Весняний' : 'Літній'}</span>
                                         <span>•</span>
-                                        <span>Рік навчання: {course.year}</span>
+                                        <span>{formatStudyYear(course.year)}</span>
                                     </div>
 
                                     {course.specialities && course.specialities.length > 0 && (

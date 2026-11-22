@@ -11,7 +11,6 @@ import {MyCoursesPage} from '../pages/MyCoursesPage/MyCoursesPage'
 import {MyGroupsPage} from '../pages/MyGroupsPage/MyGroupsPage'
 import {SettingsPage} from '../pages/SettingsPage/SettingsPage'
 import { GeneralSchedulePage } from '../pages/GeneralSchedulePage/GeneralSchedulePage'
-import { GoogleCalendarPage } from '../pages/GoogleCalendarPage/GoogleCalendarPage'
 import { AdminPage } from '../pages/AdminPage/AdminPage'
 import {NotFoundPage} from '../pages/NotFoundPage/NotFoundPage'
 
@@ -64,10 +63,6 @@ export const router = createBrowserRouter([
             {
                 path: 'general-schedule',
                 element: <GeneralSchedulePage />,
-            },
-            {
-                path: 'calendar-integration',
-                element: <GoogleCalendarPage />,
             },
             {
                 path: 'settings',

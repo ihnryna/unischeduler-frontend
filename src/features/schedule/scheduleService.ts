@@ -190,7 +190,7 @@ export const scheduleService = {
                         weeks: [semesterWeek],
                         course: cls.course ?? null,
                     },
-                    cls.id,
+                    cls,
                     overrides,
                 ),
             )

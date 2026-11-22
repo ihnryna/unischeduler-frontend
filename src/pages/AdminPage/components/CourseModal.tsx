@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react'
+import {DEFAULT_STUDY_YEAR, STUDY_YEARS, formatStudyYear} from '../../../utils/studyYear'
 import type {Course, Semester, Speciality} from '../../../types/catalog'
 import {mockSpecialities} from '../../../mocks/specialities'
 import type {CourseFormData} from '../../../features/admin/adminTypes'
@@ -31,7 +32,7 @@ export function CourseModal({
     const [faculty, setFaculty] = useState(DEFAULT_FACULTIES[0])
     const [department, setDepartment] = useState('Кафедра інформатики')
     const [semester, setSemester] = useState<Semester>('AUTUMN')
-    const [year, setYear] = useState(2026)
+    const [year, setYear] = useState<number>(DEFAULT_STUDY_YEAR)
     const [selectedSpecialities, setSelectedSpecialities] = useState<string[]>([
         activeSpecialities[0]?.name ?? 'Інженерія програмного забезпечення',
     ])
@@ -50,7 +51,7 @@ export function CourseModal({
             setFaculty(DEFAULT_FACULTIES[0])
             setDepartment('Кафедра інформатики')
             setSemester('AUTUMN')
-            setYear(2026)
+            setYear(DEFAULT_STUDY_YEAR)
             setSelectedSpecialities([mockSpecialities[0].name])
         }
         setError(null)
@@ -82,7 +83,7 @@ export function CourseModal({
             faculty,
             department: department.trim(),
             semester,
-            year: Number(year) || 2026,
+            year: Number(year) || DEFAULT_STUDY_YEAR,
             specialityNames: selectedSpecialities,
         })
         onClose()
@@ -192,17 +193,23 @@ export function CourseModal({
 
                             <div className="admin-form-group">
                                 <label className="admin-form-label" htmlFor="course-year">
-                                    Навчальний рік
+                                    Рік навчання
                                 </label>
-                                <input
+                                <select
                                     id="course-year"
-                                    className="input admin-form-input"
-                                    type="number"
-                                    min="2020"
-                                    max="2035"
+                                    className="select admin-form-select"
                                     value={year}
                                     onChange={(e) => setYear(Number(e.target.value))}
-                                />
+                                >
+                                    {(STUDY_YEARS as readonly number[]).includes(year) ? null : (
+                                        <option value={year}>{formatStudyYear(year)}</option>
+                                    )}
+                                    {STUDY_YEARS.map((studyYear) => (
+                                        <option key={studyYear} value={studyYear}>
+                                            {formatStudyYear(studyYear)}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
 

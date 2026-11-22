@@ -1,4 +1,4 @@
-import type {ClassOverride} from '../../types/catalog'
+import type {ClassOverride, CourseClass} from '../../types/catalog'
 import type {LocalDateTime} from '../../types/common'
 import type {CalendarEvent, ClassOccurrence} from '../../types/schedule'
 import {getMondayOfWeek} from '../../utils/dateUtils'
@@ -13,6 +13,8 @@ import {isLinkLike, isRealDate, isValidLink} from '../events/personalEventValida
  *
  * - `startsAtOverride === null` → **series** override: applies to every occurrence of the
  *   class (e.g. the room changed for the rest of the semester, or the class is dropped).
+ *   Imported timetables store one `CourseClass` row per week, so a series override matches
+ *   every class of the same course and group, not only the row it was saved on.
  * - `startsAtOverride !== null` → **occurrence** override: applies to the one occurrence
  *   in the same Monday–Sunday week as `startsAtOverride` (e.g. moved from Tue to Thu, or
  *   cancelled this week). A cancelled occurrence keeps its original start/end.
@@ -52,26 +54,55 @@ export function isOccurrenceOverride(override: ClassOverride): boolean {
     return override.startsAtOverride !== null && override.startsAtOverride !== undefined
 }
 
+/** The class fields that identify its series (the same subject for the same group). */
+export type ClassSeriesRef = Pick<CourseClass, 'id' | 'group'> & {
+    course?: Pick<CourseClass['course'], 'id'> | null
+}
+
+const normalizeGroup = (group: string | null | undefined) => (group ?? '').trim().toLowerCase()
+
 /**
- * Finds the overrides that apply to the occurrence of `courseClassId` that originally
- * starts at `originalStartsAt`.
+ * True when `other` belongs to the same series as `cls`: the same row, or another row of
+ * the same course for the same group (imported timetables have one row per week).
+ */
+function isSameSeries(cls: ClassSeriesRef, other: ClassSeriesRef | null | undefined): boolean {
+    if (!other) return false
+    if (other.id === cls.id) return true
+    const courseId = cls.course?.id
+    return (
+        courseId !== undefined &&
+        courseId !== null &&
+        other.course?.id === courseId &&
+        normalizeGroup(other.group) === normalizeGroup(cls.group)
+    )
+}
+
+/**
+ * Finds the overrides that apply to the occurrence of `cls` that originally starts at
+ * `originalStartsAt`. Occurrence overrides must be saved on this very row; series
+ * overrides may come from any row of the same series.
  */
 export function findOverridesFor(
-    courseClassId: number,
+    cls: ClassSeriesRef,
     originalStartsAt: LocalDateTime,
     overrides: ClassOverride[],
 ): {occurrence: ClassOverride | null; series: ClassOverride | null} {
-    const forClass = overrides.filter((override) => override.courseClass?.id === courseClassId)
     const week = weekKey(originalStartsAt)
     return {
         occurrence: newest(
-            forClass.filter(
+            overrides.filter(
                 (override) =>
+                    override.courseClass?.id === cls.id &&
                     isOccurrenceOverride(override) &&
                     weekKey(override.startsAtOverride as LocalDateTime) === week,
             ),
         ),
-        series: newest(forClass.filter((override) => !isOccurrenceOverride(override))),
+        series: newest(
+            overrides.filter(
+                (override) =>
+                    !isOccurrenceOverride(override) && isSameSeries(cls, override.courseClass),
+            ),
+        ),
     }
 }
 
@@ -81,10 +112,11 @@ export function findOverridesFor(
  */
 export function applyClassOverrides(
     base: CalendarEvent,
-    courseClassId: number,
+    cls: ClassSeriesRef,
     overrides: ClassOverride[],
 ): CalendarEvent {
-    const {occurrence, series} = findOverridesFor(courseClassId, base.startsAt, overrides)
+    const courseClassId = cls.id
+    const {occurrence, series} = findOverridesFor(cls, base.startsAt, overrides)
     const pick = <K extends keyof ClassOverride>(key: K) =>
         occurrence?.[key] ?? series?.[key] ?? null
 
